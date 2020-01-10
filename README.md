@@ -59,11 +59,11 @@ The following table lists the configurable parameters of the dgraph chart and th
 | ------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                     | Container registry name                                             | `docker.io`                                         |
 | `image.repository`                   | Container image name                                                | `dgraph/dgraph`                                     |
-| `image.tag`                          | Container image tag                                                 | `v1.0.13`                                           |
+| `image.tag`                          | Container image tag                                                 | `latest`                                            |
 | `image.pullPolicy`                   | Container pull policy                                               | `Always`                                            |
 | `zero.name`                          | Zero component name                                                 | `zero`                                              |
 | `zero.updateStrategy`                | Strategy for upgrading zero nodes                                   | `RollingUpdate`                                     |
-| `zero.monitor_label`                 | Monitor label for zero, used by prometheus.                         | `zero-dgraph-io`                                    |
+| `zero.monitorLabel`                  | Monitor label for zero, used by prometheus.                         | `zero-dgraph-io`                                    |
 | `zero.rollingUpdatePartition`        | Partition update strategy                                           | `nil`                                               |
 | `zero.podManagementPolicy`           | Pod management policy for zero nodes                                | `OrderedReady`                                      |
 | `zero.replicaCount`                  | Number of zero nodes                                                | `3`                                                 |
@@ -83,17 +83,17 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `zero.nodeSelector`                  | Node labels for zero pod assignment                                 | `{}`                                                |
 | `zero.tolerations`                   | Zero tolerations                                                    | `[]`                                                |
 | `zero.resources`                     | Zero node resources requests & limits                               | `{}`                                                |
-| `zero.livenessProbe`                 | Zero liveness probes                                                | `See values.yaml for defaults`                      |
-| `zero.readinessProbe`                | Zero readiness probes                                               | `See values.yaml for defaults`                      |
+| `zero.livenessProbe`                 | Zero liveness probes                                                | `See values.yaml for defaults`                     |
+| `zero.readinessProbe`                | Zero readiness probes                                               | `See values.yaml for defaults`                     |
 | `alpha.name`                         | Alpha component name                                                | `alpha`                                             |
 | `alpha.updateStrategy`               | Strategy for upgrading alpha nodes                                  | `RollingUpdate`                                     |
-| `alpha.monitor_label`                | Monitor label for alpha, used by prometheus.                        | `alpha-dgraph-io`                                   |
+| `alpha.monitorLabel`                 | Monitor label for alpha, used by prometheus.                        | `alpha-dgraph-io`                                   |
 | `alpha.rollingUpdatePartition`       | Partition update strategy                                           | `nil`                                               |
 | `alpha.podManagementPolicy`          | Pod management policy for alpha nodes                               | `OrderedReady`                                      |
 | `alpha.replicaCount`                 | Number of alpha nodes                                               | `3`                                                 |
 | `alpha.terminationGracePeriodSeconds`| Alpha server pod termination grace period                           | `60`                                                |
 | `alpha.antiAffinity`                 | Alpha anti-affinity policy                                          | `soft`                                              |
-| `alpha.podAntiAffinitytopologyKey`   | Anti affinity topology key for zero nodes                           | `kubernetes.io/hostname`                            |
+| `alpha.podAntiAffinitytopologyKey`   | Anti affinity topology key for zero nodes                           | `kubernetes.io/hostname`                         |
 | `alpha.nodeAffinity`                 | Alpha node affinity policy                                          | `{}`                                                |
 | `alpha.service.type`                 | Alpha node service type                                             | `ClusterIP`                                         |
 | `alpha.securityContext.enabled`      | Security context for alpha nodes enabled                            | `false`                                             |
@@ -106,16 +106,16 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.nodeSelector`                 | Node labels for alpha pod assignment                                | `{}`                                                |
 | `alpha.tolerations`                  | Alpha tolerations                                                   | `[]`                                                |
 | `alpha.resources`                    | Alpha node resources requests & limits                              | `{}`                                                |
-| `alpha.livenessProbe`                | Alpha liveness probes                                               | `See values.yaml for defaults`                      |
-| `alpha.readinessProbe`               | Alpha readiness probes                                              | `See values.yaml for defaults`                      |
+| `alpha.livenessProbe`                | Alpha liveness probes                                               | `See values.yaml for defaults`                     |
+| `alpha.readinessProbe`               | Alpha readiness probes                                              | `See values.yaml for defaults`                     |
 | `ratel.name`                         | Ratel component name                                                | `ratel`                                             |
 | `ratel.replicaCount`                 | Number of ratel nodes                                               | `1`                                                 |
 | `ratel.service.type`                 | Ratel service type                                                  | `ClusterIP`                                         |
 | `ratel.securityContext.enabled`      | Security context for ratel nodes enabled                            | `false`                                             |
 | `ratel.securityContext.fsGroup`      | Group id of the ratel container                                     | `1001`                                              |
 | `ratel.securityContext.runAsUser`    | User ID for the ratel container                                     | `1001`                                              |
-| `ratel.livenessProbe`                | Ratel liveness probes                                               | `See values.yaml for defaults`                      |
-| `ratel.readinessProbe`               | Ratel readiness probes                                              | `See values.yaml for defaults`                      |
+| `ratel.livenessProbe`                | Ratel liveness probes                                               | `See values.yaml for defaults`                     |
+| `ratel.readinessProbe`               | Ratel readiness probes                                              | `See values.yaml for defaults`                     |
 
 ## Monitoring
 
@@ -125,13 +125,13 @@ Follow the below mentioned steps to setup prometheus monitoring for your cluster
 
 * Install Prometheus operator:
 
-```sh
+```bash
 $ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.34/bundle.yaml
 ```
 
 * Ensure that the instance of `prometheus-operator` has started before continuing.
 
-```sh
+```bash
 $ kubectl get deployments prometheus-operator
 NAME                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 prometheus-operator   1         1         1            1           3m
@@ -139,7 +139,7 @@ prometheus-operator   1         1         1            1           3m
 
 * Apply prometheus manifest present [here](/contrib/config/monitoring/prometheus/prometheus.yaml).
 
-```sh
+```bash
 $ kubectl apply -f prometheus.yaml
 
 serviceaccount/prometheus-dgraph-io created
@@ -152,7 +152,7 @@ prometheus.monitoring.coreos.com/dgraph-io created
 
 To view prometheus UI locally run:
 
-```sh
+```bash
 $ kubectl port-forward prometheus-dgraph-io-0 9090:9090
 ```
 
@@ -165,7 +165,7 @@ with the required reciever configuration including the slack webhook credential 
 
 You can find more information about alertmanager configuration [here](https://prometheus.io/docs/alerting/configuration/).
 
-```sh
+```bash
 $ kubectl create secret generic alertmanager-alertmanager-dgraph-io --from-file=alertmanager.yaml=alertmanager-config.yaml
 
 $ kubectl get secrets
@@ -177,7 +177,7 @@ alertmanager-alertmanager-dgraph-io             Opaque               1      87m
 to use the default configured alert configuration. You can also add custom rules based on the metrics exposed by dgraph cluster similar to [alert-rules](/contrib/config/monitoring/prometheus/alert-rules.yaml)
 manifest. 
 
-```sh
+```bash
 $ kubectl apply -f alertmanager.yaml
 alertmanager.monitoring.coreos.com/alertmanager-dgraph-io created
 service/alertmanager-dgraph-io created

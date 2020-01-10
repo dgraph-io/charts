@@ -8,7 +8,7 @@ metadata:
     component: {{ .Values.alpha.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    monitor: {{ .Values.alpha.monitor_label }}
+    monitor: {{ .Values.alpha.monitorLabel }}
 spec:
   type: {{ .Values.alpha.service.type }}
   ports:
