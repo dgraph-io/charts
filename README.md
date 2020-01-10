@@ -1,21 +1,41 @@
 # Dgraph Helm Chart
 
+## Before you begin
+
+### Install kubectl
+
+The [Kubernetes](https://kubernetes.io/) command-line tool, `kubectl`, allows you to run commands against Kubernetes clusters. You can use kubectl to deploy applications, inspect and manage cluster resources, and view logs.
+
+To install `kubectl` follow the instructions [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+
+### Install Helm
+
+[Helm](https://helm.sh/) is a tool for managing Kubernetes charts. Charts are packages of pre-configured Kubernetes resources. 
+
+To install Helm follow the instructions [here](https://helm.sh/docs/intro/install/).
+
 ## Installing the Chart
+
+To add the Dgraph helm repository:
+
+```bash
+$ helm repo add dgraph https://charts.dgraph.io
+```
 
 To install the chart with the release name `my-release`:
 
 ```bash
-$ helm install --name my-release ./
+$ helm install my-release dgraph/dgraph
 ```
 The above command will  install the latest available dgraph docker image. In order to install the older versions:
 ```bash
-$ helm install --name my-release ./ --set image.tag=XXX
+$ helm install my-release dgraph/dgraph --set image.tag=XXX
 ```
 
 By default zero and alpha services are exposed only within the kubernetes cluster as kubernetes service type "ClusterIP". In order to expose the alpha service publicly you can use kubernetes service type "LoadBalancer":
 
 ```bash
-$ helm install --name my-release ./ --set alpha.service.type="LoadBalancer"
+$ helm install my-release dgraph/dgraph --set alpha.service.type="LoadBalancer"
 ```
 
 ## Deleting the Charts
