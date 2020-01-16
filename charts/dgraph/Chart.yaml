@@ -11,6 +11,7 @@ keywords:
 - nosql
 home: https://dgraph.io/
 sources:
+- https://charts.dgraph.io/
 - https://github.com/dgraph-io/dgraph
 maintainers:
 - name: dgraph
