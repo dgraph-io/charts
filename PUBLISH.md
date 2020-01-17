@@ -14,6 +14,9 @@ to verify that the chart is well-formed:
 
 ```bash
 $ helm lint charts/dgraph
+==> Linting charts/dgraph
+
+1 chart(s) linted, 0 chart(s) failed
 ```
 
 ### Create the Helm chart package
