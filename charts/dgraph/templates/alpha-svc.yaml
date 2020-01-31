@@ -18,6 +18,10 @@ spec:
   - port: 9080
     targetPort: 9080
     name: alpha-grpc
+  # We want all pods in the StatefulSet to have their addresses published for
+  # the sake of the other Dgraph alpha pods even before they're ready, since they
+  # have to be able to talk to each other in order to become ready.
+  publishNotReadyAddresses: true
   selector:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
