@@ -5,7 +5,7 @@
 Firstly, make sure you have [Helm](https://github.com/helm/helm/releases) and [Chart Releaser](https://github.com/helm/chart-releaser/releases) installed on the machine.
 
 The helm chart repository is available from [here](https://charts.dgraph.io/), which is hosted using
-`gh-pages` folder of the [charts repository](https://github.com/dgraph-io/charts).
+`gh-pages` branch of the [charts repository](https://github.com/dgraph-io/charts).
 
 ### Lint the chart
 
@@ -30,7 +30,7 @@ Successfully packaged chart and saved it to: /home/prashant/dgraph-code/charts/d
 
 ### Upload the package to GitHub
 
-Set the envionments variables below:
+Set the envionment variables below:
 
 ```bash
 $ export CR_OWNER="github-username"
