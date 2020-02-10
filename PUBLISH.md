@@ -30,7 +30,7 @@ Successfully packaged chart and saved it to: /home/prashant/dgraph-code/charts/d
 
 ### Upload the package to GitHub
 
-Set the envionment variables below:
+Set the environment variables to their appropriate values, as shown below:
 
 ```bash
 $ export CR_OWNER="github-username"
@@ -39,7 +39,9 @@ $ export CR_PACKAGE_PATH=".cr-release-packages"
 $ export CR_TOKEN="github-token"
 ```
 
-The `cr upload` command uploads the package as an asset to a new GitHub release. If you have above configurations are correct and the owner account has access to create releases, the command below should exit without any error:
+The `cr upload` command uploads the package as an asset to a new GitHub release.
+If you have above configurations are correct, and the owner account has access to create
+releases, the command below should exit without any error:
 
 ```bash
 $ cr upload
@@ -47,7 +49,8 @@ $ cr upload
 
 ### Create or Append the Helm chart repository index
 
-Before we create the index file, we will checkout to `gh-pages` branch and pull latest changes from remote GitHub repository to verify the creation of new tag.
+Before we create the index file, we will check out to the `gh-pages` branch and pull the latest
+changes from the remote GitHub repository to verify the creation of a new tag.
 
 ```bash
 $ git checkout gh-pages
@@ -60,15 +63,20 @@ From github.com:dgraph-io/charts
 Already up to date.
 ```
 
-The `helm repo index` command reads the current directory and generates an index file
-based on the charts found. It creates an `index.yaml` file for the chart repository.
+Generally, we would use the `helm repo index` command which reads the current directory and generates
+an index file based on the charts found and creates an `index.yaml` file for the chart repository.
+
+Here, we use `cr index` which would the equivalent task with Chart Releaser but would use the link
+of GitHub release asset instead of of the current directory.
+
+Before using `cr index`, we will need to set the environment variables to their appropriate values as shown below:
 
 ```bash
-export CR_OWNER="github-username"
-export CR_GIT_REPO="github-repository"
-export CR_CHARTS_REPO="chart-repository-url"
-export CR_INDEX_PATH="index.yaml"
-export CR_PACKAGE_PATH=".cr-release-packages"
+$ export CR_OWNER="github-username"
+$ export CR_GIT_REPO="github-repository"
+$ export CR_CHARTS_REPO="chart-repository-url"
+$ export CR_INDEX_PATH="index.yaml"
+$ export CR_PACKAGE_PATH=".cr-release-packages"
 ```
 
 ```bash
