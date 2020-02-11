@@ -199,3 +199,6 @@ $ kubectl apply -f alert-rules.yaml
 prometheusrule.monitoring.coreos.com/prometheus-rules-dgraph-io created
 ```
 
+## Publishing the Chart
+
+See the [instructions here to publish the chart](./PUBLISH.md).

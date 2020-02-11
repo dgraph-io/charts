@@ -117,7 +117,7 @@ entries:
     - https://charts.dgraph.io
     - https://github.com/dgraph-io/dgraph
     urls:
-    - https://github.com/prashant-shahi/charts/releases/download/dgraph-0.0.2/dgraph-0.0.2.tgz
+    - https://github.com/dgraph-io/charts/releases/download/dgraph-0.0.2/dgraph-0.0.2.tgz
     version: 0.0.2
 generated: "2020-01-17T22:33:36.573305+05:30"
 ```
