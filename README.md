@@ -4,13 +4,16 @@
 
 ### Install kubectl
 
-The [Kubernetes](https://kubernetes.io/) command-line tool, `kubectl`, allows you to run commands against Kubernetes clusters. You can use kubectl to deploy applications, inspect and manage cluster resources, and view logs.
+The [Kubernetes](https://kubernetes.io/) command-line tool, `kubectl`, allows you to
+run commands against Kubernetes clusters. You can use kubectl to deploy applications,
+inspect and manage cluster resources, and view logs.
 
 To install `kubectl` follow the instructions [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
 ### Install Helm
 
-[Helm](https://helm.sh/) is a tool for managing Kubernetes charts. Charts are packages of pre-configured Kubernetes resources. 
+[Helm](https://helm.sh/) is a tool for managing Kubernetes charts. Charts are packages
+of pre-configured Kubernetes resources.
 
 To install Helm follow the instructions [here](https://helm.sh/docs/intro/install/).
 
@@ -27,12 +30,17 @@ To install the chart with the release name `my-release`:
 ```bash
 $ helm install my-release dgraph/dgraph
 ```
-The above command will  install the latest available dgraph docker image. In order to install the older versions:
+
+The above command will  install the latest available dgraph docker image.
+In order to install the older versions:
+
 ```bash
 $ helm install my-release dgraph/dgraph --set image.tag=XXX
 ```
 
-By default zero and alpha services are exposed only within the kubernetes cluster as kubernetes service type "ClusterIP". In order to expose the alpha service publicly you can use kubernetes service type "LoadBalancer":
+By default zero and alpha services are exposed only within the kubernetes cluster
+as kubernetes service type "ClusterIP". In order to expose the alpha service
+publicly you can use kubernetes service type "LoadBalancer":
 
 ```bash
 $ helm install my-release dgraph/dgraph --set alpha.service.type="LoadBalancer"
@@ -45,6 +53,7 @@ Delete the Helm deployment as normal
 ```
 $ helm delete my-release
 ```
+
 Deletion of the StatefulSet doesn't cascade to deleting associated PVCs. To delete them:
 
 ```
@@ -83,8 +92,8 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `zero.nodeSelector`                  | Node labels for zero pod assignment                                 | `{}`                                                |
 | `zero.tolerations`                   | Zero tolerations                                                    | `[]`                                                |
 | `zero.resources`                     | Zero node resources requests & limits                               | `{}`                                                |
-| `zero.livenessProbe`                 | Zero liveness probes                                                | `See values.yaml for defaults`                     |
-| `zero.readinessProbe`                | Zero readiness probes                                               | `See values.yaml for defaults`                     |
+| `zero.livenessProbe`                 | Zero liveness probes                                                | `See values.yaml for defaults`                      |
+| `zero.readinessProbe`                | Zero readiness probes                                               | `See values.yaml for defaults`                      |
 | `alpha.name`                         | Alpha component name                                                | `alpha`                                             |
 | `alpha.updateStrategy`               | Strategy for upgrading alpha nodes                                  | `RollingUpdate`                                     |
 | `alpha.monitorLabel`                 | Monitor label for alpha, used by prometheus.                        | `alpha-dgraph-io`                                   |
@@ -93,7 +102,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.replicaCount`                 | Number of alpha nodes                                               | `3`                                                 |
 | `alpha.terminationGracePeriodSeconds`| Alpha server pod termination grace period                           | `60`                                                |
 | `alpha.antiAffinity`                 | Alpha anti-affinity policy                                          | `soft`                                              |
-| `alpha.podAntiAffinitytopologyKey`   | Anti affinity topology key for zero nodes                           | `kubernetes.io/hostname`                         |
+| `alpha.podAntiAffinitytopologyKey`   | Anti affinity topology key for zero nodes                           | `kubernetes.io/hostname`                            |
 | `alpha.nodeAffinity`                 | Alpha node affinity policy                                          | `{}`                                                |
 | `alpha.service.type`                 | Alpha node service type                                             | `ClusterIP`                                         |
 | `alpha.securityContext.enabled`      | Security context for alpha nodes enabled                            | `false`                                             |
@@ -106,20 +115,21 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.nodeSelector`                 | Node labels for alpha pod assignment                                | `{}`                                                |
 | `alpha.tolerations`                  | Alpha tolerations                                                   | `[]`                                                |
 | `alpha.resources`                    | Alpha node resources requests & limits                              | `{}`                                                |
-| `alpha.livenessProbe`                | Alpha liveness probes                                               | `See values.yaml for defaults`                     |
-| `alpha.readinessProbe`               | Alpha readiness probes                                              | `See values.yaml for defaults`                     |
+| `alpha.livenessProbe`                | Alpha liveness probes                                               | `See values.yaml for defaults`                      |
+| `alpha.readinessProbe`               | Alpha readiness probes                                              | `See values.yaml for defaults`                      |
 | `ratel.name`                         | Ratel component name                                                | `ratel`                                             |
 | `ratel.replicaCount`                 | Number of ratel nodes                                               | `1`                                                 |
 | `ratel.service.type`                 | Ratel service type                                                  | `ClusterIP`                                         |
 | `ratel.securityContext.enabled`      | Security context for ratel nodes enabled                            | `false`                                             |
 | `ratel.securityContext.fsGroup`      | Group id of the ratel container                                     | `1001`                                              |
 | `ratel.securityContext.runAsUser`    | User ID for the ratel container                                     | `1001`                                              |
-| `ratel.livenessProbe`                | Ratel liveness probes                                               | `See values.yaml for defaults`                     |
-| `ratel.readinessProbe`               | Ratel readiness probes                                              | `See values.yaml for defaults`                     |
+| `ratel.livenessProbe`                | Ratel liveness probes                                               | `See values.yaml for defaults`                      |
+| `ratel.readinessProbe`               | Ratel readiness probes                                              | `See values.yaml for defaults`                      |
 
 ## Monitoring
 
-Dgraph exposes prometheus metrics to monitor the state of various components involved in the cluster, this includes dgraph alpha and zero.
+Dgraph exposes prometheus metrics to monitor the state of various components involved in
+the cluster, this includes dgraph alpha and zero.
 
 Follow the below mentioned steps to setup prometheus monitoring for your cluster:
 
@@ -137,7 +147,7 @@ NAME                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 prometheus-operator   1         1         1            1           3m
 ```
 
-* Apply prometheus manifest present [here](/contrib/config/monitoring/prometheus/prometheus.yaml).
+* Apply prometheus manifest present [here](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/prometheus.yaml).
 
 ```bash
 $ kubectl apply -f prometheus.yaml
@@ -160,7 +170,8 @@ The UI is accessible at port 9090. Open http://localhost:9090 in your browser to
 
 To register alerts from dgraph cluster with your prometheus deployment follow the steps below:
 
-* Create a kubernetes secret containing alertmanager configuration. Edit the configuration file present [here](/contrib/config/monitoring/prometheus/alertmanager-config.yaml)
+* Create a kubernetes secret containing alertmanager configuration. Edit the configuration file
+present [here](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/alertmanager-config.yaml)
 with the required reciever configuration including the slack webhook credential and create the secret.
 
 You can find more information about alertmanager configuration [here](https://prometheus.io/docs/alerting/configuration/).
@@ -173,9 +184,11 @@ NAME                                            TYPE                 DATA   AGE
 alertmanager-alertmanager-dgraph-io             Opaque               1      87m
 ```
 
-* Apply the [alertmanager](/contrib/config/monitoring/prometheus/alertmanager.yaml) along with [alert-rules](/contrib/config/monitoring/prometheus/alert-rules.yaml) manifest
-to use the default configured alert configuration. You can also add custom rules based on the metrics exposed by dgraph cluster similar to [alert-rules](/contrib/config/monitoring/prometheus/alert-rules.yaml)
-manifest. 
+* Apply the [alertmanager](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/alertmanager.yaml)
+along with [alert-rules](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/alert-rules.yaml)
+manifest to use the default configured alert configuration. You can also add custom rules based on
+the metrics exposed by dgraph cluster similar to [alert-rules](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/alert-rules.yaml)
+manifest.
 
 ```bash
 $ kubectl apply -f alertmanager.yaml
@@ -185,3 +198,7 @@ service/alertmanager-dgraph-io created
 $ kubectl apply -f alert-rules.yaml
 prometheusrule.monitoring.coreos.com/prometheus-rules-dgraph-io created
 ```
+
+## Publishing the Chart
+
+See the [instructions here to publish the chart](./PUBLISH.md).
