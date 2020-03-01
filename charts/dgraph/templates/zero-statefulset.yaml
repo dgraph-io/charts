@@ -28,7 +28,13 @@ spec:
       component: {{ .Values.zero.name }}
   template:
     metadata:
-      name: "{{ template "dgraph.zero.fullname" . }}"
+      name: {{ template "dgraph.zero.fullname" . }}
+      {{- if .Values.zero.metrics.enabled }}
+      annotations:
+        prometheus.io/path: /debug/prometheus_metrics
+        prometheus.io/port: "6080"
+        prometheus.io/scrape: "true"
+      {{- end }}
       labels:
         app: {{ template "dgraph.name" . }}
         chart: {{ template "dgraph.chart" . }}
@@ -59,7 +65,7 @@ spec:
                   operator: In
                   values:
                   - {{ .Values.zero.name }}
-              topologyKey: {{ .Values.zero.podAntiAffinitytopologyKey }}        
+              topologyKey: {{ .Values.zero.podAntiAffinitytopologyKey }}
       {{- end }}
       {{- with .Values.zero.nodeAffinity }}
         nodeAffinity:
@@ -80,8 +86,8 @@ spec:
 {{ toYaml .Values.zero.tolerations | indent 8 }}
       {{- end }}
       containers:
-      - name: "{{ template "dgraph.zero.fullname" . }}"
-        image: "{{ template "dgraph.image" . }}"
+      - name: {{ template "dgraph.zero.fullname" . }}
+        image: {{ template "dgraph.image" . }}
         ports:
         - containerPort: 5080
           name: zero-grpc
@@ -123,7 +129,7 @@ spec:
         readinessProbe:
           httpGet:
             port: {{ .Values.zero.livenessProbe.port }}
-            path: {{ .Values.zero.livenessProbe.path }}          
+            path: {{ .Values.zero.livenessProbe.path }}
           initialDelaySeconds: {{ .Values.zero.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.zero.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.zero.readinessProbe.timeoutSeconds }}
