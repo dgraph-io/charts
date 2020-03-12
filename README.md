@@ -41,6 +41,10 @@ To add the Dgraph helm repository:
 $ helm repo add dgraph https://charts.dgraph.io
 ```
 
+### Usage
+
+See the [README of Dgraph helm chart](./charts/dgraph/README.md).
+
 ### Publishing the Chart
 
 See the [instructions here to publish the chart](./PUBLISH.md).
