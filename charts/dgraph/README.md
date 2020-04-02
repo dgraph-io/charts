@@ -61,8 +61,8 @@ The following table lists the configurable parameters of the dgraph chart and th
 | ------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                     | Container registry name                                             | `docker.io`                                         |
 | `image.repository`                   | Container image name                                                | `dgraph/dgraph`                                     |
-| `image.tag`                          | Container image tag                                                 | `v1.2.0`                                            |
-| `image.pullPolicy`                   | Container pull policy                                               | `Always`                                            |
+| `image.tag`                          | Container image tag                                                 | `v1.2.2`                                            |
+| `image.pullPolicy`                   | Container pull policy                                               | `IfNotPresent`                                      |
 | `zero.name`                          | Zero component name                                                 | `zero`                                              |
 | `zero.updateStrategy`                | Strategy for upgrading zero nodes                                   | `RollingUpdate`                                     |
 | `zero.monitorLabel`                  | Monitor label for zero, used by prometheus.                         | `zero-dgraph-io`                                    |
