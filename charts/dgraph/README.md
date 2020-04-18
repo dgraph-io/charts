@@ -51,7 +51,7 @@ Deletion of the StatefulSet doesn't cascade to deleting associated PVCs. To dele
 
 ```
 $ kubectl delete pvc -l release=my-release,chart=dgraph
-``````
+```
 
 ## Configuration
 
