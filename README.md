@@ -1,6 +1,22 @@
 # Dgraph Helm Chart
 
+Dgraph helm chart ready to be deployed on Kubernetes using [Kubernetes Helm](https://github.com/helm/helm).
+
+## TL;DR
+
+```bash
+$ helm repo add dgraph https://charts.dgraph.io
+$ helm install my-release dgraph/dgraph
+```
+
 ## Before you begin
+
+### Setup a Kubernetes Cluster
+
+The quickest way to setup a Kubernetes cluster is with [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/),
+[AWS Elastic Kubernetes Service](https://aws.amazon.com/eks/) or [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service/)
+using their respective quick-start guides. For setting up Kubernetes on other cloud platforms or
+bare-metal servers refer to the Kubernetes [getting started guide](http://kubernetes.io/docs/getting-started-guides/).
 
 ### Install kubectl
 
@@ -17,7 +33,7 @@ of pre-configured Kubernetes resources.
 
 To install Helm follow the instructions [here](https://helm.sh/docs/intro/install/).
 
-## Installing the Chart
+### Add Repo
 
 To add the Dgraph helm repository:
 
@@ -25,182 +41,23 @@ To add the Dgraph helm repository:
 $ helm repo add dgraph https://charts.dgraph.io
 ```
 
-To install the chart with the release name `my-release`:
+### Usage
 
-```bash
-$ helm install my-release dgraph/dgraph
-```
+See the [README of Dgraph helm chart](./charts/dgraph/README.md).
 
-The above command will  install the latest available dgraph docker image.
-In order to install the older versions:
-
-```bash
-$ helm install my-release dgraph/dgraph --set image.tag=XXX
-```
-
-By default zero and alpha services are exposed only within the kubernetes cluster
-as kubernetes service type "ClusterIP". In order to expose the alpha service
-publicly you can use kubernetes service type "LoadBalancer":
-
-```bash
-$ helm install my-release dgraph/dgraph --set alpha.service.type="LoadBalancer"
-```
-
-## Deleting the Charts
-
-Delete the Helm deployment as normal
-
-```
-$ helm delete my-release
-```
-
-Deletion of the StatefulSet doesn't cascade to deleting associated PVCs. To delete them:
-
-```
-$ kubectl delete pvc -l release=my-release,chart=dgraph
-```
-
-## Configuration
-
-The following table lists the configurable parameters of the dgraph chart and their default values.
-
-|              Parameter               |                             Description                             |                       Default                       |
-| ------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------- |
-| `nameOverride`                       | Deployment name override (will append the release name)             | `nil`                                               |
-| `fullnameOverride`                   | Deployment full name override (the release name is ignored)         | `nil`                                               |
-| `image.registry`                     | Container registry name                                             | `docker.io`                                         |
-| `image.repository`                   | Container image name                                                | `dgraph/dgraph`                                     |
-| `image.tag`                          | Container image tag                                                 | `latest`                                            |
-| `image.pullPolicy`                   | Container pull policy                                               | `Always`                                            |
-| `zero.name`                          | Zero component name                                                 | `zero`                                              |
-| `zero.updateStrategy`                | Strategy for upgrading zero nodes                                   | `RollingUpdate`                                     |
-| `zero.monitorLabel`                  | Monitor label for zero, used by prometheus.                         | `zero-dgraph-io`                                    |
-| `zero.rollingUpdatePartition`        | Partition update strategy                                           | `nil`                                               |
-| `zero.podManagementPolicy`           | Pod management policy for zero nodes                                | `OrderedReady`                                      |
-| `zero.replicaCount`                  | Number of zero nodes                                                | `3`                                                 |
-| `zero.shardReplicaCount`             | Max number of replicas per data shard                               | `5`                                                 |
-| `zero.terminationGracePeriodSeconds` | Zero server pod termination grace period                            | `60`                                                |
-| `zero.antiAffinity`                  | Zero anti-affinity policy                                           | `soft`                                              |
-| `zero.podAntiAffinitytopologyKey`    | Anti affinity topology key for zero nodes                           | `kubernetes.io/hostname`                            |
-| `zero.nodeAffinity`                  | Zero node affinity policy                                           | `{}`                                                |
-| `zero.service.type`                  | Zero node service type                                              | `ClusterIP`                                         |
-| `zero.securityContext.enabled`       | Security context for zero nodes enabled                             | `false`                                             |
-| `zero.securityContext.fsGroup`       | Group id of the zero container                                      | `1001`                                              |
-| `zero.securityContext.runAsUser`     | User ID for the zero container                                      | `1001`                                              |
-| `zero.persistence.enabled`           | Enable persistence for zero using PVC                               | `true`                                              |
-| `zero.persistence.storageClass`      | PVC Storage Class for zero volume                                   | `nil`                                               |
-| `zero.persistence.accessModes`       | PVC Access Mode for zero volume                                     | `ReadWriteOnce`                                     |
-| `zero.persistence.size`              | PVC Storage Request for zero volume                                 | `8Gi`                                               |
-| `zero.nodeSelector`                  | Node labels for zero pod assignment                                 | `{}`                                                |
-| `zero.tolerations`                   | Zero tolerations                                                    | `[]`                                                |
-| `zero.resources`                     | Zero node resources requests & limits                               | `{}`                                                |
-| `zero.livenessProbe`                 | Zero liveness probes                                                | `See values.yaml for defaults`                      |
-| `zero.readinessProbe`                | Zero readiness probes                                               | `See values.yaml for defaults`                      |
-| `alpha.name`                         | Alpha component name                                                | `alpha`                                             |
-| `alpha.updateStrategy`               | Strategy for upgrading alpha nodes                                  | `RollingUpdate`                                     |
-| `alpha.monitorLabel`                 | Monitor label for alpha, used by prometheus.                        | `alpha-dgraph-io`                                   |
-| `alpha.rollingUpdatePartition`       | Partition update strategy                                           | `nil`                                               |
-| `alpha.podManagementPolicy`          | Pod management policy for alpha nodes                               | `OrderedReady`                                      |
-| `alpha.replicaCount`                 | Number of alpha nodes                                               | `3`                                                 |
-| `alpha.terminationGracePeriodSeconds`| Alpha server pod termination grace period                           | `60`                                                |
-| `alpha.antiAffinity`                 | Alpha anti-affinity policy                                          | `soft`                                              |
-| `alpha.podAntiAffinitytopologyKey`   | Anti affinity topology key for zero nodes                           | `kubernetes.io/hostname`                            |
-| `alpha.nodeAffinity`                 | Alpha node affinity policy                                          | `{}`                                                |
-| `alpha.service.type`                 | Alpha node service type                                             | `ClusterIP`                                         |
-| `alpha.securityContext.enabled`      | Security context for alpha nodes enabled                            | `false`                                             |
-| `alpha.securityContext.fsGroup`      | Group id of the alpha container                                     | `1001`                                              |
-| `alpha.securityContext.runAsUser`    | User ID for the alpha container                                     | `1001`                                              |
-| `alpha.persistence.enabled`          | Enable persistence for alpha using PVC                              | `true`                                              |
-| `alpha.persistence.storageClass`     | PVC Storage Class for alpha volume                                  | `nil`                                               |
-| `alpha.persistence.accessModes`      | PVC Access Mode for alpha volume                                    | `ReadWriteOnce`                                     |
-| `alpha.persistence.size`             | PVC Storage Request for alpha volume                                | `8Gi`                                               |
-| `alpha.nodeSelector`                 | Node labels for alpha pod assignment                                | `{}`                                                |
-| `alpha.tolerations`                  | Alpha tolerations                                                   | `[]`                                                |
-| `alpha.resources`                    | Alpha node resources requests & limits                              | `{}`                                                |
-| `alpha.livenessProbe`                | Alpha liveness probes                                               | `See values.yaml for defaults`                      |
-| `alpha.readinessProbe`               | Alpha readiness probes                                              | `See values.yaml for defaults`                      |
-| `ratel.name`                         | Ratel component name                                                | `ratel`                                             |
-| `ratel.replicaCount`                 | Number of ratel nodes                                               | `1`                                                 |
-| `ratel.service.type`                 | Ratel service type                                                  | `ClusterIP`                                         |
-| `ratel.securityContext.enabled`      | Security context for ratel nodes enabled                            | `false`                                             |
-| `ratel.securityContext.fsGroup`      | Group id of the ratel container                                     | `1001`                                              |
-| `ratel.securityContext.runAsUser`    | User ID for the ratel container                                     | `1001`                                              |
-| `ratel.livenessProbe`                | Ratel liveness probes                                               | `See values.yaml for defaults`                      |
-| `ratel.readinessProbe`               | Ratel readiness probes                                              | `See values.yaml for defaults`                      |
-
-## Monitoring
-
-Dgraph exposes prometheus metrics to monitor the state of various components involved in
-the cluster, this includes dgraph alpha and zero.
-
-Follow the below mentioned steps to setup prometheus monitoring for your cluster:
-
-* Install Prometheus operator:
-
-```bash
-$ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.34/bundle.yaml
-```
-
-* Ensure that the instance of `prometheus-operator` has started before continuing.
-
-```bash
-$ kubectl get deployments prometheus-operator
-NAME                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-prometheus-operator   1         1         1            1           3m
-```
-
-* Apply prometheus manifest present [here](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/prometheus.yaml).
-
-```bash
-$ kubectl apply -f prometheus.yaml
-
-serviceaccount/prometheus-dgraph-io created
-clusterrole.rbac.authorization.k8s.io/prometheus-dgraph-io created
-clusterrolebinding.rbac.authorization.k8s.io/prometheus-dgraph-io created
-servicemonitor.monitoring.coreos.com/alpha.dgraph-io created
-servicemonitor.monitoring.coreos.com/zero-dgraph-io created
-prometheus.monitoring.coreos.com/dgraph-io created
-```
-
-To view prometheus UI locally run:
-
-```bash
-$ kubectl port-forward prometheus-dgraph-io-0 9090:9090
-```
-
-The UI is accessible at port 9090. Open http://localhost:9090 in your browser to play around.
-
-To register alerts from dgraph cluster with your prometheus deployment follow the steps below:
-
-* Create a kubernetes secret containing alertmanager configuration. Edit the configuration file
-present [here](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/alertmanager-config.yaml)
-with the required reciever configuration including the slack webhook credential and create the secret.
-
-You can find more information about alertmanager configuration [here](https://prometheus.io/docs/alerting/configuration/).
-
-```bash
-$ kubectl create secret generic alertmanager-alertmanager-dgraph-io --from-file=alertmanager.yaml=alertmanager-config.yaml
-
-$ kubectl get secrets
-NAME                                            TYPE                 DATA   AGE
-alertmanager-alertmanager-dgraph-io             Opaque               1      87m
-```
-
-* Apply the [alertmanager](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/alertmanager.yaml)
-along with [alert-rules](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/alert-rules.yaml)
-manifest to use the default configured alert configuration. You can also add custom rules based on
-the metrics exposed by dgraph cluster similar to [alert-rules](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/alert-rules.yaml)
-manifest.
-
-```bash
-$ kubectl apply -f alertmanager.yaml
-alertmanager.monitoring.coreos.com/alertmanager-dgraph-io created
-service/alertmanager-dgraph-io created
-
-$ kubectl apply -f alert-rules.yaml
-prometheusrule.monitoring.coreos.com/prometheus-rules-dgraph-io created
-```
-
-## Publishing the Chart
+### Publishing the Chart
 
 See the [instructions here to publish the chart](./PUBLISH.md).
+
+# License
+
+Copyright 2016-2020 Dgraph Labs, Inc.
+
+Source code in this repository is variously licensed under the Apache Public License 2.0 (APL)
+and the Dgraph Community License (DCL). A copy of each license can be found in the
+[licenses](https://github.com/dgraph-io/dgraph/tree/master/licenses) directory.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: "{{ template "dgraph.alpha.fullname" . }}"
+  name: {{ template "dgraph.alpha.fullname" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
@@ -28,7 +28,13 @@ spec:
       component: {{ .Values.alpha.name }}
   template:
     metadata:
-      name: "{{ template "dgraph.alpha.fullname" . }}"
+      name: {{ template "dgraph.alpha.fullname" . }}
+      {{- if .Values.alpha.metrics.enabled }}
+      annotations:
+        prometheus.io/path: /debug/prometheus_metrics
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
+      {{- end }}
       labels:
         app: {{ template "dgraph.name" . }}
         chart: {{ template "dgraph.chart" . }}
@@ -41,7 +47,7 @@ spec:
       {{- if eq .Values.alpha.antiAffinity "hard" }}
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            labelSelector:
+          - labelSelector:
               matchExpressions:
               - key: component
                 operator: In
@@ -80,8 +86,8 @@ spec:
 {{ toYaml .Values.alpha.tolerations | indent 8 }}
       {{- end }}
       containers:
-      - name: "{{ template "dgraph.alpha.fullname" . }}"
-        image: "{{ template "dgraph.image" . }}"
+      - name: {{ template "dgraph.alpha.fullname" . }}
+        image: {{ template "dgraph.image" . }}
         ports:
         - containerPort: 7080
           name: alpha-grpc-int
@@ -118,7 +124,7 @@ spec:
         readinessProbe:
           httpGet:
             port: {{ .Values.alpha.livenessProbe.port }}
-            path: {{ .Values.alpha.livenessProbe.path }}          
+            path: {{ .Values.alpha.livenessProbe.path }}
           initialDelaySeconds: {{ .Values.alpha.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.alpha.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.alpha.readinessProbe.timeoutSeconds }}
