@@ -63,6 +63,8 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `image.repository`                   | Container image name                                                | `dgraph/dgraph`                                     |
 | `image.tag`                          | Container image tag                                                 | `v1.2.2`                                            |
 | `image.pullPolicy`                   | Container pull policy                                               | `IfNotPresent`                                      |
+| `nameOverride`                       | Deployment name override (will append the release name)             | `nil`                                               |
+| `fullnameOverride`                   | Deployment full name override (the release name is ignored)         | `nil`                                               |
 | `zero.name`                          | Zero component name                                                 | `zero`                                              |
 | `zero.updateStrategy`                | Strategy for upgrading zero nodes                                   | `RollingUpdate`                                     |
 | `zero.monitorLabel`                  | Monitor label for zero, used by prometheus.                         | `zero-dgraph-io`                                    |
