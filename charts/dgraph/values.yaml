@@ -244,6 +244,7 @@ alpha:
     successThreshold: 1
 
 ratel:
+  enabled: true
   name: ratel
   ## Number of dgraph nodes
   ##

@@ -1,3 +1,4 @@
+{{- if .Values.ratel.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -63,3 +64,4 @@ spec:
         {{- end }}
         resources:
 {{ toYaml .Values.ratel.resources | indent 10 }}
+{{- end }}
