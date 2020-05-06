@@ -160,6 +160,10 @@ alpha:
   ##
   replicaCount: 3
 
+  ## Specify whitelisted IP addresses and ranges for hosts from which admin operations can be initiated
+  ##
+  whitelist:
+
   ## zero server pod termination grace period
   ##
   terminationGracePeriodSeconds: 600
