@@ -101,7 +101,7 @@ zero:
 
   ## Node labels and tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
   ##
   nodeSelector: {}
   tolerations: []
@@ -176,6 +176,11 @@ alpha:
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
+  # This will environment variables.
+  envvars:
+    # AWS_ACCESS_KEY_ID: XXXXXXXXXXXXXXXXXXXX
+    # AWS_SECRET_ACCESS_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
   ##
@@ -205,7 +210,7 @@ alpha:
 
   ## Node labels and tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
   ##
   nodeSelector: {}
   tolerations: []

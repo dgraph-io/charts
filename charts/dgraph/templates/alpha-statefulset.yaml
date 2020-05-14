@@ -97,6 +97,10 @@ spec:
           name: alpha-grpc
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         env:
+        {{- range $key, $value := .Values.alpha.envvars }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+        {{- end }}
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:
