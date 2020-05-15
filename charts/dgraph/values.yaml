@@ -178,8 +178,10 @@ alpha:
 
   # Extra environment variables which will be appendend to the env: definition for the container.
   extraEnvs:
-    # AWS_ACCESS_KEY_ID: XXXXXXXXXXXXXXXXXXXX
-    # AWS_SECRET_ACCESS_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    # - name: AWS_ACCESS_KEY_ID
+    #   value: "XXXXXXXXXXXXXXXXXXXX"
+    # - name: AWS_SECRET_ACCESS_KEY
+    #   value: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
