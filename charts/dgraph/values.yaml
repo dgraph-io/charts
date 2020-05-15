@@ -176,8 +176,8 @@ alpha:
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
-  # This will environment variables.
-  envvars:
+  # Extra environment variables which will be appendend to the env: definition for the container.
+  extraEnvs:
     # AWS_ACCESS_KEY_ID: XXXXXXXXXXXXXXXXXXXX
     # AWS_SECRET_ACCESS_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
