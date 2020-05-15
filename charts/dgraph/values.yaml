@@ -259,6 +259,9 @@ ratel:
   ##
   replicaCount: 1
 
+  # Extra environment variables which will be appendend to the env: definition for the container.
+  extraEnvs: []
+
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use ClusterIP or LoadBalancer
   ##
