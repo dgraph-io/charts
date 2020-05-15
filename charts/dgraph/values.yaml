@@ -73,6 +73,9 @@ zero:
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
+  # Extra environment variables which will be appendend to the env: definition for the container.
+  extraEnvs: []
+
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
   ##
