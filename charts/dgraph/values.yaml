@@ -182,6 +182,12 @@ alpha:
   service:
     type: ClusterIP
 
+  ## Kubernetes ingress configuration
+  ## This requires an ingress controller to be installed into your cluster
+  ingress:
+    enabled: false
+    # hostname: alpha.mycompany.com
+
   ## dgraph Pod Security Context
   securityContext:
     enabled: false
@@ -254,6 +260,12 @@ ratel:
   ##
   service:
     type: ClusterIP
+
+  ## Kubernetes ingress configuration
+  ## This requires an ingress controller to be installed into your cluster
+  ingress:
+    enabled: false
+    # hostname: ratel.mycompany.com
 
   ## dgraph Pod Security Context
   securityContext:
