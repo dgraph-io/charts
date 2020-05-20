@@ -73,6 +73,9 @@ zero:
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
+  # Extra environment variables which will be appended to the env: definition for the container.
+  extraEnvs: []
+
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
   ##
@@ -101,7 +104,7 @@ zero:
 
   ## Node labels and tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
   ##
   nodeSelector: {}
   tolerations: []
@@ -176,6 +179,13 @@ alpha:
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
+  # Extra environment variables which will be appended to the env: definition for the container.
+  extraEnvs: []
+    # - name: AWS_ACCESS_KEY_ID
+    #   value: "XXXXXXXXXXXXXXXXXXXX"
+    # - name: AWS_SECRET_ACCESS_KEY
+    #   value: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
   ##
@@ -205,7 +215,7 @@ alpha:
 
   ## Node labels and tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
   ##
   nodeSelector: {}
   tolerations: []
@@ -248,6 +258,9 @@ ratel:
   ## Number of dgraph nodes
   ##
   replicaCount: 1
+
+  # Extra environment variables which will be appended to the env: definition for the container.
+  extraEnvs: []
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use ClusterIP or LoadBalancer

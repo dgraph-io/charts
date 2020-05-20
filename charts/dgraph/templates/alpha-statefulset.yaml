@@ -96,11 +96,14 @@ spec:
         - containerPort: 9080
           name: alpha-grpc
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-        env:
+        env:   
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        {{- with .Values.alpha.extraEnvs }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         command:
          - bash
          - "-c"
