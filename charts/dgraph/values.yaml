@@ -82,6 +82,9 @@ zero:
   service:
     type: ClusterIP
 
+    # Set custum service annotations
+    annotations: {}
+
   ## dgraph Pod Security Context
   securityContext:
     enabled: false
@@ -192,6 +195,9 @@ alpha:
   service:
     type: ClusterIP
 
+    # Set custum service annotations
+    annotations: {}
+
   ## dgraph Pod Security Context
   securityContext:
     enabled: false
@@ -254,6 +260,8 @@ alpha:
     successThreshold: 1
 
 ratel:
+  enabled: true
+
   name: ratel
   ## Number of dgraph nodes
   ##
@@ -267,6 +275,9 @@ ratel:
   ##
   service:
     type: ClusterIP
+
+    # Set custum service annotations
+    annotations: {}
 
   ## dgraph Pod Security Context
   securityContext:

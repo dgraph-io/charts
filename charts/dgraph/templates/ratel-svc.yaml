@@ -1,3 +1,4 @@
+{{- if .Values.ratel.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,8 +9,18 @@ metadata:
     component: {{ .Values.ratel.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  {{- with .Values.ratel.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.ratel.service.type }}
+  {{- if .Values.ratel.service.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.ratel.service.loadBalancerIP }}"
+  {{- end }}
+  {{- if .Values.ratel.service.externalTrafficPolicy }}
+  externalTrafficPolicy: "{{ .Values.ratel.service.externalTrafficPolicy }}"
+  {{- end }}
   ports:
   - port: 8000
     targetPort: 8000
@@ -19,3 +30,7 @@ spec:
     chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.ratel.name }}
     release: {{ .Release.Name }}
+  {{- with .Values.ratel.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+{{- end }}

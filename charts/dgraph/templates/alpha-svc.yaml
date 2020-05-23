@@ -9,8 +9,18 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     monitor: {{ .Values.alpha.monitorLabel }}
+  {{- with .Values.alpha.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.alpha.service.type }}
+  {{- if .Values.alpha.service.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.alpha.service.loadBalancerIP }}"
+  {{- end }}
+  {{- if .Values.alpha.service.externalTrafficPolicy }}
+  externalTrafficPolicy: "{{ .Values.alpha.service.externalTrafficPolicy }}"
+  {{- end }}
   ports:
   - port: 8080
     targetPort: 8080
@@ -27,3 +37,7 @@ spec:
     chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.alpha.name }}
     release: {{ .Release.Name }}
+  {{- with .Values.alpha.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

@@ -9,8 +9,18 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     monitor: {{ .Values.zero.monitorLabel }}
+  {{- with .Values.zero.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.zero.service.type }}
+  {{- if .Values.zero.service.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.zero.service.loadBalancerIP }}"
+  {{- end }}
+  {{- if .Values.zero.service.externalTrafficPolicy }}
+  externalTrafficPolicy: "{{ .Values.zero.service.externalTrafficPolicy }}"
+  {{- end }}
   ports:
   - port: 5080
     targetPort: 5080
@@ -27,3 +37,7 @@ spec:
     chart: {{ template "dgraph.chart" . }}
     release: {{ .Release.Name }}
     component: {{ .Values.zero.name }}
+  {{- with .Values.zero.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
