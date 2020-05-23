@@ -30,7 +30,8 @@ spec:
     chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.ratel.name }}
     release: {{ .Release.Name }}
-  {{- with .Values.ratel.service.loadBalancerSourceRanges }}
+  {{- with .Values.zero.service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
     {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
