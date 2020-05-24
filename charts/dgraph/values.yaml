@@ -333,3 +333,12 @@ ratel:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
+
+
+global:
+  # This ingress override existing ingress configurations for alpha, ratel, zero
+  ingress:
+    enabled: false
+    annotations: {}
+    tls: {}
+    rules: {}

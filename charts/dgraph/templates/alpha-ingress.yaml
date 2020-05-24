@@ -1,4 +1,4 @@
-{{- if .Values.alpha.ingress.enabled -}}
+{{- if and (eq .Values.alpha.ingress.enabled true) (eq .Values.global.ingress.enabled false) -}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -28,7 +28,15 @@ spec:
     - host: {{ .Values.alpha.ingress.hostname }}
       http:
         paths:
+          {{- if index $.Values.alpha.ingress "annotations" }}
+          {{- if eq (index $.Values.alpha.ingress.annotations "kubernetes.io/ingress.class" | default "") "gce" "alb" "nsx" }}
+          - path: /*
+          {{- else }}{{/* Has annotations but ingress class is not "gce" nor "alb" */}}
           - path: /
+          {{- end }}
+          {{- else}}{{/* Has no annotations */}}
+          - path: /
+          {{- end }}
             backend:
               serviceName: {{ template "dgraph.alpha.fullname" . }}
               servicePort: 8080
