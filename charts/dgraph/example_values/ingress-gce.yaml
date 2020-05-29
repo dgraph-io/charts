@@ -1,0 +1,21 @@
+# GKE Default Ingress
+# * https://cloud.google.com/kubernetes-engine/docs/concepts/ingress
+alpha:
+  ingress:
+    enabled: true
+    hostname: alpha.example.com
+    annotations:
+      kubernetes.io/ingress.class: gce
+  # NodePort or LoadBalancer required for GCE ingress
+  service:
+    type: NodePort
+
+ratel:
+  ingress:
+    enabled: true
+    hostname: ratel.example.com
+    annotations:
+      kubernetes.io/ingress.class: gce
+  # NodePort or LoadBalancer required for GCE ingress
+  service:
+    type: NodePort
