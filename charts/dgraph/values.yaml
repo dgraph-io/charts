@@ -182,26 +182,13 @@ alpha:
   service:
     type: ClusterIP
 
-  ## Kubernetes ingress configuration
-  ## This requires an ingress controller to be installed into your cluster
+  ## alpha ingress respirce configuration
+  ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
     enabled: false
-    # hostname: alpha.mycompany.com
-    #
-    # Example Annotation for ingress-nginx
-    # annotations:
-    #   kubernetes.io/ingress.class: nginx
-    #
-    # Example Annotations for aws-alb-ingress-controller
-    # annotations:
-    #   kubernetes.io/ingress.class: alb
-    #   # target-type: ip = ClusterIP, instance = NodePort
-    #   alb.ingress.kubernetes.io/target-type: ip
-    #   # scheme: 'internet-facing' or 'internal'
-    #   alb.ingress.kubernetes.io/scheme: internet-facing
-    #   alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:012345678901:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    #   alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
-    #   alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    # hostname: ""
+    # annoations: {}
+    # tls: {}
 
   ## dgraph Pod Security Context
   securityContext:
@@ -276,26 +263,13 @@ ratel:
   service:
     type: ClusterIP
 
-  ## Kubernetes ingress configuration
-  ## This requires an ingress controller to be installed into your cluster
+  ## ratel ingress respirce configuration
+  ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
     enabled: false
-    # hostname: ratel.mycompany.com
-    #
-    # Example Annotation for ingress-nginx
-    # annotations:
-    #   kubernetes.io/ingress.class: nginx
-    #
-    # Example Annotations for aws-alb-ingress-controller
-    # annotations:
-    #   kubernetes.io/ingress.class: alb
-    #   # target-type: ip = ClusterIP, instance = NodePort
-    #   alb.ingress.kubernetes.io/target-type: ip
-    #   # scheme: 'internet-facing' or 'internal'
-    #   alb.ingress.kubernetes.io/scheme: internet-facing
-    #   alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:012345678901:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    #   alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
-    #   alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    # hostname: ""
+    # annoations: {}
+    # tls: {}
 
   ## dgraph Pod Security Context
   securityContext:
@@ -336,9 +310,13 @@ ratel:
 
 
 global:
-  # This ingress override existing ingress configurations for alpha, ratel, zero
+  ## Combined ingress resource for alpha and ratel services
+  ## This will override existing ingress configurations under alpha and ratel
+  ## This requires an ingress controller to be installed into your k8s cluster
+
   ingress:
     enabled: false
     annotations: {}
     tls: {}
-    rules: {}
+    ratel_hostname: ""
+    alpha_hostname: ""
