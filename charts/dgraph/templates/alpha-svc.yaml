@@ -9,6 +9,10 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     monitor: {{ .Values.alpha.monitorLabel }}
+  {{- with .Values.alpha.service.annotations }}
+  annotations:
+    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.alpha.service.type }}
   ports:
