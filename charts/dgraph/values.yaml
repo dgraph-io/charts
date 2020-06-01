@@ -30,6 +30,9 @@ image:
 
 zero:
   name: zero
+  ## Used for add flags in initialization zero command
+  ## ie: --ludicrous-mode --enable_sentry=false
+  additional_flags: ''
   metrics:
     enabled: true
   monitorLabel: zero-dgraph-io
@@ -141,6 +144,9 @@ zero:
 
 alpha:
   name: alpha
+  ## Used for add flags in initialization alpha command
+  ## ie: --ludicrous_mode --rebalance_interval=12m0s
+  additional_flags: ''
   metrics:
     enabled: true
   monitorLabel: alpha-dgraph-io
