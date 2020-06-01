@@ -255,6 +255,10 @@ alpha:
 
 ratel:
   name: ratel
+
+  ## Enable Ratel service?
+  enabled: true
+
   ## Number of dgraph nodes
   ##
   replicaCount: 1
