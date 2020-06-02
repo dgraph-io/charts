@@ -194,6 +194,14 @@ alpha:
     type: ClusterIP
     annotations: {}
 
+  ## alpha ingress resource configuration
+  ## This requires an ingress controller to be installed into your k8s cluster
+  ingress:
+    enabled: false
+    # hostname: ""
+    # annoations: {}
+    # tls: {}
+
   ## dgraph Pod Security Context
   securityContext:
     enabled: false
@@ -271,6 +279,14 @@ ratel:
     type: ClusterIP
     annotations: {}
 
+  ## ratel ingress resource configuration
+  ## This requires an ingress controller to be installed into your k8s cluster
+  ingress:
+    enabled: false
+    # hostname: ""
+    # annoations: {}
+    # tls: {}
+
   ## dgraph Pod Security Context
   securityContext:
     enabled: false
@@ -307,3 +323,16 @@ ratel:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
+
+
+global:
+  ## Combined ingress resource for alpha and ratel services
+  ## This will override existing ingress configurations under alpha and ratel
+  ## This requires an ingress controller to be installed into your k8s cluster
+
+  ingress:
+    enabled: false
+    annotations: {}
+    tls: {}
+    ratel_hostname: ""
+    alpha_hostname: ""
