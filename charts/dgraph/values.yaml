@@ -81,6 +81,7 @@ zero:
   ##
   service:
     type: ClusterIP
+    annotations: {}
 
   ## dgraph Pod Security Context
   securityContext:
@@ -191,6 +192,7 @@ alpha:
   ##
   service:
     type: ClusterIP
+    annotations: {}
 
   ## dgraph Pod Security Context
   securityContext:
@@ -267,6 +269,7 @@ ratel:
   ##
   service:
     type: ClusterIP
+    annotations: {}
 
   ## dgraph Pod Security Context
   securityContext:
