@@ -40,6 +40,7 @@ spec:
             backend:
               serviceName: {{ template "dgraph.alpha.fullname" . }}
               servicePort: 8080
+    {{- if .Values.ratel.enabled }}
     - host: {{ .Values.global.ingress.ratel_hostname }}
       http:
         paths:
@@ -55,4 +56,5 @@ spec:
             backend:
               serviceName: {{ template "dgraph.alpha.fullname" . }}
               servicePort: 80
+    {{- end }}
 {{- end }}
