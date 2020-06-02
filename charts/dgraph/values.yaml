@@ -182,7 +182,7 @@ alpha:
   service:
     type: ClusterIP
 
-  ## alpha ingress respirce configuration
+  ## alpha ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
     enabled: false
@@ -263,7 +263,7 @@ ratel:
   service:
     type: ClusterIP
 
-  ## ratel ingress respirce configuration
+  ## ratel ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
     enabled: false
