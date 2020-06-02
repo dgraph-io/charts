@@ -54,5 +54,5 @@ spec:
           {{- end }}
             backend:
               serviceName: {{ template "dgraph.alpha.fullname" . }}
-              servicePort: 8000
+              servicePort: 80
 {{- end }}

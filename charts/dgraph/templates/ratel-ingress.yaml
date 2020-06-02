@@ -40,5 +40,5 @@ spec:
           {{- end }}
             backend:
               serviceName: {{ template "dgraph.ratel.fullname" . }}
-              servicePort: 8000
+              servicePort: 80
 {{- end }}
