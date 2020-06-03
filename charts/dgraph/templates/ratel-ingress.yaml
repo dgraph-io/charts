@@ -1,4 +1,4 @@
-{{- if and (eq .Values.ratel.ingress.enabled true) (eq .Values.global.ingress.enabled false) -}}
+{{- if and (eq .Values.ratel.ingress.enabled true) (eq .Values.global.ingress.enabled false) (eq .Values.ratel.enabled true) -}}
 
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
@@ -40,5 +40,5 @@ spec:
           {{- end }}
             backend:
               serviceName: {{ template "dgraph.ratel.fullname" . }}
-              servicePort: 8000
+              servicePort: 80
 {{- end }}
