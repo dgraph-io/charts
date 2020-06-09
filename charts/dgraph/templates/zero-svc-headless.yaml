@@ -12,7 +12,7 @@ spec:
   type: ClusterIP
   clusterIP: None
   ports:
-  - name: zero-grpc
+  - name: grpc-zero
     port: 5080
     targetPort: 5080
   selector:

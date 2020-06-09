@@ -90,11 +90,11 @@ spec:
         image: {{ template "dgraph.image" . }}
         ports:
         - containerPort: 7080
-          name: alpha-grpc-int
+          name: grpc-alpha-int
         - containerPort: 8080
-          name: alpha-http
+          name: http-alpha
         - containerPort: 9080
-          name: alpha-grpc
+          name: grpc-alpha
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         env:   
           - name: POD_NAMESPACE

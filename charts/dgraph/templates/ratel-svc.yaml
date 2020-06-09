@@ -18,7 +18,7 @@ spec:
   ports:
   - port: 80
     targetPort: 8000
-    name: ratel-http
+    name: http-ratel
   selector:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
