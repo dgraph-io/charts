@@ -22,9 +22,6 @@ spec:
   - port: 6080
     targetPort: 6080
     name: zero-http
-  # We want all pods in the StatefulSet to have their addresses published for
-  # the sake of the other Dgraph zero pods even before they're ready, since they
-  # have to be able to talk to each other in order to become ready.
   publishNotReadyAddresses: {{ .Values.zero.service.publishNotReadyAddresses }}
   selector:
     app: {{ template "dgraph.name" . }}
