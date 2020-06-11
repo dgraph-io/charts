@@ -25,7 +25,7 @@ spec:
   # We want all pods in the StatefulSet to have their addresses published for
   # the sake of the other Dgraph zero pods even before they're ready, since they
   # have to be able to talk to each other in order to become ready.
-  publishNotReadyAddresses: true
+  publishNotReadyAddresses: {{ .Values.zero.service.publishNotReadyAddresses }}
   selector:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}

@@ -82,6 +82,9 @@ zero:
   service:
     type: ClusterIP
     annotations: {}
+    ## StatefulSet pods will need to have addresses published in order to 
+    ## communicate to each other in order to enter a ready state.
+    publishNotReadyAddresses: true
 
   ## dgraph Pod Security Context
   securityContext:
@@ -193,6 +196,9 @@ alpha:
   service:
     type: ClusterIP
     annotations: {}
+    ## StatefulSet pods will need to have addresses published in order to 
+    ## communicate to each other in order to enter a ready state.
+    publishNotReadyAddresses: true
 
   ## alpha ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
