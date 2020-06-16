@@ -212,6 +212,9 @@ alpha:
   tls:
     enabled: false
     files: {}
+    ## Documentation on dgraph alpha TLS options, 
+    ##  see https://dgraph.io/docs/master/deploy/#tls-options
+    cli_options: --tls_dir /tls --tls_client_auth VERIFYIFGIVEN --tls_use_system_ca
 
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
