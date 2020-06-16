@@ -139,11 +139,21 @@ spec:
         - name: datadir
           mountPath: /dgraph
         {{- end }}
+        {{- if .Values.alpha.tls.enabled }}
+        - name: tls-volume
+          mountPath: /tls
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
         persistentVolumeClaim:
           claimName: datadir
+      {{- if .Values.alpha.tls.enabled }}
+      - name: tls-volume
+        secret:
+          secretName: {{ template "dgraph.alpha.fullname" . }}-secret
+      {{- end }}
+
 {{- if .Values.alpha.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:

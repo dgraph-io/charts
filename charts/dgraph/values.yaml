@@ -208,6 +208,11 @@ alpha:
     fsGroup: 1001
     runAsUser: 1001
 
+  ## tls enabled
+  tls:
+    enabled: false
+    files: {}
+
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
