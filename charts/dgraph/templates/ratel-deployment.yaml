@@ -44,7 +44,7 @@ spec:
         command:
           - dgraph-ratel
         ports:
-        - name: http
+        - name: http-ratel
           containerPort: 8000
         {{- if .Values.ratel.livenessProbe.enabled }}
         livenessProbe:

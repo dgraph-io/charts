@@ -90,9 +90,9 @@ spec:
         image: {{ template "dgraph.image" . }}
         ports:
         - containerPort: 5080
-          name: zero-grpc
+          name: grpc-zero
         - containerPort: 6080
-          name: zero-http
+          name: http-zero
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         env:
           - name: POD_NAMESPACE

@@ -18,10 +18,10 @@ spec:
   ports:
   - port: 5080
     targetPort: 5080
-    name: zero-grpc
+    name: grpc-zero
   - port: 6080
     targetPort: 6080
-    name: zero-http
+    name: http-zero
   publishNotReadyAddresses: {{ .Values.zero.service.publishNotReadyAddresses }}
   selector:
     app: {{ template "dgraph.name" . }}
