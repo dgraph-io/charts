@@ -133,8 +133,8 @@ spec:
         {{- if .Values.zero.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
-            port: {{ .Values.zero.livenessProbe.port }}
-            path: {{ .Values.zero.livenessProbe.path }}
+            port: {{ .Values.zero.readinessProbe.port }}
+            path: {{ .Values.zero.readinessProbe.path }}
           initialDelaySeconds: {{ .Values.zero.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.zero.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.zero.readinessProbe.timeoutSeconds }}

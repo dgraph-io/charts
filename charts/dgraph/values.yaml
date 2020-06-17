@@ -82,6 +82,9 @@ zero:
   service:
     type: ClusterIP
     annotations: {}
+    ## StatefulSet pods will need to have addresses published in order to 
+    ## communicate to each other in order to enter a ready state.
+    publishNotReadyAddresses: true
 
   ## dgraph Pod Security Context
   securityContext:
@@ -133,7 +136,7 @@ zero:
   readinessProbe:
     enabled: false
     port: 6080
-    path: /state
+    path: /health
     initialDelaySeconds: 15
     periodSeconds: 10
     timeoutSeconds: 5
@@ -197,6 +200,9 @@ alpha:
   service:
     type: ClusterIP
     annotations: {}
+    ## StatefulSet pods will need to have addresses published in order to 
+    ## communicate to each other in order to enter a ready state.
+    publishNotReadyAddresses: true
 
   ## alpha ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
@@ -211,6 +217,24 @@ alpha:
     enabled: false
     fsGroup: 1001
     runAsUser: 1001
+
+  ## TLS Configuration
+  tls:
+    enabled: false
+    ## Files created from '/tls' directory set with `dgraph cert` command
+    ## Can use make_tls_secrets.sh to generate secrets.yaml
+    files: {}
+    ## Documentation on dgraph alpha TLS options,
+    ##  see https://dgraph.io/docs/master/deploy/#tls-options
+    config: {}
+        ## Config Keys
+        ##  dir - location of keys and certificates
+        ##  client_auth - set to REQUEST, REQUIREANY, VERIFYIFGIVEN (default), or REQUIREANDVERIFY
+        ##  use_system_ca - true or false
+    #   dir: /tls
+    #   client_auth: VERIFYIFGIVEN
+    #   use_system_ca: true
+
 
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
