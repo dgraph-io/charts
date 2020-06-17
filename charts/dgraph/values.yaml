@@ -136,7 +136,7 @@ zero:
   readinessProbe:
     enabled: false
     port: 6080
-    path: /state
+    path: /health
     initialDelaySeconds: 15
     periodSeconds: 10
     timeoutSeconds: 5

@@ -150,8 +150,8 @@ spec:
         {{- if .Values.alpha.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
-            port: {{ .Values.alpha.livenessProbe.port }}
-            path: {{ .Values.alpha.livenessProbe.path }}
+            port: {{ .Values.alpha.readinessProbe.port }}
+            path: {{ .Values.alpha.readinessProbe.path }}
           initialDelaySeconds: {{ .Values.alpha.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.alpha.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.alpha.readinessProbe.timeoutSeconds }}

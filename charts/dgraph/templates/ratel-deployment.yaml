@@ -60,8 +60,8 @@ spec:
         {{- if .Values.ratel.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
-            port: {{ .Values.ratel.livenessProbe.port }}
-            path: {{ .Values.ratel.livenessProbe.path }}          
+            port: {{ .Values.ratel.readinessProbe.port }}
+            path: {{ .Values.ratel.readinessProbe.path }}          
           initialDelaySeconds: {{ .Values.ratel.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.ratel.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.ratel.readinessProbe.timeoutSeconds }}
