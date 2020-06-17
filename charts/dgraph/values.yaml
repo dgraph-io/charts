@@ -208,13 +208,23 @@ alpha:
     fsGroup: 1001
     runAsUser: 1001
 
-  ## tls enabled
+  ## TLS Configuration
   tls:
     enabled: false
+    ## Files created from '/tls' directory set with `dgraph cert` command
+    ## Can use make_tls_secretes.sh to generate secrets.yaml
     files: {}
     ## Documentation on dgraph alpha TLS options, 
     ##  see https://dgraph.io/docs/master/deploy/#tls-options
-    cli_options: --tls_dir /tls --tls_client_auth VERIFYIFGIVEN --tls_use_system_ca
+    config: {}
+        ## Config Keys
+        ##  dir - location of keys and certificates
+        ##  client_auth - set to REQUEST, REQUIREANY, VERIFYIFGIVEN (default), or REQUIREANDVERIFY
+        ##  use_system_ca - true or false
+    #   dir: /tls
+    #   client_auth: VERIFYIFGIVEN
+    #   use_system_ca: true
+      
 
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>

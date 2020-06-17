@@ -1,0 +1,10 @@
+# alpha-tls-config.yaml
+# Specify TLS Command line options for `dgraph alpha`
+# * https://dgraph.io/docs/master/deploy/#tls-options
+alpha:
+  tls:
+    enabled: true
+    config:
+      dir: /tls
+      client_auth: VERIFYIFGIVEN
+      use_system_ca: true

@@ -1,3 +1,23 @@
+{{- /* Generate TLS Command Line Options */}}
+{{ define "tls_options" }}
+  {{- /* Default `--tls_dir /tls` if not set */}}
+  {{- if .Values.alpha.tls.config.dir -}}
+      {{- printf "--tls_dir %s " .Values.alpha.tls.config.dir -}}
+  {{- else -}}
+      {{- printf "--tls_dir /tls " -}}    
+  {{- end -}}
+  {{- /* Default `--tls_client_auth VERIFYIFGIVEN` if not valid setting  */}}
+  {{- $validTlsClientAuth := list "REQUEST" "REQUIREANY" "VERIFYIFGIVEN" "REQUIREANDVERIFY" -}}
+  {{- if has .Values.alpha.tls.config.client_auth $validTlsClientAuth -}}
+      {{- printf "--tls_client_auth %s " .Values.alpha.tls.config.client_auth -}}
+  {{- else -}}
+      {{- printf "--tls_client_auth VERIFYIFGIVEN " -}}   
+  {{- end -}}
+  {{- /* Add `--tls_use_system_ca` if enabled */}}
+  {{- if .Values.alpha.tls.config.use_system_ca -}}
+      {{- printf "--tls_use_system_ca " -}}
+  {{- end -}}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -96,14 +116,14 @@ spec:
         - containerPort: 9080
           name: alpha-grpc
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-        env:   
+        env:
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-          {{- if and .Values.alpha.tls.enabled .Values.alpha.tls.cli_options }}
+          {{- if .Values.alpha.tls.enabled }}
           - name: TLS_OPTIONS
-            value: {{ .Values.alpha.tls.cli_options }}
+            value: {{ template "tls_options" . }}   
           {{- end }}
         {{- with .Values.alpha.extraEnvs }}
           {{- toYaml . | nindent 10 }}
@@ -145,7 +165,7 @@ spec:
         {{- end }}
         {{- if .Values.alpha.tls.enabled }}
         - name: tls-volume
-          mountPath: /tls
+          mountPath: {{ .Values.alpha.tls.config.dir | default "/tls" }}
         {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
