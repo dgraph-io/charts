@@ -10,6 +10,6 @@ cat <<-EOF > secrets.yaml
 alpha:
   tls:
     files:
-$(for F in ./tls/*; do echo "      ${F##*/}: `cat $F | base64 | tr -d '\n'`"; done)
+$(for F in ./tls/*; do [[ ${F##*/} =~ ^client.*$ ]] || echo "      ${F##*/}: `cat $F | base64 | tr -d '\n'`"; done)
 EOF
 
