@@ -214,7 +214,7 @@ alpha:
     ## Files created from '/tls' directory set with `dgraph cert` command
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
-    ## Documentation on dgraph alpha TLS options, 
+    ## Documentation on dgraph alpha TLS options,
     ##  see https://dgraph.io/docs/master/deploy/#tls-options
     config: {}
         ## Config Keys
@@ -224,7 +224,7 @@ alpha:
     #   dir: /tls
     #   client_auth: VERIFYIFGIVEN
     #   use_system_ca: true
-      
+
 
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>

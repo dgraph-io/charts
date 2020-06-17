@@ -4,14 +4,14 @@
   {{- if .Values.alpha.tls.config.dir -}}
       {{- printf "--tls_dir %s " .Values.alpha.tls.config.dir -}}
   {{- else -}}
-      {{- printf "--tls_dir /tls " -}}    
+      {{- printf "--tls_dir /tls " -}}
   {{- end -}}
   {{- /* Default `--tls_client_auth VERIFYIFGIVEN` if not valid setting  */}}
   {{- $validTlsClientAuth := list "REQUEST" "REQUIREANY" "VERIFYIFGIVEN" "REQUIREANDVERIFY" -}}
   {{- if has .Values.alpha.tls.config.client_auth $validTlsClientAuth -}}
       {{- printf "--tls_client_auth %s " .Values.alpha.tls.config.client_auth -}}
   {{- else -}}
-      {{- printf "--tls_client_auth VERIFYIFGIVEN " -}}   
+      {{- printf "--tls_client_auth VERIFYIFGIVEN " -}}
   {{- end -}}
   {{- /* Add `--tls_use_system_ca` if enabled */}}
   {{- if .Values.alpha.tls.config.use_system_ca -}}
@@ -123,7 +123,7 @@ spec:
                 fieldPath: metadata.namespace
           {{- if .Values.alpha.tls.enabled }}
           - name: TLS_OPTIONS
-            value: {{ template "tls_options" . }}   
+            value: {{ template "tls_options" . }}
           {{- end }}
         {{- with .Values.alpha.extraEnvs }}
           {{- toYaml . | nindent 10 }}
