@@ -127,6 +127,8 @@ spec:
           timeoutSeconds: {{ .Values.zero.livenessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.zero.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.zero.livenessProbe.failureThreshold }}
+        {{- else if .Values.zero.customLivenessProbe }}
+        livenessProbe: {{- toYaml .Values.zero.customLivenessProbe | nindent 10 }}
         {{- end }}
         {{- if .Values.zero.readinessProbe.enabled }}
         readinessProbe:
@@ -138,6 +140,8 @@ spec:
           timeoutSeconds: {{ .Values.zero.readinessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.zero.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.zero.readinessProbe.failureThreshold }}
+        {{- else if .Values.zero.customReadinessProbe }}
+        readinessProbe: {{- toYaml .Values.zero.customReadinessProbe | nindent 10 }}
         {{- end }}
         volumeMounts:
         {{- if .Values.zero.persistence.enabled }}

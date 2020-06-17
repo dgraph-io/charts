@@ -143,6 +143,10 @@ zero:
     failureThreshold: 6
     successThreshold: 1
 
+  ## Custom liveness and readiness probes
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+
 alpha:
   name: alpha
   metrics:
@@ -287,6 +291,11 @@ alpha:
     failureThreshold: 6
     successThreshold: 1
 
+  ## Custom liveness and readiness probes
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+
+
 ratel:
   name: ratel
 
@@ -352,6 +361,9 @@ ratel:
     failureThreshold: 6
     successThreshold: 1
 
+  ## Custom liveness and readiness probes
+  customLivenessProbe: {}
+  customReadinessProbe: {}
 
 global:
   ## Combined ingress resource for alpha and ratel services

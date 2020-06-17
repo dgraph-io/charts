@@ -56,6 +56,8 @@ spec:
           timeoutSeconds: {{ .Values.ratel.livenessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.ratel.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.ratel.livenessProbe.failureThreshold }}
+        {{- else if .Values.ratel.customLivenessProbe }}
+        livenessProbe: {{- toYaml .Values.ratel.customLivenessProbe | nindent 10 }}
         {{- end }}
         {{- if .Values.ratel.readinessProbe.enabled }}
         readinessProbe:
@@ -67,6 +69,8 @@ spec:
           timeoutSeconds: {{ .Values.ratel.readinessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.ratel.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.ratel.readinessProbe.failureThreshold }}
+        {{- else if .Values.ratel.customReadinessProbe }}
+        readinessProbe: {{- toYaml .Values.ratel.customReadinessProbe | nindent 10 }}
         {{- end }}
         resources:
 {{ toYaml .Values.ratel.resources | indent 10 }}

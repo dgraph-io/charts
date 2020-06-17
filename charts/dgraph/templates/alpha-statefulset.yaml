@@ -146,6 +146,8 @@ spec:
           timeoutSeconds: {{ .Values.alpha.livenessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.alpha.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.alpha.livenessProbe.failureThreshold }}
+        {{- else if .Values.alpha.customLivenessProbe }} 
+        livenessProbe: {{- toYaml .Values.alpha.customLivenessProbe | nindent 10 }}
         {{- end }}
         {{- if .Values.alpha.readinessProbe.enabled }}
         readinessProbe:
@@ -157,6 +159,8 @@ spec:
           timeoutSeconds: {{ .Values.alpha.readinessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.alpha.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.alpha.readinessProbe.failureThreshold }}
+        {{- else if .Values.alpha.customReadinessProbe }} 
+        readinessProbe: {{- toYaml .Values.alpha.customReadinessProbe | nindent 10 }}
         {{- end }}
         volumeMounts:
         {{- if .Values.alpha.persistence.enabled }}
