@@ -74,4 +74,5 @@ spec:
         {{- end }}
         resources:
 {{ toYaml .Values.ratel.resources | indent 10 }}
+
 {{- end }}
