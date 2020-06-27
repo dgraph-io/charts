@@ -9,19 +9,19 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     monitor: {{ .Values.alpha.monitorLabel }}
+  {{- with .Values.alpha.service.annotations }}
+  annotations:
+    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.alpha.service.type }}
   ports:
   - port: 8080
     targetPort: 8080
-    name: alpha-http
+    name: http-alpha
   - port: 9080
-    targetPort: 9080
-    name: alpha-grpc
-  # We want all pods in the StatefulSet to have their addresses published for
-  # the sake of the other Dgraph alpha pods even before they're ready, since they
-  # have to be able to talk to each other in order to become ready.
-  publishNotReadyAddresses: true
+    name: grpc-alpha
+  publishNotReadyAddresses: {{ .Values.alpha.service.publishNotReadyAddresses }}
   selector:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}

@@ -1,0 +1,17 @@
+# aws-alb-ingress-controller
+# * https://kubernetes-sigs.github.io/aws-alb-ingress-controller
+global:
+  ingress:
+    enabled: true
+    ratel_hostname: ratel.example.com
+    alpha_hostname: alpha.example.com
+    annotations:
+      kubernetes.io/ingress.class: alb
+      # ip for ClusterIP, instance for NodePort
+      alb.ingress.kubernetes.io/target-type: ip
+      # internet-facing or internal
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      # terminate TLS using ACM (https://aws.amazon.com/certificate-manager/)
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:012345678901:certificate/01234567-0123-0123-0123-0123456789ab
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
