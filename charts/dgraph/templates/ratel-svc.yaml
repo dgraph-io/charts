@@ -1,3 +1,4 @@
+{{- if (eq .Values.ratel.enabled true) -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,14 +9,19 @@ metadata:
     component: {{ .Values.ratel.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  {{- with .Values.ratel.service.annotations }}
+  annotations:
+    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.ratel.service.type }}
   ports:
-  - port: 8000
+  - port: 80
     targetPort: 8000
-    name: ratel-http
+    name: http-ratel
   selector:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.ratel.name }}
     release: {{ .Release.Name }}
+{{- end }}

@@ -10,7 +10,7 @@
 image:
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v1.2.2
+  tag: v20.03.3
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -73,11 +73,18 @@ zero:
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
+  # Extra environment variables which will be appended to the env: definition for the container.
+  extraEnvs: []
+
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
   ##
   service:
     type: ClusterIP
+    annotations: {}
+    ## StatefulSet pods will need to have addresses published in order to 
+    ## communicate to each other in order to enter a ready state.
+    publishNotReadyAddresses: true
 
   ## dgraph Pod Security Context
   securityContext:
@@ -101,7 +108,7 @@ zero:
 
   ## Node labels and tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
   ##
   nodeSelector: {}
   tolerations: []
@@ -129,12 +136,16 @@ zero:
   readinessProbe:
     enabled: false
     port: 6080
-    path: /state
+    path: /health
     initialDelaySeconds: 15
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
+
+  ## Custom liveness and readiness probes
+  customLivenessProbe: {}
+  customReadinessProbe: {}
 
 alpha:
   name: alpha
@@ -180,17 +191,54 @@ alpha:
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
+  # Extra environment variables which will be appended to the env: definition for the container.
+  extraEnvs: []
+    # - name: AWS_ACCESS_KEY_ID
+    #   value: "XXXXXXXXXXXXXXXXXXXX"
+    # - name: AWS_SECRET_ACCESS_KEY
+    #   value: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
   ##
   service:
     type: ClusterIP
+    annotations: {}
+    ## StatefulSet pods will need to have addresses published in order to 
+    ## communicate to each other in order to enter a ready state.
+    publishNotReadyAddresses: true
+
+  ## alpha ingress resource configuration
+  ## This requires an ingress controller to be installed into your k8s cluster
+  ingress:
+    enabled: false
+    # hostname: ""
+    # annoations: {}
+    # tls: {}
 
   ## dgraph Pod Security Context
   securityContext:
     enabled: false
     fsGroup: 1001
     runAsUser: 1001
+
+  ## TLS Configuration
+  tls:
+    enabled: false
+    ## Files created from '/tls' directory set with `dgraph cert` command
+    ## Can use make_tls_secrets.sh to generate secrets.yaml
+    files: {}
+    ## Documentation on dgraph alpha TLS options,
+    ##  see https://dgraph.io/docs/master/deploy/#tls-options
+    config: {}
+        ## Config Keys
+        ##  dir - location of keys and certificates
+        ##  client_auth - set to REQUEST, REQUIREANY, VERIFYIFGIVEN (default), or REQUIREANDVERIFY
+        ##  use_system_ca - true or false
+    #   dir: /tls
+    #   client_auth: VERIFYIFGIVEN
+    #   use_system_ca: true
+
 
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -209,7 +257,7 @@ alpha:
 
   ## Node labels and tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
   ##
   nodeSelector: {}
   tolerations: []
@@ -247,17 +295,39 @@ alpha:
     failureThreshold: 6
     successThreshold: 1
 
+  ## Custom liveness and readiness probes
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+
+
 ratel:
+  enabled: true
   name: ratel
+
+  ## Enable Ratel service
+  enabled: true
+
   ## Number of dgraph nodes
   ##
   replicaCount: 1
+
+  # Extra environment variables which will be appended to the env: definition for the container.
+  extraEnvs: []
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use ClusterIP or LoadBalancer
   ##
   service:
     type: ClusterIP
+    annotations: {}
+
+  ## ratel ingress resource configuration
+  ## This requires an ingress controller to be installed into your k8s cluster
+  ingress:
+    enabled: false
+    # hostname: ""
+    # annoations: {}
+    # tls: {}
 
   ## dgraph Pod Security Context
   securityContext:
@@ -295,3 +365,19 @@ ratel:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
+
+  ## Custom liveness and readiness probes
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+
+global:
+  ## Combined ingress resource for alpha and ratel services
+  ## This will override existing ingress configurations under alpha and ratel
+  ## This requires an ingress controller to be installed into your k8s cluster
+
+  ingress:
+    enabled: false
+    annotations: {}
+    tls: {}
+    ratel_hostname: ""
+    alpha_hostname: ""
