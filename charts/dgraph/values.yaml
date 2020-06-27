@@ -301,7 +301,6 @@ alpha:
 
 
 ratel:
-  enabled: true
   name: ratel
 
   ## Enable Ratel service
