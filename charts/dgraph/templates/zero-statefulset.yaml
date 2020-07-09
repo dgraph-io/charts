@@ -90,9 +90,9 @@ spec:
         image: {{ template "dgraph.image" . }}
         ports:
         - containerPort: 5080
-          name: zero-grpc
+          name: grpc-zero
         - containerPort: 6080
-          name: zero-http
+          name: http-zero
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         env:
           - name: POD_NAMESPACE
@@ -127,17 +127,21 @@ spec:
           timeoutSeconds: {{ .Values.zero.livenessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.zero.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.zero.livenessProbe.failureThreshold }}
+        {{- else if .Values.zero.customLivenessProbe }}
+        livenessProbe: {{- toYaml .Values.zero.customLivenessProbe | nindent 10 }}
         {{- end }}
         {{- if .Values.zero.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
-            port: {{ .Values.zero.livenessProbe.port }}
-            path: {{ .Values.zero.livenessProbe.path }}
+            port: {{ .Values.zero.readinessProbe.port }}
+            path: {{ .Values.zero.readinessProbe.path }}
           initialDelaySeconds: {{ .Values.zero.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.zero.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.zero.readinessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.zero.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.zero.readinessProbe.failureThreshold }}
+        {{- else if .Values.zero.customReadinessProbe }}
+        readinessProbe: {{- toYaml .Values.zero.customReadinessProbe | nindent 10 }}
         {{- end }}
         volumeMounts:
         {{- if .Values.zero.persistence.enabled }}

@@ -1,3 +1,4 @@
+{{- if (eq .Values.ratel.enabled true) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -43,7 +44,7 @@ spec:
         command:
           - dgraph-ratel
         ports:
-        - name: http
+        - name: http-ratel
           containerPort: 8000
         {{- if .Values.ratel.livenessProbe.enabled }}
         livenessProbe:
@@ -55,17 +56,23 @@ spec:
           timeoutSeconds: {{ .Values.ratel.livenessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.ratel.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.ratel.livenessProbe.failureThreshold }}
+        {{- else if .Values.ratel.customLivenessProbe }}
+        livenessProbe: {{- toYaml .Values.ratel.customLivenessProbe | nindent 10 }}
         {{- end }}
         {{- if .Values.ratel.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
-            port: {{ .Values.ratel.livenessProbe.port }}
-            path: {{ .Values.ratel.livenessProbe.path }}          
+            port: {{ .Values.ratel.readinessProbe.port }}
+            path: {{ .Values.ratel.readinessProbe.path }}          
           initialDelaySeconds: {{ .Values.ratel.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.ratel.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.ratel.readinessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.ratel.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.ratel.readinessProbe.failureThreshold }}
+        {{- else if .Values.ratel.customReadinessProbe }}
+        readinessProbe: {{- toYaml .Values.ratel.customReadinessProbe | nindent 10 }}
         {{- end }}
         resources:
 {{ toYaml .Values.ratel.resources | indent 10 }}
+
+{{- end }}

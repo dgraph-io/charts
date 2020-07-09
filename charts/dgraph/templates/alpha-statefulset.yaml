@@ -1,3 +1,23 @@
+{{- /* Generate TLS Command Line Options */}}
+{{ define "tls_options" }}
+  {{- /* Default `--tls_dir /tls` if not set */}}
+  {{- if .Values.alpha.tls.config.dir -}}
+      {{- printf "--tls_dir %s " .Values.alpha.tls.config.dir -}}
+  {{- else -}}
+      {{- printf "--tls_dir /tls " -}}
+  {{- end -}}
+  {{- /* Default `--tls_client_auth VERIFYIFGIVEN` if not valid setting  */}}
+  {{- $validTlsClientAuth := list "REQUEST" "REQUIREANY" "VERIFYIFGIVEN" "REQUIREANDVERIFY" -}}
+  {{- if has .Values.alpha.tls.config.client_auth $validTlsClientAuth -}}
+      {{- printf "--tls_client_auth %s " .Values.alpha.tls.config.client_auth -}}
+  {{- else -}}
+      {{- printf "--tls_client_auth VERIFYIFGIVEN " -}}
+  {{- end -}}
+  {{- /* Add `--tls_use_system_ca` if enabled */}}
+  {{- if .Values.alpha.tls.config.use_system_ca -}}
+      {{- printf "--tls_use_system_ca " -}}
+  {{- end -}}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -90,17 +110,21 @@ spec:
         image: {{ template "dgraph.image" . }}
         ports:
         - containerPort: 7080
-          name: alpha-grpc-int
+          name: grpc-alpha-int
         - containerPort: 8080
-          name: alpha-http
+          name: http-alpha
         - containerPort: 9080
-          name: alpha-grpc
+          name: grpc-alpha
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-        env:   
+        env:
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          {{- if .Values.alpha.tls.enabled }}
+          - name: TLS_OPTIONS
+            value: {{ template "tls_options" . }}
+          {{- end }}
         {{- with .Values.alpha.extraEnvs }}
           {{- toYaml . | nindent 10 }}
         {{- end }}
@@ -109,7 +133,7 @@ spec:
          - "-c"
          - |
             set -ex
-            dgraph alpha {{ .Values.alpha.additional_flags }} --my=$(hostname -f):7080 --lru_mb {{ .Values.alpha.lru_mb }} --zero {{ template "dgraph.zero.fullname" . }}-0.{{ template "dgraph.zero.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local:5080
+            dgraph alpha ${TLS_OPTIONS} {{ .Values.alpha.additional_flags }} --my=$(hostname -f):7080 --lru_mb {{ .Values.alpha.lru_mb }} --zero {{ template "dgraph.zero.fullname" . }}-0.{{ template "dgraph.zero.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local:5080
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.livenessProbe.enabled }}
@@ -122,28 +146,42 @@ spec:
           timeoutSeconds: {{ .Values.alpha.livenessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.alpha.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.alpha.livenessProbe.failureThreshold }}
+        {{- else if .Values.alpha.customLivenessProbe }} 
+        livenessProbe: {{- toYaml .Values.alpha.customLivenessProbe | nindent 10 }}
         {{- end }}
         {{- if .Values.alpha.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
-            port: {{ .Values.alpha.livenessProbe.port }}
-            path: {{ .Values.alpha.livenessProbe.path }}
+            port: {{ .Values.alpha.readinessProbe.port }}
+            path: {{ .Values.alpha.readinessProbe.path }}
           initialDelaySeconds: {{ .Values.alpha.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.alpha.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.alpha.readinessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.alpha.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.alpha.readinessProbe.failureThreshold }}
+        {{- else if .Values.alpha.customReadinessProbe }} 
+        readinessProbe: {{- toYaml .Values.alpha.customReadinessProbe | nindent 10 }}
         {{- end }}
         volumeMounts:
         {{- if .Values.alpha.persistence.enabled }}
         - name: datadir
           mountPath: /dgraph
         {{- end }}
+        {{- if .Values.alpha.tls.enabled }}
+        - name: tls-volume
+          mountPath: {{ .Values.alpha.tls.config.dir | default "/tls" }}
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
         persistentVolumeClaim:
           claimName: datadir
+      {{- if .Values.alpha.tls.enabled }}
+      - name: tls-volume
+        secret:
+          secretName: {{ template "dgraph.alpha.fullname" . }}-secret
+      {{- end }}
+
 {{- if .Values.alpha.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:
