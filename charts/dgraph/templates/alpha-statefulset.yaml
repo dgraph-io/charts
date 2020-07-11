@@ -18,11 +18,15 @@
       {{- printf "--tls_use_system_ca " -}}
   {{- end -}}
 {{- end }}
-
+{{- /* Generate Comma Seperated List of Zeros */}}
 {{- define "multi_zeros" -}}
-  {{- /* TODO: $max = 1 if older version */}}
   {{- $zeroFullName := include "dgraph.zero.fullname" . -}}
   {{- $max := int .Values.alpha.replicaCount -}}
+  {{- /* Reset $max to 1 if multiple zeros not supported dgraph version */}}
+  {{- if semverCompare "< 1.2.3" .Values.image.tag -}}
+     {{- $max = 1 -}}
+  {{- end -}}
+  {{- /* Create Comman seperated List Zeros */}}    
   {{- range $idx := until $max }}
     {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc.cluster.local:5080" $zeroFullName $idx $zeroFullName -}}
     {{- if ne $idx (sub $max 1) -}}
