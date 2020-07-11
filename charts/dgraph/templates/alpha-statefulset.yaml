@@ -21,7 +21,7 @@
 {{- /* Generate Comma Seperated List of Zeros */}}
 {{- define "multi_zeros" -}}
   {{- $zeroFullName := include "dgraph.zero.fullname" . -}}
-  {{- $max := int .Values.alpha.replicaCount -}}
+  {{- $max := int .Values.zero.replicaCount -}}
   {{- /* Reset $max to 1 if multiple zeros not supported dgraph version */}}
   {{- if semverCompare "< 1.2.3" .Values.image.tag -}}
      {{- $max = 1 -}}
