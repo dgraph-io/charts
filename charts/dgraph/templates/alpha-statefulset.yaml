@@ -18,6 +18,18 @@
       {{- printf "--tls_use_system_ca " -}}
   {{- end -}}
 {{- end }}
+
+{{- define "multi_zeros" -}}
+  {{- /* TODO: $max = 1 if older version */}}
+  {{- $zeroFullName := include "dgraph.zero.fullname" . -}}
+  {{- $max := int .Values.alpha.replicaCount -}}
+  {{- range $idx := until $max }}
+    {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc.cluster.local:5080" $zeroFullName $idx $zeroFullName -}}
+    {{- if ne $idx (sub $max 1) -}}
+      {{- print "," -}}
+    {{- end -}}
+  {{ end }}
+{{- end -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -133,7 +145,7 @@ spec:
          - "-c"
          - |
             set -ex
-            dgraph alpha ${TLS_OPTIONS} --my=$(hostname -f):7080 --lru_mb {{ .Values.alpha.lru_mb }} --zero {{ template "dgraph.zero.fullname" . }}-0.{{ template "dgraph.zero.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local:5080
+            dgraph alpha ${TLS_OPTIONS} --my=$(hostname -f):7080 --lru_mb {{ .Values.alpha.lru_mb }} --zero {{ template "multi_zeros" . }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.livenessProbe.enabled }}
