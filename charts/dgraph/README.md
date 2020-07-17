@@ -143,8 +143,8 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `ratel.securityContext.fsGroup`          | Group id of the ratel container                                       | `1001`                                              |
 | `ratel.securityContext.runAsUser`        | User ID for the ratel container                                       | `1001`                                              |
 | `ratel.resources.requests`               | Ratel pod resources requests & limits                                 | `nil`                                               |
-| `ratel.livenessProbe`                    | Ratel liveness probes                                                 | `See values.yaml for defaults`                      |
-| `ratel.readinessProbe`                   | Ratel readiness probes                                                | `See values.yaml for defaults`                      |
+| `ratel.livenessProbe`                    | Ratel liveness probes                                                 | See `values.yaml` for defaults                      |
+| `ratel.readinessProbe`                   | Ratel readiness probes                                                | See `values.yaml` for defaults                      |
 | `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
 | `global.ingress.enabled`                 | Enable global ingress resource (overrides alpha/ratel ingress)        | `false`                                             |
