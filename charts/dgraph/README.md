@@ -89,7 +89,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `zero.persistence.size`                  | PVC Storage Request for zero volume                                   | `32Gi`                                              |
 | `zero.nodeSelector`                      | Node labels for zero pod assignment                                   | `{}`                                                |
 | `zero.tolerations`                       | Zero tolerations                                                      | `[]`                                                |
-| `zero.resources.requests.memory`         | Zero pod resources requests & limits                                  | `100Mi`                                             |
+| `zero.resources.requests.memory`         | Zero pod resources memory requests                                    | `100Mi`                                             |
 | `zero.livenessProbe`                     | Zero liveness probes                                                  | See `values.yaml` for defaults                      |
 | `zero.readinessProbe`                    | Zero readiness probes                                                 | See `values.yaml` for defaults                      |
 | `zero.customLivenessProbe`               | Zero custom liveness probes (if `zero.livenessProbe` not enabled)     | `{}`                                                |
@@ -124,7 +124,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.persistence.size`                 | PVC Storage Request for alpha volume                                  | `100Gi`                                             |
 | `alpha.nodeSelector`                     | Node labels for alpha pod assignment                                  | `{}`                                                |
 | `alpha.tolerations`                      | Alpha tolerations                                                     | `[]`                                                |
-| `alpha.resources.requests.memory`        | Zero pod resources requests & limits                                  | `100Mi`                                             |
+| `alpha.resources.requests.memory`        | Zero pod resources memory request                                     | `100Mi`                                             |
 | `alpha.livenessProbe`                    | Alpha liveness probes                                                 | See `values.yaml` for defaults                      |
 | `alpha.readinessProbe`                   | Alpha readiness probes                                                | See `values.yaml` for defaults                      |
 | `alpha.customLivenessProbe`              | Alpha custom liveness probes (if `alpha.livenessProbe` not enabled)   | `{}`                                                |
@@ -142,7 +142,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `ratel.securityContext.enabled`          | Security context for ratel nodes enabled                              | `false`                                             |
 | `ratel.securityContext.fsGroup`          | Group id of the ratel container                                       | `1001`                                              |
 | `ratel.securityContext.runAsUser`        | User ID for the ratel container                                       | `1001`                                              |
-| `ratel.resources.requests`               | Ratel pod resources requests & limits                                 | `nil`                                               |
+| `ratel.resources.requests`               | Ratel pod resources requests                                          | `nil`                                               |
 | `ratel.livenessProbe`                    | Ratel liveness probes                                                 | See `values.yaml` for defaults                      |
 | `ratel.readinessProbe`                   | Ratel readiness probes                                                | See `values.yaml` for defaults                      |
 | `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
