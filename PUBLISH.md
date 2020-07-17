@@ -33,10 +33,10 @@ Successfully packaged chart and saved it to: /home/prashant/dgraph-code/charts/d
 Set the environment variables to their appropriate values, as shown below:
 
 ```bash
-$ export CR_OWNER="github-username"
-$ export CR_GIT_REPO="github-repository"
+$ export CR_OWNER="dgraph-io"
+$ export CR_GIT_REPO="charts"
 $ export CR_PACKAGE_PATH=".cr-release-packages"
-$ export CR_TOKEN="github-token"
+$ export CR_TOKEN="<your-github-token>"
 ```
 
 The `cr upload` command uploads the package as an asset to a new GitHub release.
@@ -72,9 +72,9 @@ of GitHub release asset instead of of the current directory.
 Before using `cr index`, we will need to set the environment variables to their appropriate values as shown below:
 
 ```bash
-$ export CR_OWNER="github-username"
-$ export CR_GIT_REPO="github-repository"
-$ export CR_CHARTS_REPO="chart-repository-url"
+$ export CR_OWNER="dgraph-io"
+$ export CR_GIT_REPO="charts"
+$ export CR_CHARTS_REPO="https://charts.dgraph.io/"
 $ export CR_INDEX_PATH="index.yaml"
 $ export CR_PACKAGE_PATH=".cr-release-packages"
 ```
