@@ -209,7 +209,7 @@ alpha:
   ingress:
     enabled: false
     # hostname: ""
-    # annoations: {}
+    # annotations: {}
     # tls: {}
 
   ## dgraph Pod Security Context
@@ -321,7 +321,7 @@ ratel:
   ingress:
     enabled: false
     # hostname: ""
-    # annoations: {}
+    # annotations: {}
     # tls: {}
 
   ## dgraph Pod Security Context

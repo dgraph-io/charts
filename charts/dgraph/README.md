@@ -19,7 +19,7 @@ Kubernetes cluster using [Helm](https://helm.sh) package manager.
 
 ### Prerequisites
 
-- Kubernetes 1.12+
+- Kubernetes 1.14+
 - Helm 3.0+
 
 ### Installing the Chart
@@ -32,7 +32,7 @@ $ helm install my-release dgraph/dgraph
 ```
 
 These command deploy Dgraph on the Kubernetes cluster in the default configuration.
-The [Configuration](#configuration) section lists the paramets that can be configured during installation:
+The [Configuration](#configuration) section lists the parameters that can be configured during installation:
 
 > **Tip**: List all releases using `helm list`
 
@@ -57,69 +57,116 @@ $ kubectl delete pvc -l release=my-release,chart=dgraph
 
 The following table lists the configurable parameters of the dgraph chart and their default values.
 
-|              Parameter               |                             Description                             |                       Default                       |
-| ------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------- |
-| `image.registry`                     | Container registry name                                             | `docker.io`                                         |
-| `image.repository`                   | Container image name                                                | `dgraph/dgraph`                                     |
-| `image.tag`                          | Container image tag                                                 | `v1.2.2`                                            |
-| `image.pullPolicy`                   | Container pull policy                                               | `IfNotPresent`                                      |
-| `nameOverride`                       | Deployment name override (will append the release name)             | `nil`                                               |
-| `fullnameOverride`                   | Deployment full name override (the release name is ignored)         | `nil`                                               |
-| `zero.name`                          | Zero component name                                                 | `zero`                                              |
-| `zero.updateStrategy`                | Strategy for upgrading zero nodes                                   | `RollingUpdate`                                     |
-| `zero.monitorLabel`                  | Monitor label for zero, used by prometheus.                         | `zero-dgraph-io`                                    |
-| `zero.rollingUpdatePartition`        | Partition update strategy                                           | `nil`                                               |
-| `zero.podManagementPolicy`           | Pod management policy for zero nodes                                | `OrderedReady`                                      |
-| `zero.replicaCount`                  | Number of zero nodes                                                | `3`                                                 |
-| `zero.shardReplicaCount`             | Max number of replicas per data shard                               | `5`                                                 |
-| `zero.terminationGracePeriodSeconds` | Zero server pod termination grace period                            | `60`                                                |
-| `zero.antiAffinity`                  | Zero anti-affinity policy                                           | `soft`                                              |
-| `zero.podAntiAffinitytopologyKey`    | Anti affinity topology key for zero nodes                           | `kubernetes.io/hostname`                            |
-| `zero.nodeAffinity`                  | Zero node affinity policy                                           | `{}`                                                |
-| `zero.service.type`                  | Zero node service type                                              | `ClusterIP`                                         |
-| `zero.securityContext.enabled`       | Security context for zero nodes enabled                             | `false`                                             |
-| `zero.securityContext.fsGroup`       | Group id of the zero container                                      | `1001`                                              |
-| `zero.securityContext.runAsUser`     | User ID for the zero container                                      | `1001`                                              |
-| `zero.persistence.enabled`           | Enable persistence for zero using PVC                               | `true`                                              |
-| `zero.persistence.storageClass`      | PVC Storage Class for zero volume                                   | `nil`                                               |
-| `zero.persistence.accessModes`       | PVC Access Mode for zero volume                                     | `ReadWriteOnce`                                     |
-| `zero.persistence.size`              | PVC Storage Request for zero volume                                 | `8Gi`                                               |
-| `zero.nodeSelector`                  | Node labels for zero pod assignment                                 | `{}`                                                |
-| `zero.tolerations`                   | Zero tolerations                                                    | `[]`                                                |
-| `zero.resources`                     | Zero node resources requests & limits                               | `{}`                                                |
-| `zero.livenessProbe`                 | Zero liveness probes                                                | `See values.yaml for defaults`                      |
-| `zero.readinessProbe`                | Zero readiness probes                                               | `See values.yaml for defaults`                      |
-| `alpha.name`                         | Alpha component name                                                | `alpha`                                             |
-| `alpha.updateStrategy`               | Strategy for upgrading alpha nodes                                  | `RollingUpdate`                                     |
-| `alpha.monitorLabel`                 | Monitor label for alpha, used by prometheus.                        | `alpha-dgraph-io`                                   |
-| `alpha.rollingUpdatePartition`       | Partition update strategy                                           | `nil`                                               |
-| `alpha.podManagementPolicy`          | Pod management policy for alpha nodes                               | `OrderedReady`                                      |
-| `alpha.replicaCount`                 | Number of alpha nodes                                               | `3`                                                 |
-| `alpha.terminationGracePeriodSeconds`| Alpha server pod termination grace period                           | `60`                                                |
-| `alpha.antiAffinity`                 | Alpha anti-affinity policy                                          | `soft`                                              |
-| `alpha.podAntiAffinitytopologyKey`   | Anti affinity topology key for zero nodes                           | `kubernetes.io/hostname`                            |
-| `alpha.nodeAffinity`                 | Alpha node affinity policy                                          | `{}`                                                |
-| `alpha.service.type`                 | Alpha node service type                                             | `ClusterIP`                                         |
-| `alpha.securityContext.enabled`      | Security context for alpha nodes enabled                            | `false`                                             |
-| `alpha.securityContext.fsGroup`      | Group id of the alpha container                                     | `1001`                                              |
-| `alpha.securityContext.runAsUser`    | User ID for the alpha container                                     | `1001`                                              |
-| `alpha.persistence.enabled`          | Enable persistence for alpha using PVC                              | `true`                                              |
-| `alpha.persistence.storageClass`     | PVC Storage Class for alpha volume                                  | `nil`                                               |
-| `alpha.persistence.accessModes`      | PVC Access Mode for alpha volume                                    | `ReadWriteOnce`                                     |
-| `alpha.persistence.size`             | PVC Storage Request for alpha volume                                | `8Gi`                                               |
-| `alpha.nodeSelector`                 | Node labels for alpha pod assignment                                | `{}`                                                |
-| `alpha.tolerations`                  | Alpha tolerations                                                   | `[]`                                                |
-| `alpha.resources`                    | Alpha node resources requests & limits                              | `{}`                                                |
-| `alpha.livenessProbe`                | Alpha liveness probes                                               | `See values.yaml for defaults`                      |
-| `alpha.readinessProbe`               | Alpha readiness probes                                              | `See values.yaml for defaults`                      |
-| `ratel.name`                         | Ratel component name                                                | `ratel`                                             |
-| `ratel.replicaCount`                 | Number of ratel nodes                                               | `1`                                                 |
-| `ratel.service.type`                 | Ratel service type                                                  | `ClusterIP`                                         |
-| `ratel.securityContext.enabled`      | Security context for ratel nodes enabled                            | `false`                                             |
-| `ratel.securityContext.fsGroup`      | Group id of the ratel container                                     | `1001`                                              |
-| `ratel.securityContext.runAsUser`    | User ID for the ratel container                                     | `1001`                                              |
-| `ratel.livenessProbe`                | Ratel liveness probes                                               | `See values.yaml for defaults`                      |
-| `ratel.readinessProbe`               | Ratel readiness probes                                              | `See values.yaml for defaults`                      |
+|              Parameter                   |                             Description                               |                       Default                       |
+| ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
+| `image.registry`                         | Container registry name                                               | `docker.io`                                         |
+| `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
+| `image.tag`                              | Container image tag                                                   | `v20.03.3`                                          |
+| `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
+| `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
+| `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
+| `zero.name`                              | Zero component name                                                   | `zero`                                              |
+| `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
+| `zero.monitorLabel`                      | Monitor label for zero, used by prometheus.                           | `zero-dgraph-io`                                    |
+| `zero.rollingUpdatePartition`            | Partition update strategy                                             | `nil`                                               |
+| `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `OrderedReady`                                      |
+| `zero.replicaCount`                      | Number of zero nodes                                                  | `3`                                                 |
+| `zero.shardReplicaCount`                 | Max number of replicas per data shard                                 | `5`                                                 |
+| `zero.terminationGracePeriodSeconds`     | Zero server pod termination grace period                              | `60`                                                |
+| `zero.antiAffinity`                      | Zero anti-affinity policy                                             | `soft`                                              |
+| `zero.podAntiAffinitytopologyKey`        | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
+| `zero.nodeAffinity`                      | Zero node affinity policy                                             | `{}`                                                |
+| `zero.extraEnvs`                         | extra env vars                                                        | `[]`                                                |
+| `zero.service.type`                      | Zero service type                                                     | `ClusterIP`                                         |
+| `zero.service.annotations`               | Zero service annotations                                              | `{}`                                                |
+| `zero.service.publishNotReadyAddresses`  | publish address if pods not in ready state                            | `true`                                              |
+| `zero.securityContext.enabled`           | Security context for zero nodes enabled                               | `false`                                             |
+| `zero.securityContext.fsGroup`           | Group id of the zero container                                        | `1001`                                              |
+| `zero.securityContext.runAsUser`         | User ID for the zero container                                        | `1001`                                              |
+| `zero.persistence.enabled`               | Enable persistence for zero using PVC                                 | `true`                                              |
+| `zero.persistence.storageClass`          | PVC Storage Class for zero volume                                     | `nil`                                               |
+| `zero.persistence.accessModes`           | PVC Access Mode for zero volume                                       | `['ReadWriteOnce']`                                 |
+| `zero.persistence.size`                  | PVC Storage Request for zero volume                                   | `32Gi`                                              |
+| `zero.nodeSelector`                      | Node labels for zero pod assignment                                   | `{}`                                                |
+| `zero.tolerations`                       | Zero tolerations                                                      | `[]`                                                |
+| `zero.resources.requests.memory`         | Zero pod resources requests & limits                                  | `100Mi`                                             |
+| `zero.livenessProbe`                     | Zero liveness probes                                                  | See `values.yaml` for defaults                      |
+| `zero.readinessProbe`                    | Zero readiness probes                                                 | See `values.yaml` for defaults                      |
+| `zero.customLivenessProbe`               | Zero custom liveness probes (if `zero.livenessProbe` not enabled)     | `{}`                                                |
+| `zero.customReadinessProbe`              | Zero custom readiness probes  (if `zero.readinessProbe` not enabled)  | `{}`                                                |
+| `alpha.name`                             | Alpha component name                                                  | `alpha`                                             |
+| `alpha.monitorLabel`                     | Monitor label for alpha, used by prometheus.                          | `alpha-dgraph-io`                                   |
+| `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
+| `alpha.rollingUpdatePartition`           | Partition update strategy                                             | `nil`                                               |
+| `alpha.podManagementPolicy`              | Pod management policy for alpha nodes                                 | `OrderedReady`                                      |
+| `alpha.replicaCount`                     | Number of alpha nodes                                                 | `3`                                                 |
+| `alpha.terminationGracePeriodSeconds`    | Alpha server pod termination grace period                             | `600`                                               |
+| `alpha.antiAffinity`                     | Alpha anti-affinity policy                                            | `soft`                                              |
+| `alpha.podAntiAffinitytopologyKey`       | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
+| `alpha.nodeAffinity`                     | Alpha node affinity policy                                            | `{}`                                                |
+| `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
+| `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
+| `alpha.service.annotations`              | Alpha service annotations                                             | `{}`                                                |
+| `alpha.service.publishNotReadyAddresses` | publish address if pods not in ready state                            | `true`                                              |
+| `alpha.ingress.enabled`                  | Alpha Ingress resource enabled                                        | `false`                                             |
+| `alpha.ingress.hostname`                 | Alpha Ingress virtual hostname                                        | `nil`                                               |
+| `alpha.ingress.annotations`              | Alpha Ingress annotations                                             | `nil`                                               |
+| `alpha.ingress.tls`                      | Alpha Ingress TLS settings                                            | `nil`                                               |
+| `alpha.securityContext.enabled`          | Security context for alpha nodes enabled                              | `false`                                             |
+| `alpha.securityContext.fsGroup`          | Group id of the alpha container                                       | `1001`                                              |
+| `alpha.securityContext.runAsUser`        | User ID for the alpha container                                       | `1001`                                              |
+| `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
+| `alpha.tls.files`                        | Alpha service TLS key and certificate files store as secret           | `false`                                             |
+| `alpha.tls.config`                       | Alpha service TLS options, see `values.yaml`                          | `{}`                                                |
+| `alpha.persistence.enabled`              | Enable persistence for alpha using PVC                                | `true`                                              |
+| `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
+| `alpha.persistence.accessModes`          | PVC Access Mode for alpha volume                                      | `['ReadWriteOnce']`                                 |
+| `alpha.persistence.size`                 | PVC Storage Request for alpha volume                                  | `100Gi`                                             |
+| `alpha.nodeSelector`                     | Node labels for alpha pod assignment                                  | `{}`                                                |
+| `alpha.tolerations`                      | Alpha tolerations                                                     | `[]`                                                |
+| `alpha.resources.requests.memory`        | Zero pod resources requests & limits                                  | `100Mi`                                             |
+| `alpha.livenessProbe`                    | Alpha liveness probes                                                 | See `values.yaml` for defaults                      |
+| `alpha.readinessProbe`                   | Alpha readiness probes                                                | See `values.yaml` for defaults                      |
+| `alpha.customLivenessProbe`              | Alpha custom liveness probes (if `alpha.livenessProbe` not enabled)   | `{}`                                                |
+| `alpha.customReadinessProbe`             | Alpha custom readiness probes (if `alpha.readinessProbe` not enabled) | `{}`                                                |
+| `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
+| `ratel.enabled`                          | Ratel service enabled or disabled                                     | `true`                                              |
+| `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
+| `ratel.extraEnvs`                        | Extra env vars                                                        | `[]`                                                |
+| `ratel.service.type`                     | Ratel service type                                                    | `ClusterIP`                                         |
+| `ratel.service.annotations`              | Ratel Service annotations                                             | `ClusterIP`                                         |
+| `ratel.ingress.enabled`                  | Ratel Ingress resource enabled                                        | `false`                                             |
+| `ratel.ingress.hostname`                 | Ratel Ingress virtual hostname                                        | `nil`                                               |
+| `ratel.ingress.annotations`              | Ratel Ingress annotations                                             | `nil`                                               |
+| `ratel.ingress.tls`                      | Ratel Ingress TLS settings                                            | `nil`                                               |
+| `ratel.securityContext.enabled`          | Security context for ratel nodes enabled                              | `false`                                             |
+| `ratel.securityContext.fsGroup`          | Group id of the ratel container                                       | `1001`                                              |
+| `ratel.securityContext.runAsUser`        | User ID for the ratel container                                       | `1001`                                              |
+| `ratel.resources.requests`               | Ratel pod resources requests & limits                                 | `nil`                                               |
+| `ratel.livenessProbe`                    | Ratel liveness probes                                                 | `See values.yaml for defaults`                      |
+| `ratel.readinessProbe`                   | Ratel readiness probes                                                | `See values.yaml for defaults`                      |
+| `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
+| `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
+| `global.ingress.enabled`                 | Enable global ingress resource (overrides alpha/ratel ingress)        | `false`                                             |
+| `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
+| `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |
+| `global.ingress.ratel_hostname`          | global ingress virtual host name for ratel service                    | `""`                                                |
+| `global.ingress.alpha_hostname`          | global ingress virtual host name for alpha service                    | `""`                                                |
+
+
+## Ingress Resource
+
+You can define ingress resources through `alpha.ingress` for the alpha http service and `ratel.ingress` for the ratel ui service, or you can use a combined single ingress with `global.ingress` for both alpha http and ratel ui services.
+
+There are some example chart values for ingress resource configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
+
+## Alpha TLS Options
+
+The Dgraph alpha service can be configured to use Mutual TLS.  Instructions about this configuration can be found in `values.yaml`.  
+
+It is recommend that you keep secrets values and config values in separate yaml files.  To assist with this practice, you can use the [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh) script to generate a `secrets.yaml` file from an existing `./tls` directory that was previously generated by the `dgraph cert` command.
+
+There are some example chart values for Alpha TLS configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
 ## Monitoring
 
