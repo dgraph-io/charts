@@ -90,8 +90,10 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `zero.nodeSelector`                      | Node labels for zero pod assignment                                   | `{}`                                                |
 | `zero.tolerations`                       | Zero tolerations                                                      | `[]`                                                |
 | `zero.resources.requests.memory`         | Zero pod resources memory requests                                    | `100Mi`                                             |
+| `zero.startupProbe`                      | Zero startup probes (**NOTE**: only support in Kubernetes v1.16+)     | See `values.yaml` for defaults                      |
 | `zero.livenessProbe`                     | Zero liveness probes                                                  | See `values.yaml` for defaults                      |
 | `zero.readinessProbe`                    | Zero readiness probes                                                 | See `values.yaml` for defaults                      |
+| `zero.customStartupProbe`                | Zero custom startup probes (if `zero.startupProbe` not enabled)       | `{}`                                                |
 | `zero.customLivenessProbe`               | Zero custom liveness probes (if `zero.livenessProbe` not enabled)     | `{}`                                                |
 | `zero.customReadinessProbe`              | Zero custom readiness probes  (if `zero.readinessProbe` not enabled)  | `{}`                                                |
 | `alpha.name`                             | Alpha component name                                                  | `alpha`                                             |
@@ -125,8 +127,10 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.nodeSelector`                     | Node labels for alpha pod assignment                                  | `{}`                                                |
 | `alpha.tolerations`                      | Alpha tolerations                                                     | `[]`                                                |
 | `alpha.resources.requests.memory`        | Zero pod resources memory request                                     | `100Mi`                                             |
+| `alpha.startupProbe`                     | Alpha startup probes (**NOTE**: only support in Kubernetes v1.16+)    | See `values.yaml` for defaults                      |
 | `alpha.livenessProbe`                    | Alpha liveness probes                                                 | See `values.yaml` for defaults                      |
 | `alpha.readinessProbe`                   | Alpha readiness probes                                                | See `values.yaml` for defaults                      |
+| `alpha.customStartupProbe`               | Alpha custom startup probes (if `alpha.startupProbe` not enabled)     | `{}`                                                |
 | `alpha.customLivenessProbe`              | Alpha custom liveness probes (if `alpha.livenessProbe` not enabled)   | `{}`                                                |
 | `alpha.customReadinessProbe`             | Alpha custom readiness probes (if `alpha.readinessProbe` not enabled) | `{}`                                                |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
