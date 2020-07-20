@@ -123,6 +123,16 @@ zero:
   ## Configure extra options for liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
   ##
+  startupProbe:
+    enabled: false
+    port: 6080
+    path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  
   livenessProbe:
     enabled: false
     port: 6080
@@ -144,6 +154,7 @@ zero:
     successThreshold: 1
 
   ## Custom liveness and readiness probes
+  customStartupProbe: {}
   customLivenessProbe: {}
   customReadinessProbe: {}
 
@@ -271,6 +282,16 @@ alpha:
   ## Configure extra options for liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
   ##
+  startupProbe:
+    enabled: false
+    port: 8080
+    path: /health?live=1
+    initialDelaySeconds: 180
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+
   livenessProbe:
     enabled: false
     port: 8080
@@ -292,6 +313,7 @@ alpha:
     successThreshold: 1
 
   ## Custom liveness and readiness probes
+  customStartupProbe: {}
   customLivenessProbe: {}
   customReadinessProbe: {}
 

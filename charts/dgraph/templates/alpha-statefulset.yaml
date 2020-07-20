@@ -152,6 +152,20 @@ spec:
             dgraph alpha ${TLS_OPTIONS} --my=$(hostname -f):7080 --lru_mb {{ .Values.alpha.lru_mb }} --zero {{ template "multi_zeros" . }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
+        {{- if .Values.alpha.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            port: {{ .Values.alpha.startupProbe.port }}
+            path: {{ .Values.alpha.startupProbe.path }}
+          initialDelaySeconds: {{ .Values.alpha.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.alpha.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.alpha.startupProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.alpha.startupProbe.successThreshold }}
+          failureThreshold: {{ .Values.alpha.startupProbe.failureThreshold }}
+        {{- else if .Values.alpha.customStartupProbe }}
+        startupProbe: {{- toYaml .Values.alpha.customStartupProbe | nindent 10 }}
+        {{- end }}
+
         {{- if .Values.alpha.livenessProbe.enabled }}
         livenessProbe:
           httpGet:
