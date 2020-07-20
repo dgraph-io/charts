@@ -122,7 +122,6 @@ spec:
           httpGet:
             port: {{ .Values.zero.startupProbe.port }}
             path: {{ .Values.zero.startupProbe.path }}
-          initialDelaySeconds: {{ .Values.zero.startupProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.zero.startupProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.zero.startupProbe.timeoutSeconds }}
           successThreshold: {{ .Values.zero.startupProbe.successThreshold }}
