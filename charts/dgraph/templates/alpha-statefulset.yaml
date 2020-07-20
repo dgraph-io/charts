@@ -165,7 +165,6 @@ spec:
         {{- else if .Values.alpha.customStartupProbe }}
         startupProbe: {{- toYaml .Values.alpha.customStartupProbe | nindent 10 }}
         {{- end }}
-
         {{- if .Values.alpha.livenessProbe.enabled }}
         livenessProbe:
           httpGet:
