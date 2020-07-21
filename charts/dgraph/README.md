@@ -90,7 +90,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `zero.nodeSelector`                      | Node labels for zero pod assignment                                   | `{}`                                                |
 | `zero.tolerations`                       | Zero tolerations                                                      | `[]`                                                |
 | `zero.resources.requests.memory`         | Zero pod resources memory requests                                    | `100Mi`                                             |
-| `zero.startupProbe`                      | Zero startup probes (**NOTE**: only support in Kubernetes v1.16+)     | See `values.yaml` for defaults                      |
+| `zero.startupProbe`                      | Zero startup probes (**NOTE**: only supported in Kubernetes v1.16+)   | See `values.yaml` for defaults                      |
 | `zero.livenessProbe`                     | Zero liveness probes                                                  | See `values.yaml` for defaults                      |
 | `zero.readinessProbe`                    | Zero readiness probes                                                 | See `values.yaml` for defaults                      |
 | `zero.customStartupProbe`                | Zero custom startup probes (if `zero.startupProbe` not enabled)       | `{}`                                                |
@@ -127,7 +127,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.nodeSelector`                     | Node labels for alpha pod assignment                                  | `{}`                                                |
 | `alpha.tolerations`                      | Alpha tolerations                                                     | `[]`                                                |
 | `alpha.resources.requests.memory`        | Zero pod resources memory request                                     | `100Mi`                                             |
-| `alpha.startupProbe`                     | Alpha startup probes (**NOTE**: only support in Kubernetes v1.16+)    | See `values.yaml` for defaults                      |
+| `alpha.startupProbe`                     | Alpha startup probes (**NOTE**: only supported in Kubernetes v1.16+)  | See `values.yaml` for defaults                      |
 | `alpha.livenessProbe`                    | Alpha liveness probes                                                 | See `values.yaml` for defaults                      |
 | `alpha.readinessProbe`                   | Alpha readiness probes                                                | See `values.yaml` for defaults                      |
 | `alpha.customStartupProbe`               | Alpha custom startup probes (if `alpha.startupProbe` not enabled)     | `{}`                                                |
