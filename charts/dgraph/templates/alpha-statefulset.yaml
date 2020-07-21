@@ -157,7 +157,6 @@ spec:
           httpGet:
             port: {{ .Values.alpha.startupProbe.port }}
             path: {{ .Values.alpha.startupProbe.path }}
-          initialDelaySeconds: {{ .Values.alpha.startupProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.alpha.startupProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.alpha.startupProbe.timeoutSeconds }}
           successThreshold: {{ .Values.alpha.startupProbe.successThreshold }}

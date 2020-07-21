@@ -287,7 +287,6 @@ alpha:
     enabled: false
     port: 8080
     path: /health?live=1
-    initialDelaySeconds: 15
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 30
