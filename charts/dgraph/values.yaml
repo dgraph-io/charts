@@ -65,16 +65,20 @@ zero:
   ## and that they will never end up on the same node. Setting this to soft will do this "best effort"
   antiAffinity: soft
 
-  # By default this will make sure two pods don't end up on the same node
-  # Changing this to a region would allow you to spread pods across regions
+  ## By default this will make sure two pods don't end up on the same node
+  ## Changing this to a region would allow you to spread pods across regions
   podAntiAffinitytopologyKey: "kubernetes.io/hostname"
 
   ## This is the node affinity settings as defined in
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
-  # Extra environment variables which will be appended to the env: definition for the container.
+  ## Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
+
+  ## Configuration file for dgraph zero used as an alternative to command-line options
+  ## Ref: https://dgraph.io/docs/master/deploy/#config
+  config_file: {}
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -179,20 +183,24 @@ alpha:
   ## and that they will never end up on the same node. Setting this to soft will do this "best effort"
   antiAffinity: soft
 
-  # By default this will make sure two pods don't end up on the same node
-  # Changing this to a region would allow you to spread pods across regions
+  ## By default this will make sure two pods don't end up on the same node
+  ## Changing this to a region would allow you to spread pods across regions
   podAntiAffinitytopologyKey: "kubernetes.io/hostname"
 
   ## This is the node affinity settings as defined in
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
-  # Extra environment variables which will be appended to the env: definition for the container.
+  ## Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
     # - name: AWS_ACCESS_KEY_ID
     #   value: "XXXXXXXXXXXXXXXXXXXX"
     # - name: AWS_SECRET_ACCESS_KEY
     #   value: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+  ## Configuration file for dgraph alpha used as an alternative to command-line options
+  ## Ref: https://dgraph.io/docs/master/deploy/#config
+  config_file: {}
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer

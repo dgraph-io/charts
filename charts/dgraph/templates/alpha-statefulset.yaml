@@ -137,6 +137,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          {{- if .Values.alpha.config_file }}
+          - name: CONFIG_OPTION
+            value: --config /dgraph/config/{{ first (keys .Values.alpha.config_file | uniq | sortAlpha) }}
+          {{- end }}
           {{- if .Values.alpha.tls.enabled }}
           - name: TLS_OPTIONS
             value: {{ template "tls_options" . }}
@@ -149,7 +153,7 @@ spec:
          - "-c"
          - |
             set -ex
-            dgraph alpha ${TLS_OPTIONS} --my=$(hostname -f):7080 --lru_mb {{ .Values.alpha.lru_mb }} --zero {{ template "multi_zeros" . }}
+            dgraph alpha ${TLS_OPTIONS} ${CONFIG_OPTION} --my=$(hostname -f):7080 --lru_mb {{ .Values.alpha.lru_mb }} --zero {{ template "multi_zeros" . }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.livenessProbe.enabled }}
@@ -183,6 +187,10 @@ spec:
         - name: datadir
           mountPath: /dgraph
         {{- end }}
+        {{- if .Values.alpha.config_file }}
+        - name: config-volume
+          mountPath: /dgraph/config
+        {{- end }}
         {{- if .Values.alpha.tls.enabled }}
         - name: tls-volume
           mountPath: {{ .Values.alpha.tls.config.dir | default "/tls" }}
@@ -192,6 +200,11 @@ spec:
       - name: datadir
         persistentVolumeClaim:
           claimName: datadir
+      {{- if .Values.alpha.config_file }}
+      - name: config-volume
+        configMap: 
+          name: {{ template "dgraph.alpha.fullname" . }}-config
+      {{- end }}
       {{- if .Values.alpha.tls.enabled }}
       - name: tls-volume
         secret:
