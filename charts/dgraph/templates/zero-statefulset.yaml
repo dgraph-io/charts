@@ -117,6 +117,18 @@ spec:
              fi 
         resources:
 {{ toYaml .Values.zero.resources | indent 10 }}
+        {{- if .Values.zero.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            port: {{ .Values.zero.startupProbe.port }}
+            path: {{ .Values.zero.startupProbe.path }}
+          periodSeconds: {{ .Values.zero.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.zero.startupProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.zero.startupProbe.successThreshold }}
+          failureThreshold: {{ .Values.zero.startupProbe.failureThreshold }}
+        {{- else if .Values.zero.customStartupProbe }}
+        startupProbe: {{- toYaml .Values.zero.customStartupProbe | nindent 10 }}
+        {{- end }}
         {{- if .Values.zero.livenessProbe.enabled }}
         livenessProbe:
           httpGet:

@@ -120,9 +120,19 @@ zero:
     requests:
       memory: 100Mi
 
-  ## Configure extra options for liveness and readiness probes
+  ## Configure extra options for startup, liveness and readiness probes.
+  ## NOTE: startupProbe only support in Kubernetes v1.16+
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
   ##
+  startupProbe:
+    enabled: false
+    port: 6080
+    path: /health
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  
   livenessProbe:
     enabled: false
     port: 6080
@@ -144,6 +154,7 @@ zero:
     successThreshold: 1
 
   ## Custom liveness and readiness probes
+  customStartupProbe: {}
   customLivenessProbe: {}
   customReadinessProbe: {}
 
@@ -268,9 +279,19 @@ alpha:
   ## Typically a third of available memory is recommended, keeping the default value to 2048mb
   lru_mb: 2048
 
-  ## Configure extra options for liveness and readiness probes
+  ## Configure extra options for startup, liveness and readiness probes
+  ## NOTE: startupProbe only support in Kubernetes v1.16+
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
   ##
+  startupProbe:
+    enabled: false
+    port: 8080
+    path: /health?live=1
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 30
+    successThreshold: 1
+
   livenessProbe:
     enabled: false
     port: 8080
@@ -292,6 +313,7 @@ alpha:
     successThreshold: 1
 
   ## Custom liveness and readiness probes
+  customStartupProbe: {}
   customLivenessProbe: {}
   customReadinessProbe: {}
 
