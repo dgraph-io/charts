@@ -4,7 +4,8 @@
 alpha:
   tls:
     enabled: true
-    config:
-      dir: /tls
-      client_auth: VERIFYIFGIVEN
-      use_system_ca: true
+  configFile:
+    config.yaml: |
+      tls_client_auth: VERIFYIFGIVEN
+      tls_dir: /dgraph/tls
+      tls_use_system_ca: true

@@ -99,9 +99,9 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-          {{- if .Values.zero.config_file }}
+          {{- if .Values.zero.configFile }}
           - name: CONFIG_OPTION
-            value: --config /dgraph/config/{{ first (keys .Values.zero.config_file | uniq | sortAlpha) }}
+            value: --config /dgraph/config/{{ first (keys .Values.zero.configFile | uniq | sortAlpha) }}
           {{- end }}
         {{- with .Values.zero.extraEnvs }}
           {{- toYaml . | nindent 10 }}
@@ -152,7 +152,7 @@ spec:
         - name: datadir
           mountPath: /dgraph
         {{- end }}
-        {{- if .Values.zero.config_file }}
+        {{- if .Values.zero.configFile }}
         - name: config-volume
           mountPath: /dgraph/config
         {{- end }}
@@ -161,7 +161,7 @@ spec:
       - name: datadir
         persistentVolumeClaim:
           claimName: datadir
-     {{- if .Values.zero.config_file }}
+     {{- if .Values.zero.configFile }}
       - name: config-volume
         configMap: 
           name: {{ template "dgraph.zero.fullname" . }}-config

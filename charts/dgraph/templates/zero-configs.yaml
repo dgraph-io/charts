@@ -1,4 +1,4 @@
-{{ if .Values.zero.config_file }}
+{{ if .Values.zero.configFile }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,7 +10,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  {{- with .Values.zero.config_file }}
+  {{- with .Values.zero.configFile }}
     {{- toYaml . | trimSuffix "\n" | nindent 2 }}
   {{- end }}
 {{ end }}

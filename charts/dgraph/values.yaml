@@ -78,7 +78,7 @@ zero:
 
   ## Configuration file for dgraph zero used as an alternative to command-line options
   ## Ref: https://dgraph.io/docs/master/deploy/#config
-  config_file: {}
+  configFile: {}
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -200,7 +200,7 @@ alpha:
 
   ## Configuration file for dgraph alpha used as an alternative to command-line options
   ## Ref: https://dgraph.io/docs/master/deploy/#config
-  config_file: {}
+  configFile: {}
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -227,22 +227,13 @@ alpha:
     runAsUser: 1001
 
   ## TLS Configuration
+  ## Documentation on dgraph alpha TLS options,
+  ##  see https://dgraph.io/docs/master/deploy/#tls-options
   tls:
     enabled: false
-    ## Files created from '/tls' directory set with `dgraph cert` command
+    ## Files created from './tls' directory set with `dgraph cert` command
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
-    ## Documentation on dgraph alpha TLS options,
-    ##  see https://dgraph.io/docs/master/deploy/#tls-options
-    config: {}
-        ## Config Keys
-        ##  dir - location of keys and certificates
-        ##  client_auth - set to REQUEST, REQUIREANY, VERIFYIFGIVEN (default), or REQUIREANDVERIFY
-        ##  use_system_ca - true or false
-    #   dir: /tls
-    #   client_auth: VERIFYIFGIVEN
-    #   use_system_ca: true
-
 
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
