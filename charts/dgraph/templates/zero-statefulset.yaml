@@ -100,8 +100,8 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
           {{- if .Values.zero.configFile }}
-          - name: CONFIG_OPTION
-            value: --config /dgraph/config/{{ first (keys .Values.zero.configFile | uniq | sortAlpha) }}
+          - name: DGRAPH_ZERO_CONFIG
+            value: /dgraph/config/{{ first (keys .Values.zero.configFile | uniq | sortAlpha) }}
           {{- end }}
         {{- with .Values.zero.extraEnvs }}
           {{- toYaml . | nindent 10 }}
@@ -115,9 +115,9 @@ spec:
              ordinal=${BASH_REMATCH[1]}
              idx=$(($ordinal + 1))
              if [[ $ordinal -eq 0 ]]; then
-               exec dgraph zero ${CONFIG_OPTION} --my=$(hostname -f):5080 --idx $idx --replicas {{ .Values.zero.shardReplicaCount }}
+               exec dgraph zero --my=$(hostname -f):5080 --idx $idx --replicas {{ .Values.zero.shardReplicaCount }}
              else
-               exec dgraph zero ${CONFIG_OPTION} --my=$(hostname -f):5080 --peer {{ template "dgraph.zero.fullname" . }}-0.{{ template "dgraph.zero.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local:5080 --idx $idx --replicas {{ .Values.zero.shardReplicaCount }}
+               exec dgraph zero --my=$(hostname -f):5080 --peer {{ template "dgraph.zero.fullname" . }}-0.{{ template "dgraph.zero.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local:5080 --idx $idx --replicas {{ .Values.zero.shardReplicaCount }}
              fi 
         resources:
 {{ toYaml .Values.zero.resources | indent 10 }}

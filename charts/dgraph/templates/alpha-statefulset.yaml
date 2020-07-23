@@ -118,8 +118,8 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
           {{- if .Values.alpha.configFile }}
-          - name: CONFIG_OPTION
-            value: --config /dgraph/config/{{ first (keys .Values.alpha.configFile | uniq | sortAlpha) }}
+          - name: DGRAPH_ALPHA_CONFIG
+            value: /dgraph/config/{{ first (keys .Values.alpha.configFile | uniq | sortAlpha) }}
           {{- end }}
         {{- with .Values.alpha.extraEnvs }}
           {{- toYaml . | nindent 10 }}
@@ -129,7 +129,7 @@ spec:
          - "-c"
          - |
             set -ex
-            dgraph alpha ${CONFIG_OPTION} --my=$(hostname -f):7080 --zero {{ template "multi_zeros" . }}
+            dgraph alpha --my=$(hostname -f):7080 --zero {{ template "multi_zeros" . }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.livenessProbe.enabled }}
