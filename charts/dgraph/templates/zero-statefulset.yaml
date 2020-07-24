@@ -99,6 +99,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          {{- if .Values.zero.configFile }}
+          - name: DGRAPH_ZERO_CONFIG
+            value: /dgraph/config/{{ first (keys .Values.zero.configFile | uniq | sortAlpha) }}
+          {{- end }}
         {{- with .Values.zero.extraEnvs }}
           {{- toYaml . | nindent 10 }}
         {{- end }}
@@ -160,11 +164,20 @@ spec:
         - name: datadir
           mountPath: /dgraph
         {{- end }}
+        {{- if .Values.zero.configFile }}
+        - name: config-volume
+          mountPath: /dgraph/config
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.zero.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
         persistentVolumeClaim:
           claimName: datadir
+     {{- if .Values.zero.configFile }}
+      - name: config-volume
+        configMap: 
+          name: {{ template "dgraph.zero.fullname" . }}-config
+      {{- end }}
 {{- if .Values.zero.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:

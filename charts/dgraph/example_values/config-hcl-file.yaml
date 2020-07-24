@@ -1,0 +1,29 @@
+alpha:
+  configFile:
+    config.hcl: |
+      "abort_older_than" = "5m"
+      "alsologtostderr" = true
+      "badger.compression_level" = 3
+      "badger.tables" = "mmap"
+      "badger.vlog" = "mmap"
+      "bindall" = true
+      "enable_sentry" = true
+      "export" = "export"
+      "graphql_introspection" = true
+      "log_backtrace_at" = ":0"
+      "logtostderr" = true
+      "lru_mb" = 2048
+      "ludicrous_mode" = false
+zero:
+  configFile:
+    config.hcl: |      
+      "alsologtostderr" = true
+      "bindall" = true
+      "enable_sentry" = true
+      "log_backtrace_at" = ":0"
+      "logtostderr" = true
+      "ludicrous_mode" = false
+      "rebalance_interval" = "8m0s"
+      "telemetry" = true
+      "trace" = 1
+      "wal" = "/dgraph/data/zw"

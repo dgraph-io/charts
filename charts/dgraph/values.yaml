@@ -65,16 +65,20 @@ zero:
   ## and that they will never end up on the same node. Setting this to soft will do this "best effort"
   antiAffinity: soft
 
-  # By default this will make sure two pods don't end up on the same node
-  # Changing this to a region would allow you to spread pods across regions
+  ## By default this will make sure two pods don't end up on the same node
+  ## Changing this to a region would allow you to spread pods across regions
   podAntiAffinitytopologyKey: "kubernetes.io/hostname"
 
   ## This is the node affinity settings as defined in
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
-  # Extra environment variables which will be appended to the env: definition for the container.
+  ## Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
+
+  ## Configuration file for dgraph zero used as an alternative to command-line options
+  ## Ref: https://dgraph.io/docs/deploy/#config
+  configFile: {}
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -190,20 +194,24 @@ alpha:
   ## and that they will never end up on the same node. Setting this to soft will do this "best effort"
   antiAffinity: soft
 
-  # By default this will make sure two pods don't end up on the same node
-  # Changing this to a region would allow you to spread pods across regions
+  ## By default this will make sure two pods don't end up on the same node
+  ## Changing this to a region would allow you to spread pods across regions
   podAntiAffinitytopologyKey: "kubernetes.io/hostname"
 
   ## This is the node affinity settings as defined in
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
-  # Extra environment variables which will be appended to the env: definition for the container.
+  ## Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
     # - name: AWS_ACCESS_KEY_ID
     #   value: "XXXXXXXXXXXXXXXXXXXX"
     # - name: AWS_SECRET_ACCESS_KEY
     #   value: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+  ## Configuration file for dgraph alpha used as an alternative to command-line options
+  ## Ref: https://dgraph.io/docs/deploy/#config
+  configFile: {}
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -230,22 +238,13 @@ alpha:
     runAsUser: 1001
 
   ## TLS Configuration
+  ## Documentation on dgraph alpha TLS options,
+  ##  see https://dgraph.io/docs/deploy/#tls-options
   tls:
     enabled: false
-    ## Files created from '/tls' directory set with `dgraph cert` command
+    ## Files created from './tls' directory set with `dgraph cert` command
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
-    ## Documentation on dgraph alpha TLS options,
-    ##  see https://dgraph.io/docs/master/deploy/#tls-options
-    config: {}
-        ## Config Keys
-        ##  dir - location of keys and certificates
-        ##  client_auth - set to REQUEST, REQUIREANY, VERIFYIFGIVEN (default), or REQUIREANDVERIFY
-        ##  use_system_ca - true or false
-    #   dir: /tls
-    #   client_auth: VERIFYIFGIVEN
-    #   use_system_ca: true
-
 
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -275,9 +274,6 @@ alpha:
   resources:
     requests:
       memory: 100Mi
-  ## Configure value for lru_mb flag
-  ## Typically a third of available memory is recommended, keeping the default value to 2048mb
-  lru_mb: 2048
 
   ## Configure extra options for startup, liveness and readiness probes
   ## NOTE: startupProbe only support in Kubernetes v1.16+

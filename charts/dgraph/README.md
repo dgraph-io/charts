@@ -77,6 +77,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `zero.podAntiAffinitytopologyKey`        | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
 | `zero.nodeAffinity`                      | Zero node affinity policy                                             | `{}`                                                |
 | `zero.extraEnvs`                         | extra env vars                                                        | `[]`                                                |
+| `zero.configFile`                        | Zero config file                                                      | `{}`                                                |
 | `zero.service.type`                      | Zero service type                                                     | `ClusterIP`                                         |
 | `zero.service.annotations`               | Zero service annotations                                              | `{}`                                                |
 | `zero.service.publishNotReadyAddresses`  | publish address if pods not in ready state                            | `true`                                              |
@@ -107,6 +108,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.podAntiAffinitytopologyKey`       | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
 | `alpha.nodeAffinity`                     | Alpha node affinity policy                                            | `{}`                                                |
 | `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
+| `alpha.configFile`                       | Alpha config file                                                     | `{}`                                                |
 | `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
 | `alpha.service.annotations`              | Alpha service annotations                                             | `{}`                                                |
 | `alpha.service.publishNotReadyAddresses` | publish address if pods not in ready state                            | `true`                                              |
@@ -118,8 +120,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.securityContext.fsGroup`          | Group id of the alpha container                                       | `1001`                                              |
 | `alpha.securityContext.runAsUser`        | User ID for the alpha container                                       | `1001`                                              |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
-| `alpha.tls.files`                        | Alpha service TLS key and certificate files store as secret           | `false`                                             |
-| `alpha.tls.config`                       | Alpha service TLS options, see `values.yaml`                          | `{}`                                                |
+| `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
 | `alpha.persistence.enabled`              | Enable persistence for alpha using PVC                                | `true`                                              |
 | `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
 | `alpha.persistence.accessModes`          | PVC Access Mode for alpha volume                                      | `['ReadWriteOnce']`                                 |
@@ -164,6 +165,12 @@ You can define ingress resources through `alpha.ingress` for the alpha http serv
 
 There are some example chart values for ingress resource configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
+## Zero and Alpha Configuration
+
+Should you need additional configuration options you can add these either through environment variables or a configuration file, e.g. `config.toml`. Instructions about this configuration can be found in `values.yaml`.
+
+There are some example values files demonstrating how to add configuration with HCL, JSON, Java Properties, TOML, and YAML file formats in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
+
 ## Alpha TLS Options
 
 The Dgraph alpha service can be configured to use Mutual TLS.  Instructions about this configuration can be found in `values.yaml`.  
@@ -171,6 +178,52 @@ The Dgraph alpha service can be configured to use Mutual TLS.  Instructions abou
 It is recommend that you keep secrets values and config values in separate yaml files.  To assist with this practice, you can use the [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh) script to generate a `secrets.yaml` file from an existing `./tls` directory that was previously generated by the `dgraph cert` command.
 
 There are some example chart values for Alpha TLS configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
+
+### Alpha TLS Example
+
+As an example to test this feature, you can run the following:
+
+```bash
+VERS="0.0.8"
+RELNAME="my-release"
+
+# Prepare Certificates/Keys
+dgraph cert --nodes localhost --client dgraphuser
+# Create Dgraph alpha secrets
+curl --silent --remote-name --location \
+  https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/make_tls_secrets.sh
+bash make_tls_secrets.sh
+# Download Example Dgraph alpha config
+curl --silent --remote-name --location \
+ https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/example_values/alpha-tls-config.yaml
+
+# Install Chart with TLS Certificates
+helm install $RELNAME \
+ --values secrets.yaml
+ --values alpha-tls-config.yaml
+ --version $VERS
+ dgraph/dgraph
+
+# Port Forward Alpha GRPC to localhost (use other terminal tab)
+kubectl port-forward $RELNAME-dgraph-alpha-0 9080:9080 &
+# Port Forward Alpha HTTPS to localhost (use other terminal tab)
+kubectl port-forward $RELNAME-dgraph-alpha-0 8080:8080 &
+
+# Test GRPC using Mutual TLS
+dgraph increment \
+ --tls_cacert ./tls/ca.crt \
+ --tls_cert ./tls/client.dgraphuser.crt \
+ --tls_key ./tls/client.dgraphuser.key \
+ --tls_server_name "localhost"
+
+# Test HTTPS using Mutual TLS 
+curl --silent \
+  --cacert ./tls/ca.crt \
+  --cert ./tls/client.dgraphuser.crt \
+  --key ./tls/client.dgraphuser.key \
+  https://localhost:8080/state  
+```
+
 
 ## Monitoring
 
@@ -182,7 +235,7 @@ Follow the below mentioned steps to setup prometheus monitoring for your cluster
 * Install Prometheus operator:
 
 ```bash
-$ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.34/bundle.yaml
+$ kubectl apply --filename https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.34/bundle.yaml
 ```
 
 * Ensure that the instance of `prometheus-operator` has started before continuing.
@@ -196,7 +249,7 @@ prometheus-operator   1         1         1            1           3m
 * Apply prometheus manifest present [here](https://github.com/dgraph-io/dgraph/blob/master/contrib/config/monitoring/prometheus/prometheus.yaml).
 
 ```bash
-$ kubectl apply -f prometheus.yaml
+$ kubectl apply --filename prometheus.yaml
 
 serviceaccount/prometheus-dgraph-io created
 clusterrole.rbac.authorization.k8s.io/prometheus-dgraph-io created
@@ -237,10 +290,10 @@ the metrics exposed by dgraph cluster similar to [alert-rules](https://github.co
 manifest.
 
 ```bash
-$ kubectl apply -f alertmanager.yaml
+$ kubectl apply --filename alertmanager.yaml
 alertmanager.monitoring.coreos.com/alertmanager-dgraph-io created
 service/alertmanager-dgraph-io created
 
-$ kubectl apply -f alert-rules.yaml
+$ kubectl apply --filename alert-rules.yaml
 prometheusrule.monitoring.coreos.com/prometheus-rules-dgraph-io created
 ```
