@@ -161,6 +161,12 @@ You can define ingress resources through `alpha.ingress` for the alpha http serv
 
 There are some example chart values for ingress resource configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
+## Zero and Alpha Configuration
+
+Should you need additional confugration options you can add these either through environment variables or a configuration file, e.g. `config.toml`.  See https://dgraph.io/docs/master/deploy/#config for more information.
+
+There are some example values files demonstrating how to add configuration with HCL, JSON, Java Properties, TOML, and YAML file formats in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
+
 ## Alpha TLS Options
 
 The Dgraph alpha service can be configured to use Mutual TLS.  Instructions about this configuration can be found in `values.yaml`.  
@@ -178,7 +184,7 @@ VERS="0.0.8"
 RELNAME="my-release"
 
 # Prepare Certificates/Keys
-dgraph cert -n localhost -c dgraphuser
+dgraph cert --nodes localhost --client dgraphuser
 # Create Dgraph alpha secrets
 curl --silent --remote-name --location \
   https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/make_tls_secrets.sh
