@@ -77,7 +77,7 @@ zero:
   extraEnvs: []
 
   ## Configuration file for dgraph zero used as an alternative to command-line options
-  ## Ref: https://dgraph.io/docs/master/deploy/#config
+  ## Ref: https://dgraph.io/docs/deploy/#config
   configFile: {}
 
   ## Kubernetes configuration
@@ -199,7 +199,7 @@ alpha:
     #   value: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
   ## Configuration file for dgraph alpha used as an alternative to command-line options
-  ## Ref: https://dgraph.io/docs/master/deploy/#config
+  ## Ref: https://dgraph.io/docs/deploy/#config
   configFile: {}
 
   ## Kubernetes configuration
@@ -228,7 +228,7 @@ alpha:
 
   ## TLS Configuration
   ## Documentation on dgraph alpha TLS options,
-  ##  see https://dgraph.io/docs/master/deploy/#tls-options
+  ##  see https://dgraph.io/docs/deploy/#tls-options
   tls:
     enabled: false
     ## Files created from './tls' directory set with `dgraph cert` command

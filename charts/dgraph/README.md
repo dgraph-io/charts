@@ -163,7 +163,7 @@ There are some example chart values for ingress resource configuration in [examp
 
 ## Zero and Alpha Configuration
 
-Should you need additional confugration options you can add these either through environment variables or a configuration file, e.g. `config.toml`.  See https://dgraph.io/docs/master/deploy/#config for more information.
+Should you need additional configuration options you can add these either through environment variables or a configuration file, e.g. `config.toml`. Instructions about this configuration can be found in `values.yaml`.
 
 There are some example values files demonstrating how to add configuration with HCL, JSON, Java Properties, TOML, and YAML file formats in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
