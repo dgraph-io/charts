@@ -40,4 +40,3 @@ zero:
       telemetry = true
       trace = 1
       wal = '/dgraph/data/zw'
-
