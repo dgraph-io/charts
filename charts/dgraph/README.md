@@ -108,7 +108,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.podAntiAffinitytopologyKey`       | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
 | `alpha.nodeAffinity`                     | Alpha node affinity policy                                            | `{}`                                                |
 | `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
-| `alpha.configFile`                       | Alpha config file                                                     | `{}`                                                |
+| `alpha.configFile`                       | Alpha config file                                                     | `{ config.yaml: 'lru_mb: 2048' }`                   |
 | `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
 | `alpha.service.annotations`              | Alpha service annotations                                             | `{}`                                                |
 | `alpha.service.publishNotReadyAddresses` | publish address if pods not in ready state                            | `true`                                              |
