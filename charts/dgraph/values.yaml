@@ -80,7 +80,6 @@ zero:
   ## Ref: https://dgraph.io/docs/deploy/#config
   configFile: {}
 
-
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
   ##
