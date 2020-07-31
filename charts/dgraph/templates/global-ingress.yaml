@@ -54,7 +54,7 @@ spec:
           - path: /
           {{- end }}
             backend:
-              serviceName: {{ template "dgraph.alpha.fullname" . }}
+              serviceName: {{ template "dgraph.ratel.fullname" . }}
               servicePort: 80
     {{- end }}
 {{- end }}
