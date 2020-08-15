@@ -4,7 +4,9 @@
   {{- $max := int .Values.zero.replicaCount -}}
   {{- /* Create semverCompare() safe version if 'master' or 'latest' */ -}}
   {{- $safeVersion := .Values.image.tag -}}
-  {{- if or (eq $safeVersion "latest") (eq $safeVersion "master") -}}
+  {{- if (eq $safeVersion "shuri") -}}
+    {{- $safeVersion = "20.07.0" -}}
+  {{- else if  (regexMatch "^[^v].*" $safeVersion) -}}
     {{- $safeVersion = "v50.0.0" -}}
   {{- end -}}
   {{- /* Reset $max to 1 if multiple zeros not supported by dgraph version */}}
