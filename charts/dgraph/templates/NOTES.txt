@@ -1,4 +1,4 @@
-1. Congratulations, You have just deployed {{ .Chart.Name }}. 
+1. Congratulations, You have just deployed {{ .Chart.Name }}, version '{{ .Values.image.tag }}'.
 
    For further information:
      * Documentation: https://dgraph.io/docs/
