@@ -1,0 +1,30 @@
+1. Congratulations, You have just deployed {{ .Chart.Name }}. 
+
+   For further information:
+     * Documentation: https://dgraph.io/docs/
+     * Community and Issues: https://discuss.dgraph.io/
+   {{ if or (eq .Values.image.tag "latest") (eq .Values.image.tag "master") }}
+   NOTE: Using 'latest' or 'master' for 'image.tag' is DANGEROUS and can lead to data loss. 
+         >>> Do not use '{{- .Values.image.tag }}' in production!!! <<<
+   {{ end }}
+2. Accessing Dgraph Alpha
+{{- if .Values.global.ingress.enabled }}
+ TBA INGRESS
+{{- else if .Values.alpha.ingress.enabled }}
+ TBA INGRESS
+{{- else if contains "NodePort" .Values.alpha.service.type }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "dgraph.alpha.fullname" . }})
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo "Access Alpha http service from the same subnet with http://$NODE_IP:$NODE_PORT"
+{{- else if contains "LoadBalancer" .Values.alpha.service.type }}
+    NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} service --watch {{ include "dgraph.alpha.fullname" . }}'
+
+    export SERVICE_IP=$(kubectl get service --namespace {{ .Release.Namespace }} {{ include "dgraph.alpha.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+    echo "Access Alpha http service with http://$SERVICE_IP:8080"
+
+{{- else if contains "ClusterIP" .Values.alpha.service.type }}
+    export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} --selector "statefulset.kubernetes.io/pod-name={{ include "dgraph.alpha.fullname" . }}-0,release={{ .Release.Name }}" --output jsonpath="{.items[0].metadata.name}")
+    echo "Visit http://127.0.0.1:8080 to use your application"
+    kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:8080
+{{- end }}
