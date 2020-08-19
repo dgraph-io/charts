@@ -1,0 +1,10 @@
+## alpha-acl-config.yaml
+## Specify Access Control Lists configuration options for `dgraph alpha`
+## * https://dgraph.io/docs/enterprise-features/access-control-lists/
+alpha:
+  acl:
+    enabled: true
+  configFile:
+    config.toml: |
+      acl_secret_file = '/dgraph/acl/hmac-secret'
+      lru_mb = 2048

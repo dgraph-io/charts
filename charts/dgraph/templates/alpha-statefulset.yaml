@@ -194,6 +194,10 @@ spec:
         - name: enc-volume
           mountPath: /dgraph/enc
         {{- end }}
+        {{- if .Values.alpha.acl.enabled }}
+        - name: acl-volume
+          mountPath: /dgraph/acl
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
@@ -213,6 +217,11 @@ spec:
       - name: enc-volume
         secret:
           secretName: {{ template "dgraph.alpha.fullname" . }}-encryption-secret
+      {{- end }}
+      {{- if .Values.alpha.acl.enabled }}
+      - name: acl-volume
+        secret:
+          secretName: {{ template "dgraph.alpha.fullname" . }}-acl-secret
       {{- end }}
 
 {{- if .Values.alpha.persistence.enabled }}
