@@ -7,24 +7,66 @@
    NOTE: Using 'latest' or 'master' for 'image.tag' is DANGEROUS and can lead to data loss. 
          >>> Do not use '{{- .Values.image.tag }}' in production!!! <<<
    {{ end }}
-2. Accessing Dgraph Alpha
+2. Get the Dgraph Alpha HTTP/S endpoint by running these commands.
+
 {{- if .Values.global.ingress.enabled }}
- TBA INGRESS
+
+    echo "Access Alpha HTTP/S service: http://{{ .Values.global.ingress.alpha_hostname }}"
+
 {{- else if .Values.alpha.ingress.enabled }}
- TBA INGRESS
+
+    echo "Access Alpha HTTP/S service: http://{{ .Values.alpha.ingress.hostname }}"
+
 {{- else if contains "NodePort" .Values.alpha.service.type }}
+
     export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[?(@.name=='http-alpha')].nodePort}" services {{ include "dgraph.alpha.fullname" . }})
     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-    echo "Access Alpha http service from the same subnet with http://$NODE_IP:$NODE_PORT"
+    echo "Access Alpha HTTP/S service using http://$NODE_IP:$NODE_PORT"
 {{- else if contains "LoadBalancer" .Values.alpha.service.type }}
-    NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} service --watch {{ include "dgraph.alpha.fullname" . }}'
+   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+         You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} service --watch {{ include "dgraph.alpha.fullname" . }}'
 
     export SERVICE_IP=$(kubectl get service --namespace {{ .Release.Namespace }} {{ include "dgraph.alpha.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-    echo "Access Alpha http service with http://$SERVICE_IP:8080"
+    echo "Access Alpha HTTP/S service using http://$SERVICE_IP:8080"
 
 {{- else if contains "ClusterIP" .Values.alpha.service.type }}
+
     export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} --selector "statefulset.kubernetes.io/pod-name={{ include "dgraph.alpha.fullname" . }}-0,release={{ .Release.Name }}" --output jsonpath="{.items[0].metadata.name}")
-    echo "Visit http://127.0.0.1:8080 to use your application"
+    echo "Access Alpha HTTP/S using http://localhost:8080"
     kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:8080
+
 {{- end }}
+
+   NOTE: Change "http://" to "https://" if TLS was added to the Ingress, Load Balancer, or Dgraph alpha service.
+
+3. Get the Dgraph Ratel UI endpoint by running these commands:
+
+{{- if .Values.global.ingress.enabled }}
+
+    echo "Access ratel HTTP/S service: http://{{ .Values.global.ingress.ratel_hostname }}"
+
+{{- else if .Values.ratel.ingress.enabled }}
+
+    echo "Access ratel HTTP/S service: http://{{ .Values.ratel.ingress.hostname }}"
+
+{{- else if contains "NodePort" .Values.ratel.service.type }}
+
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[?(@.name=='http-ratel')].nodePort}" services {{ include "dgraph.ratel.fullname" . }})
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo "Access ratel HTTP/S service using http://$NODE_IP:$NODE_PORT"
+{{- else if contains "LoadBalancer" .Values.ratel.service.type }}
+    NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} service --watch {{ include "dgraph.ratel.fullname" . }}'
+
+    export SERVICE_IP=$(kubectl get service --namespace {{ .Release.Namespace }} {{ include "dgraph.ratel.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+    echo "Access ratel HTTP/S service using http://$SERVICE_IP:8080"
+
+{{- else if contains "ClusterIP" .Values.ratel.service.type }}
+
+    export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} --selector "statefulset.kubernetes.io/pod-name={{ include "dgraph.ratel.fullname" . }}-0,release={{ .Release.Name }}" --output jsonpath="{.items[0].metadata.name}")
+    echo "Access ratel HTTP/S using http://localhost:8080"
+    kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:8080
+
+{{- end }}
+
+   NOTE: Change "http://" to "https://" if TLS was added to the Ingress or Load Balancer.
