@@ -13,7 +13,7 @@
 {{- else if .Values.alpha.ingress.enabled }}
  TBA INGRESS
 {{- else if contains "NodePort" .Values.alpha.service.type }}
-    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "dgraph.alpha.fullname" . }})
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[?(@.name=='http-alpha')].nodePort}" services {{ include "dgraph.alpha.fullname" . }})
     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
     echo "Access Alpha http service from the same subnet with http://$NODE_IP:$NODE_PORT"
 {{- else if contains "LoadBalancer" .Values.alpha.service.type }}
