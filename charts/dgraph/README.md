@@ -121,6 +121,10 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.securityContext.runAsUser`        | User ID for the alpha container                                       | `1001`                                              |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
 | `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
+| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled (Enterprise feature)                 | `false`                                             |
+| `alpha.encryption.key_file`              | Alpha Encryption at Rest key file (Enterprise feature)                | `nil`                                               |
+| `alpha.acl.enabled`                      | Alpha ACL enabled (Enterprise feature)                                | `false`                                             |
+| `alpha.acl.secret_file`                  | Alpha ACL secret file (Enterprise feature)                            | `nil`                                               |
 | `alpha.persistence.enabled`              | Enable persistence for alpha using PVC                                | `true`                                              |
 | `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
 | `alpha.persistence.accessModes`          | PVC Access Mode for alpha volume                                      | `['ReadWriteOnce']`                                 |
