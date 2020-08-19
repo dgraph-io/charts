@@ -190,6 +190,10 @@ spec:
         - name: tls-volume
           mountPath: /dgraph/tls
         {{- end }}
+        {{- if .Values.alpha.encryption.enabled }}
+        - name: enc-volume
+          mountPath: /dgraph/enc
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
@@ -204,6 +208,11 @@ spec:
       - name: tls-volume
         secret:
           secretName: {{ template "dgraph.alpha.fullname" . }}-secret
+      {{- end }}
+      {{- if .Values.alpha.encryption.enabled }}
+      - name: enc-volume
+        secret:
+          secretName: {{ template "dgraph.alpha.fullname" . }}-encryption-secret
       {{- end }}
 
 {{- if .Values.alpha.persistence.enabled }}

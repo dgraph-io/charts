@@ -248,6 +248,24 @@ alpha:
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
 
+  ## ACL Configuration
+  ## Documentation on Enterprise ACL Feature
+  ##  see https://dgraph.io/docs/enterprise-features/access-control-lists/
+  acl:
+    enabled: false
+    ## Note this must match the file name specified for the `acl_secret_file` option in your configFile setting.
+    # secret_file:
+    #   hmac-secret: 1234567890123456789012345678901
+
+  ## Encryption at Rest Configuration
+  ## Documentation on Enterprise ACL Feature
+  ##  see https://dgraph.io/docs/enterprise-features/encryption-at-rest/
+  encryption:
+    enabled: false
+    ## Note this must match the file name specified for the `encryption_key_file` option in your configFile setting.
+    # key_file:
+    #   enc_key_file: 123456789012345
+
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
