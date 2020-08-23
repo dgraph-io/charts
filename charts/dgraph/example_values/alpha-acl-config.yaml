@@ -6,5 +6,5 @@ alpha:
     enabled: true
   configFile:
     config.toml: |
-      acl_secret_file = '/dgraph/acl/hmac-secret'
+      acl_secret_file = '/dgraph/acl/hmac_secret_file'
       lru_mb = 2048
