@@ -62,13 +62,13 @@
            You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} service --watch {{ include "dgraph.ratel.fullname" . }}'
 
     export SERVICE_IP=$(kubectl get service --namespace {{ .Release.Namespace }} {{ include "dgraph.ratel.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-    echo "Access Ratel HTTP/S service using http://$SERVICE_IP:8080"
+    echo "Access Ratel HTTP/S service using http://$SERVICE_IP"
 
 {{- else if contains "ClusterIP" .Values.ratel.service.type }}
 
-    export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} --selector "deployment.kubernetes.io/pod-name={{ include "dgraph.ratel.fullname" . }}-0,release={{ .Release.Name }}" --output jsonpath="{.items[0].metadata.name}")
-    echo "Access Ratel HTTP/S using http://localhost:8080"
-    kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:8080
+    export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} --selector "component={{ .Values.ratel.name }},release={{ .Release.Name }}" --output jsonpath="{.items[0].metadata.name}")
+    echo "Access Ratel HTTP/S using http://localhost:8000"
+    kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8000:8000
 
 {{- end }}
 
