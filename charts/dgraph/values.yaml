@@ -86,7 +86,7 @@ zero:
   service:
     type: ClusterIP
     annotations: {}
-    ## StatefulSet pods will need to have addresses published in order to 
+    ## StatefulSet pods will need to have addresses published in order to
     ## communicate to each other in order to enter a ready state.
     publishNotReadyAddresses: true
 
@@ -136,7 +136,7 @@ zero:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
-  
+
   livenessProbe:
     enabled: false
     port: 6080
@@ -221,7 +221,7 @@ alpha:
   service:
     type: ClusterIP
     annotations: {}
-    ## StatefulSet pods will need to have addresses published in order to 
+    ## StatefulSet pods will need to have addresses published in order to
     ## communicate to each other in order to enter a ready state.
     publishNotReadyAddresses: true
 
@@ -253,9 +253,11 @@ alpha:
   ##  see https://dgraph.io/docs/enterprise-features/access-control-lists/
   acl:
     enabled: false
-    ## Note this must match the file name specified for the `acl_secret_file` option in your configFile setting.
+    ## The values in `file: {}` will be the filename as key and the file data as the value.
+    ## Make sure that the filename key matches the dgraph configuration of `acl_secret_file`
     # file:
-    #   # value for 1234567890123456789012345678901
+    #   ## value for 1234567890123456789012345678901
+    #   ## Note that Kubernetes secrets must be base64-encoded
     #   hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
 
   ## Encryption at Rest Configuration
@@ -263,9 +265,11 @@ alpha:
   ##  see https://dgraph.io/docs/enterprise-features/encryption-at-rest/
   encryption:
     enabled: false
-    ## Note this must match the file name specified for the `encryption_key_file` option in your configFile setting.
+    ## The values in `file: {}` will be the filename as key and the file data as the value.
+    ## Make sure that the filename key matches the dgraph configuration of `encryption_key_file`
     # file:
-    #   # value for 123456789012345
+    #   ## value for 123456789012345
+    #   ## Note that Kubernetes secrets must be base64-encoded
     #   enc_key_file: MTIzNDU2Nzg5MDEyMzQ1Cg==
 
   ## dgraph data Persistent Volume Storage Class
