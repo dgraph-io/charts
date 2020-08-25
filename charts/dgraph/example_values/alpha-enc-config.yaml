@@ -1,0 +1,10 @@
+## alpha-enc-config.yaml
+## Specify Encryption at Rest configuration options for `dgraph alpha`
+## * https://dgraph.io/docs/enterprise-features/encryption-at-rest/
+alpha:
+  encryption:
+    enabled: true
+  configFile:
+    config.toml: |
+      encryption_key_file = '/dgraph/enc/enc_key_file'
+      lru_mb = 2048

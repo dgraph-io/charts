@@ -121,6 +121,10 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `alpha.securityContext.runAsUser`        | User ID for the alpha container                                       | `1001`                                              |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
 | `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
+| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled (Enterprise feature)                 | `false`                                             |
+| `alpha.encryption.file`                  | Alpha Encryption at Rest key file (Enterprise feature)                | `nil`                                               |
+| `alpha.acl.enabled`                      | Alpha ACL enabled (Enterprise feature)                                | `false`                                             |
+| `alpha.acl.file`                         | Alpha ACL secret file (Enterprise feature)                            | `nil`                                               |
 | `alpha.persistence.enabled`              | Enable persistence for alpha using PVC                                | `true`                                              |
 | `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
 | `alpha.persistence.accessModes`          | PVC Access Mode for alpha volume                                      | `['ReadWriteOnce']`                                 |
@@ -184,7 +188,6 @@ There are some example chart values for Alpha TLS configuration in [example_valu
 As an example to test this feature, you can run the following:
 
 ```bash
-VERS="0.0.8"
 RELNAME="my-release"
 
 # Prepare Certificates/Keys
@@ -201,7 +204,6 @@ curl --silent --remote-name --location \
 helm install $RELNAME \
  --values secrets.yaml
  --values alpha-tls-config.yaml
- --version $VERS
  dgraph/dgraph
 
 # Port Forward Alpha GRPC to localhost (use other terminal tab)
@@ -222,6 +224,90 @@ curl --silent \
   --cert ./tls/client.dgraphuser.crt \
   --key ./tls/client.dgraphuser.key \
   https://localhost:8080/state  
+```
+
+## Alpha Encryption at Rest (Enterprise Feature)
+
+You can generate a secret for the key file using `base64` tool:
+
+```bash
+base64 <<< '123456789012345'
+# MTIzNDU2Nzg5MDEyMzQ1Cg==
+```
+
+Then create a Helm chart value config file with the secret:
+
+```yaml
+# alpha-enc-secret.yaml
+alpha:
+  encryption:
+    file:
+      enc_key_file: MTIzNDU2Nzg5MDEyMzQ1Cg==
+```
+
+Create a corresponding configuration enables and configures dgraph alpha to use this file:
+
+```yaml
+# alpha-enc-config.yaml
+alpha:
+  encryption:
+    enabled: true
+  configFile:
+    config.toml: |
+      encryption_key_file = '/dgraph/enc/enc_key_file'
+      lru_mb = 2048
+```
+
+Then deploy dgraph using the secret and config files:
+
+```bash
+RELNAME=my-release
+helm install $RELNAME \
+ --values alpha-enc-secret.yaml
+ --values alpha-enc-config.yaml
+ dgraph/dgraph
+```
+
+## Alpha Access Control Lists (Enterprise Feature)
+
+You can generate a secret for the secrets file using `base64` tool:
+
+```bash
+base64 <<< '1234567890123456789012345678901'
+# MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
+```
+
+Then create a Helm chart value config file with the secret:
+
+```yaml
+# alpha-acl-secret.yaml
+alpha:
+  acl:
+    file:
+      hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
+```
+
+Create a corresponding configuration enables and configures dgraph alpha to use this file:
+
+```yaml
+# alpha-acl-config.yaml
+alpha:
+  acl:
+    enabled: true
+  configFile:
+    config.toml: |
+      acl_secret_file = '/dgraph/acl/hmac_secret_file'
+      lru_mb = 2048
+```
+
+Then deploy dgraph using the secret and config files:
+
+```bash
+RELNAME=my-release
+helm install $RELNAME \
+ --values alpha-acl-secret.yaml
+ --values alpha-acl-config.yaml
+ dgraph/dgraph
 ```
 
 

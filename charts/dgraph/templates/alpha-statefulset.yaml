@@ -4,7 +4,9 @@
   {{- $max := int .Values.zero.replicaCount -}}
   {{- /* Create semverCompare() safe version if 'master' or 'latest' */ -}}
   {{- $safeVersion := .Values.image.tag -}}
-  {{- if or (eq $safeVersion "latest") (eq $safeVersion "master") -}}
+  {{- if (eq $safeVersion "shuri") -}}
+    {{- $safeVersion = "20.07.0" -}}
+  {{- else if  (regexMatch "^[^v].*" $safeVersion) -}}
     {{- $safeVersion = "v50.0.0" -}}
   {{- end -}}
   {{- /* Reset $max to 1 if multiple zeros not supported by dgraph version */}}
@@ -188,6 +190,14 @@ spec:
         - name: tls-volume
           mountPath: /dgraph/tls
         {{- end }}
+        {{- if .Values.alpha.encryption.enabled }}
+        - name: enc-volume
+          mountPath: /dgraph/enc
+        {{- end }}
+        {{- if .Values.alpha.acl.enabled }}
+        - name: acl-volume
+          mountPath: /dgraph/acl
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
@@ -202,6 +212,16 @@ spec:
       - name: tls-volume
         secret:
           secretName: {{ template "dgraph.alpha.fullname" . }}-secret
+      {{- end }}
+      {{- if .Values.alpha.encryption.enabled }}
+      - name: enc-volume
+        secret:
+          secretName: {{ template "dgraph.alpha.fullname" . }}-encryption-secret
+      {{- end }}
+      {{- if .Values.alpha.acl.enabled }}
+      - name: acl-volume
+        secret:
+          secretName: {{ template "dgraph.alpha.fullname" . }}-acl-secret
       {{- end }}
 
 {{- if .Values.alpha.persistence.enabled }}

@@ -10,7 +10,7 @@
 image:
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v20.03.4
+  tag: v20.07.0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -86,7 +86,7 @@ zero:
   service:
     type: ClusterIP
     annotations: {}
-    ## StatefulSet pods will need to have addresses published in order to 
+    ## StatefulSet pods will need to have addresses published in order to
     ## communicate to each other in order to enter a ready state.
     publishNotReadyAddresses: true
 
@@ -136,7 +136,7 @@ zero:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
-  
+
   livenessProbe:
     enabled: false
     port: 6080
@@ -221,7 +221,7 @@ alpha:
   service:
     type: ClusterIP
     annotations: {}
-    ## StatefulSet pods will need to have addresses published in order to 
+    ## StatefulSet pods will need to have addresses published in order to
     ## communicate to each other in order to enter a ready state.
     publishNotReadyAddresses: true
 
@@ -247,6 +247,30 @@ alpha:
     ## Files created from './tls' directory set with `dgraph cert` command
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
+
+  ## ACL Configuration
+  ## Documentation on Enterprise ACL Feature
+  ##  see https://dgraph.io/docs/enterprise-features/access-control-lists/
+  acl:
+    enabled: false
+    ## The values in `file: {}` will be the filename as key and the file data as the value.
+    ## Make sure that the filename key matches the dgraph configuration of `acl_secret_file`
+    # file:
+    #   ## value for 1234567890123456789012345678901
+    #   ## Note that Kubernetes secrets must be base64-encoded
+    #   hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
+
+  ## Encryption at Rest Configuration
+  ## Documentation on Enterprise ACL Feature
+  ##  see https://dgraph.io/docs/enterprise-features/encryption-at-rest/
+  encryption:
+    enabled: false
+    ## The values in `file: {}` will be the filename as key and the file data as the value.
+    ## Make sure that the filename key matches the dgraph configuration of `encryption_key_file`
+    # file:
+    #   ## value for 123456789012345
+    #   ## Note that Kubernetes secrets must be base64-encoded
+    #   enc_key_file: MTIzNDU2Nzg5MDEyMzQ1Cg==
 
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
