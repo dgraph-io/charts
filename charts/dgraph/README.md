@@ -316,4 +316,4 @@ helm install $RELNAME \
 Dgraph exposes prometheus metrics to monitor the state of various components involved in
 the cluster, this includes Dgraph Alpha and Dgraph Zero.
 
-Further information can be found [Monitoring in Kubernetes](https://dgraph.io/docs/deploy/kubernetes/#monitoring-in-kubernetes) documentation.
+Further information can be found in the [Monitoring in Kubernetes](https://dgraph.io/docs/deploy/kubernetes/#monitoring-in-kubernetes) documentation.
