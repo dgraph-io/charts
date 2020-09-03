@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v20.03.3`                                          |
+| `image.tag`                              | Container image tag                                                   | `v20.07.0`                                          |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
@@ -218,7 +218,7 @@ dgraph increment \
  --tls_key ./tls/client.dgraphuser.key \
  --tls_server_name "localhost"
 
-# Test HTTPS using Mutual TLS 
+# Test HTTPS using Mutual TLS
 curl --silent \
   --cacert ./tls/ca.crt \
   --cert ./tls/client.dgraphuser.crt \
