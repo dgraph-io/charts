@@ -35,7 +35,7 @@ spec:
                 set -ex
                 source /scripts/backup.sh
 
-                ## Use Single Alpha in Cluster to avoid problems with concurrent backups suppported
+                ## Use Single Alpha in Cluster to avoid potential issues with concurrent backups
                 ## ref https://discuss.dgraph.io/t/concurrent-backups-can-lead-to-issues/9934/2
                 ALPHA_HOST={{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc
                 BACKUP_DESTINATION={{ .Values.backups.full.destination }}

@@ -2,13 +2,7 @@
 {{- define "multi_zeros" -}}
   {{- $zeroFullName := include "dgraph.zero.fullname" . -}}
   {{- $max := int .Values.zero.replicaCount -}}
-  {{- /* Create semverCompare() safe version if 'master' or 'latest' */ -}}
-  {{- $safeVersion := .Values.image.tag -}}
-  {{- if (eq $safeVersion "shuri") -}}
-    {{- $safeVersion = "20.07.0" -}}
-  {{- else if  (regexMatch "^[^v].*" $safeVersion) -}}
-    {{- $safeVersion = "v50.0.0" -}}
-  {{- end -}}
+  {{- $safeVersion := include "dgraph.version" . -}}
   {{- /* Reset $max to 1 if multiple zeros not supported by dgraph version */}}
   {{- if semverCompare "< 1.2.3 || 20.03.0" $safeVersion -}}
      {{- $max = 1 -}}
