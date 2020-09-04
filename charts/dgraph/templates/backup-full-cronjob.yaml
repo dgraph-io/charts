@@ -1,3 +1,12 @@
+{{- /* Determine Backup is REST or GraphQL */}}
+{{- define "backup_api_type" -}}
+{{- $apiType := "graphql" -}}
+{{- $safeVersion := include "dgraph.version" . -}}
+{{- if semverCompare "< 20.0" $safeVersion -}}
+  {{- $apiType = "rest" -}}
+{{- end -}}
+{{- printf "%s" $apiType -}}
+{{- end -}}
 {{- if eq .Values.backups.full.enabled true -}}
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -26,21 +35,21 @@ spec:
                 set -ex
                 source /scripts/backup.sh
 
+                ## Use Single Alpha in Cluster to avoid problems with concurrent backups suppported
+                ## ref https://discuss.dgraph.io/t/concurrent-backups-can-lead-to-issues/9934/2
+                ALPHA_HOST={{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc
                 BACKUP_DESTINATION={{ .Values.backups.full.destination }}
-                
-                ## TODO: check version for rest vs. graphql
+                API_TYPE={{ template "backup_api_type" . }}
+                MINIO_SECURE={{ .Values.backups.full.minioSecure }}
+
                 ## TODO: check acl, secrests, token
                 ## TODO: tls and tls w/ client
-                ## TODO: minio secure?
-
                 
                 FORCE_FULL=true backup
             volumeMounts:
             - name: config-volume
               mountPath: /scripts
             env:
-            - name: S3_URL
-              value: s3://s3.us-east-2.amazonaws.com/joaquin-dgraph-backups
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:

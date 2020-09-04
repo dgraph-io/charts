@@ -424,10 +424,8 @@ backups:
     ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
     ##   minio://my-release-minio.default.svc:9000/<bucketname>
     destination: /path/to/backups
-    ## user and password used to login if ACLs are enabled
-    ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/
-    user: groot
-    password: password
+    ## enable if minio service has https://
+    minioSecure: false
   incremental:
     enabled: false
     ## incremental backup schedule
@@ -439,6 +437,8 @@ backups:
     ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
     ##   minio://my-release-minio.default.svc:9000/<bucketname>
     destination: /path/to/backups
+    ## enable if minio service has https://
+    minioSecure: false
   admin:
     ## backup user and password used to login if ACLs are enabled
     ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/

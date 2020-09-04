@@ -32,6 +32,21 @@ Create a default fully qualified data name.
 {{- end -}}
 
 {{/*
+Create a semVer/calVer version from image.tag so that it can be safely use in 
+version comparisions used to toggle features or behavior.
+*/}}
+{{- define "dgraph.version" -}}
+{{- $safeVersion := .Values.image.tag -}}
+{{- if (eq $safeVersion "shuri") -}}
+  {{- $safeVersion = "v20.07.0" -}}
+{{- else if  (regexMatch "^[^v].*" $safeVersion) -}}
+  {{- $safeVersion = "v50.0.0" -}}
+{{- end -}}
+{{- printf "%s" $safeVersion -}}
+{{- end -}}
+
+
+{{/*
 Return the backup image name
 */}}
 {{- define "backup.image" -}}
