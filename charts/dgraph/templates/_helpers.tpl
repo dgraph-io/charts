@@ -32,6 +32,16 @@ Create a default fully qualified data name.
 {{- end -}}
 
 {{/*
+Return the backup image name
+*/}}
+{{- define "backup.image" -}}
+{{- $registryName := .Values.backups.image.registry -}}
+{{- $repositoryName := .Values.backups.image.repository -}}
+{{- $tag := .Values.backups.image.tag | toString -}}
+{{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
+{{- end -}}
+
+{{/*
 Return the proper image name (for the metrics image)
 */}}
 {{- define "dgraph.image" -}}
@@ -97,8 +107,3 @@ Create a default fully qualified ratel name.
 {{- define "dgraph.ratel.fullname" -}}
 {{ template "dgraph.fullname" . }}-{{ .Values.ratel.name }}
 {{- end -}}
-
-
-
-
-

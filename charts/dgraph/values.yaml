@@ -7,7 +7,7 @@
 #   imagePullSecrets:
 #     - myRegistryKeySecretName
 
-image:
+image: &image
   registry: docker.io
   repository: dgraph/dgraph
   tag: v20.07.0
@@ -444,6 +444,10 @@ backups:
     ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/
     user: groot
     password: password
+  ## Backups image - image needs at least curl command
+  ## default is to reuse dgraph image
+  image:
+    << : *image
 
 global:
   ## Combined ingress resource for alpha and ratel services

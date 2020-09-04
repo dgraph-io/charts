@@ -1,0 +1,53 @@
+{{- if eq .Values.backups.full.enabled true -}}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "dgraph.alpha.fullname" . }}-backup-full
+  labels:
+    app: {{ template "dgraph.name" . }}
+    chart: {{ template "dgraph.chart" . }}
+    component: {{ .Values.alpha.name }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  schedule: {{ .Values.backups.full.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ template "dgraph.fullname" . }}-backup-full
+            image: {{ template "backup.image" . }}
+            imagePullPolicy: {{ .Values.backups.image.pullPolicy | quote }}
+            command:
+             - /usr/bin/bash
+             - "-c"
+             - |
+                set -ex
+                source /scripts/backup.sh
+
+                BACKUP_DESTINATION={{ .Values.backups.full.destination }}
+                
+                ## TODO: check version for rest vs. graphql
+                ## TODO: check acl, secrests, token
+                ## TODO: tls and tls w/ client
+                ## TODO: minio secure?
+
+                
+                FORCE_FULL=true backup
+            volumeMounts:
+            - name: config-volume
+              mountPath: /scripts
+            env:
+            - name: S3_URL
+              value: s3://s3.us-east-2.amazonaws.com/joaquin-dgraph-backups
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          restartPolicy: OnFailure
+          volumes:
+          - name: config-volume
+            configMap:
+              name: {{ template "dgraph.fullname" . }}-backup-config         
+{{- end }}

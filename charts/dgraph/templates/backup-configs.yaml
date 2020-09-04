@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "dgraph.alpha.fullname" . }}-backup-config
+  name: {{ template "dgraph.fullname" . }}-backup-config
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
@@ -183,6 +183,4 @@ data:
         $ALPHA_HOST:8080/admin \
         --data "$GQL"
     }
-
-
 {{- end }}
