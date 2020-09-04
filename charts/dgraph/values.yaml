@@ -409,6 +409,42 @@ ratel:
   customLivenessProbe: {}
   customReadinessProbe: {}
 
+## Binary Backup Configuration (Enterprise feature)
+## ref: https://dgraph.io/docs/enterprise-features/binary-backups/
+##
+backups:
+  full:
+    enabled: false
+    ## full backup schedule
+    ## 12AM server time
+    schedule: 0 * * * *
+    ## destination is file path, s3, or minio
+    ## examples:
+    ##   /dgraph/backups
+    ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
+    ##   minio://my-release-minio.default.svc:9000/<bucketname>
+    destination: /path/to/backups
+    ## user and password used to login if ACLs are enabled
+    ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/
+    user: groot
+    password: password
+  incremental:
+    enabled: false
+    ## incremental backup schedule
+    ## every hour, except 12AM serer time
+    schedule: 0 1-23 * * *
+    ## destination is file path, s3, or minio
+    ## examples:
+    ##   /dgraph/backups
+    ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
+    ##   minio://my-release-minio.default.svc:9000/<bucketname>
+    destination: /path/to/backups
+  admin:
+    ## backup user and password used to login if ACLs are enabled
+    ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/
+    user: groot
+    password: password
+
 global:
   ## Combined ingress resource for alpha and ratel services
   ## This will override existing ingress configurations under alpha and ratel
