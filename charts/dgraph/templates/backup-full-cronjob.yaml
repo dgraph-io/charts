@@ -41,11 +41,11 @@ spec:
                 BACKUP_DESTINATION={{ .Values.backups.full.destination }}
                 API_TYPE={{ template "backup_api_type" . }}
                 MINIO_SECURE={{ .Values.backups.full.minioSecure }}
-
-                ## TODO: check acl, secrests, token
-                ## TODO: tls and tls w/ client
-                
+                {{- if .Values.alpha.acl.enabled }}
+                FORCE_FULL=true backup $(get_token {{ .Values.backups.admin.user }} {{ .Values.backups.admin.password }})
+                {{- else }}
                 FORCE_FULL=true backup
+                {{- end }}                
             volumeMounts:
             - name: config-volume
               mountPath: /scripts
