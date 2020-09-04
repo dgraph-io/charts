@@ -58,6 +58,16 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            {{- if .Values.alpha.tls.enabled }}
+            - name: CACERT_PATH
+              value: /dgraph/tls/ca.crt
+            {{- if .Values.backups.admin.tls_user }}
+            - name: CLIENT_CERT_PATH
+              value: /dgraph/tls/client.{{ .Values.backups.admin.tls_user }}.crt
+            - name: CLIENT_KEY_PATH
+              value: /dgraph/tls/client.{{ .Values.backups.admin.tls_user }}.key
+            {{- end }}
+            {{- end }}          
           restartPolicy: OnFailure
           volumes:
           - name: config-volume
