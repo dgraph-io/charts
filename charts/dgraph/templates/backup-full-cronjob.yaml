@@ -2,7 +2,7 @@
 {{- define "backup_api_type" -}}
 {{- $apiType := "graphql" -}}
 {{- $safeVersion := include "dgraph.version" . -}}
-{{- if semverCompare "< 20.0" $safeVersion -}}
+{{- if semverCompare "< 20.03" $safeVersion -}}
   {{- $apiType = "rest" -}}
 {{- end -}}
 {{- printf "%s" $apiType -}}
@@ -45,7 +45,7 @@ spec:
                 FORCE_FULL=true backup $(get_token {{ .Values.backups.admin.user }} {{ .Values.backups.admin.password }})
                 {{- else }}
                 FORCE_FULL=true backup
-                {{- end }}                
+                {{- end }}
             volumeMounts:
             - name: config-volume
               mountPath: /scripts
