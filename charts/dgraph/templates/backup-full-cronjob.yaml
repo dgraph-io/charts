@@ -49,6 +49,10 @@ spec:
             volumeMounts:
             - name: config-volume
               mountPath: /scripts
+            {{- if .Values.alpha.tls.enabled }}
+            - name: tls-volume
+              mountPath: /dgraph/tls
+            {{- end }}
             env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -58,5 +62,10 @@ spec:
           volumes:
           - name: config-volume
             configMap:
-              name: {{ template "dgraph.fullname" . }}-backup-config         
+              name: {{ template "dgraph.fullname" . }}-backup-config
+          {{- if .Values.alpha.tls.enabled }}
+          - name: tls-volume
+            secret:
+              secretName: {{ template "dgraph.alpha.fullname" . }}-secret
+          {{- end }}     
 {{- end }}
