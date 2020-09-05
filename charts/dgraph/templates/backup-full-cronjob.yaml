@@ -32,7 +32,11 @@ spec:
              - /usr/bin/bash
              - "-c"
              - |
-                set -ex
+                set -e
+                {{- if .Values.backups.full.debug }}
+                set -x
+                {{- end }}
+
                 source /scripts/backup.sh
 
                 ## Use Single Alpha in Cluster to avoid potential issues with concurrent backups

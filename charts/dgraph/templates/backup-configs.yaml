@@ -128,7 +128,7 @@ data:
         CLIENT_KEY_OPT="--key $CLIENT_CERT_PATH"
       fi
 
-      if [[ "$BACKUP_DESTINATION" =~ "^minio" ]]; then
+      if [[ "$BACKUP_DESTINATION" =~ ^minio ]]; then
         if [[ "$MINIO_SECURE" == "true" ]]; then
           BACKUP_DESTINATION="${BACKUP_DESTINATION}/dgraph_$(date +%Y%m%d)"
         else

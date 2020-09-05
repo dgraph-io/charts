@@ -156,6 +156,24 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `ratel.readinessProbe`                   | Ratel readiness probes                                                | See `values.yaml` for defaults                      |
 | `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
+| `backups.name`                           | Backups component name                                                | `backups`                                           |
+| `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
+| `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
+| `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
+| `backups.full.destination`               | Destination - file path, s3://, minio:                                | `nil`                                               |
+| `backups.full.minioSecure`               | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
+| `backups.incremental.enabled`            | Enable incremental backups cronjob                                    | `false`                                             |
+| `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |
+| `backups.incremental.schedule`           | Cronjob schedule                                                      | `"0 1-23 * * *"`                                    |
+| `backups.incremental.destination`        | Destination - file path, s3://, minio:                                | `nil`                                               |
+| `backups.incremental.minioSecure`        | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
+| `backups.amdin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
+| `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |
+| `backups.admin.tls_user`                 | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
+| `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
+| `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
+| `backups.image.tag`                      | Container image tag                                                   | `v20.07.0`                                          |
+| `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `global.ingress.enabled`                 | Enable global ingress resource (overrides alpha/ratel ingress)        | `false`                                             |
 | `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
 | `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |
@@ -310,6 +328,12 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
+## Binary Backups
+
+Dgraph [Binary Backups](https://dgraph.io/docs/master/enterprise-features/binary-backups/) (Enterprise feature) is supported by Kubernetes CronJobs.  There are two types of Kubernets CronJobs supported
+
+* full backup at midnight: `0 * * * *`
+* incremental backups every hour, except midnight: `0 1-23 * * *`
 
 ## Monitoring
 

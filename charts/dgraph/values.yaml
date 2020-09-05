@@ -409,13 +409,15 @@ ratel:
   customLivenessProbe: {}
   customReadinessProbe: {}
 
-## Binary Backup Configuration (Enterprise feature)
+## Binary Backup CronJob Configuration (Enterprise feature)
 ## ref: https://dgraph.io/docs/enterprise-features/binary-backups/
 ##
 backups:
   name: backups
   full:
     enabled: false
+    ## enable bash debugging (set -x)
+    debug: false
     ## full backup schedule
     ## 12AM server time
     schedule: 0 * * * *
@@ -429,6 +431,8 @@ backups:
     minioSecure: false
   incremental:
     enabled: false
+    ## enable bash debugging (set -x)
+    debug: false
     ## incremental backup schedule
     ## every hour, except 12AM serer time
     schedule: 0 1-23 * * *
@@ -437,7 +441,7 @@ backups:
     ##   /dgraph/backups
     ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
     ##   minio://my-release-minio.default.svc:9000/<bucketname>
-    destination: /path/to/backups
+    destination: ""
     ## enable if minio service has https://
     minioSecure: false
   admin:
@@ -455,7 +459,6 @@ global:
   ## Combined ingress resource for alpha and ratel services
   ## This will override existing ingress configurations under alpha and ratel
   ## This requires an ingress controller to be installed into your k8s cluster
-
   ingress:
     enabled: false
     annotations: {}

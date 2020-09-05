@@ -7,5 +7,5 @@ alpha:
   configFile:
     config.toml: |
       acl_secret_file = '/dgraph/acl/hmac_secret_file'
-      white_list = '10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,172.20.0.0/12'
+      whitelist = '10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,172.20.0.0/12'
       lru_mb = 2048
