@@ -125,7 +125,7 @@ data:
         CLIENT_KEY_OPT=""
       else
         CLIENT_CERT_OPT="--cert $CLIENT_CERT_PATH"
-        CLIENT_KEY_OPT="--key $CLIENT_CERT_PATH"
+        CLIENT_KEY_OPT="--key $CLIENT_KEY_PATH"
       fi
 
       if [[ "$BACKUP_DESTINATION" =~ ^minio ]]; then

@@ -41,8 +41,11 @@ spec:
 
                 ## Use Single Alpha in Cluster to avoid potential issues with concurrent backups
                 ## ref https://discuss.dgraph.io/t/concurrent-backups-can-lead-to-issues/9934/2
-                ALPHA_HOST={{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc
-
+                {{- if .Values.alpha.tls.enabled }}
+                ALPHA_HOST="https://{{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local"
+                {{- else }}
+                ALPHA_HOST="http://{{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local"
+                {{- end }}
                 BACKUP_DESTINATION={{ .Values.backups.full.destination }}
                 API_TYPE={{ template "backup_api_type" . }}
                 MINIO_SECURE={{ .Values.backups.full.minioSecure }}

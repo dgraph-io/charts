@@ -1,3 +1,5 @@
+## backup-minio-config.yaml
+## * https://dgraph.io/docs/master/enterprise-features/binary-backups/
 backups:
   full:
     enabled: true
@@ -7,6 +9,8 @@ backups:
     enabled: true
     schedule: 0 1-23 * * *
     destination: minio://my-release-minio.default.svc:9000/dgraph-backups
+  admin:
+    user: alice
 alpha:
   acl:
     enabled: true
