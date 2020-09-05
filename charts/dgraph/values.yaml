@@ -413,6 +413,7 @@ ratel:
 ## ref: https://dgraph.io/docs/enterprise-features/binary-backups/
 ##
 backups:
+  name: backups
   full:
     enabled: false
     ## full backup schedule

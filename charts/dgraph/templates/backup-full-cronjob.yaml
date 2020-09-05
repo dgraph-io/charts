@@ -11,7 +11,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ template "dgraph.alpha.fullname" . }}-backup-full
+  name: {{ template "dgraph.backups.fullname" . }}-full
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
@@ -25,7 +25,7 @@ spec:
       template:
         spec:
           containers:
-          - name: {{ template "dgraph.fullname" . }}-backup-full
+          - name: {{ template "dgraph.backups.fullname" . }}-full
             image: {{ template "backup.image" . }}
             imagePullPolicy: {{ .Values.backups.image.pullPolicy | quote }}
             command:
@@ -38,20 +38,28 @@ spec:
                 ## Use Single Alpha in Cluster to avoid potential issues with concurrent backups
                 ## ref https://discuss.dgraph.io/t/concurrent-backups-can-lead-to-issues/9934/2
                 ALPHA_HOST={{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc
+
                 BACKUP_DESTINATION={{ .Values.backups.full.destination }}
                 API_TYPE={{ template "backup_api_type" . }}
                 MINIO_SECURE={{ .Values.backups.full.minioSecure }}
+
+                ## Perform Backup
                 {{- if .Values.alpha.acl.enabled }}
-                FORCE_FULL=true backup $(get_token {{ .Values.backups.admin.user }} {{ .Values.backups.admin.password }})
+                TOKEN=$(get_token {{ .Values.backups.admin.user }} $(cat /backup_secrets/backup_admin_password ))
+                FORCE_FULL=true backup $TOKEN
                 {{- else }}
                 FORCE_FULL=true backup
                 {{- end }}
             volumeMounts:
-            - name: config-volume
+            - name: backup-config-volume
               mountPath: /scripts
             {{- if .Values.alpha.tls.enabled }}
             - name: tls-volume
               mountPath: /dgraph/tls
+            {{- end }}
+            {{- if .Values.alpha.acl.enabled }}
+            - name: backup-secret-volume
+              mountPath: /backup_secrets
             {{- end }}
             env:
             - name: POD_NAMESPACE
@@ -67,15 +75,20 @@ spec:
             - name: CLIENT_KEY_PATH
               value: /dgraph/tls/client.{{ .Values.backups.admin.tls_user }}.key
             {{- end }}
-            {{- end }}          
+            {{- end }}
           restartPolicy: OnFailure
           volumes:
-          - name: config-volume
+          - name: backup-config-volume
             configMap:
-              name: {{ template "dgraph.fullname" . }}-backup-config
+              name: {{ template "dgraph.backups.fullname" . }}-config
           {{- if .Values.alpha.tls.enabled }}
           - name: tls-volume
             secret:
               secretName: {{ template "dgraph.alpha.fullname" . }}-secret
-          {{- end }}     
+          {{- end }}
+          {{- if .Values.alpha.acl.enabled }}
+          - name: backup-secret-volume
+            secret:
+              secretName: {{ template "dgraph.backups.fullname" . }}-secret
+          {{- end }}
 {{- end }}

@@ -32,6 +32,13 @@ Create a default fully qualified data name.
 {{- end -}}
 
 {{/*
+Create a default fully qualified data name.
+*/}}
+{{- define "dgraph.backups.fullname" -}}
+{{ template "dgraph.fullname" . }}-{{ .Values.backups.name }}
+{{- end -}}
+
+{{/*
 Create a semVer/calVer version from image.tag so that it can be safely use in 
 version comparisions used to toggle features or behavior.
 */}}
