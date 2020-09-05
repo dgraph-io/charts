@@ -26,7 +26,7 @@ data:
           --data "${JSON}" #\
             | grep -o '(?<=accessJWT":")[^"]*'
       )
-
+      echo "$ACCESS_JWT"
     }
 
     ######
@@ -35,7 +35,7 @@ data:
     get_token_graphql() {
       GQL="{\"query\": \"mutation { login(userId: \\\"${USER}\\\" password: \\\"${PASSWORD}\\\") { response { accessJWT } } }\"}"
       ACCESS_JWT=$(
-        echo /usr/bin/curl --silent \
+        /usr/bin/curl --silent \
           --header "Content-Type: application/json" \
           $CACERT_OPT \
           $CLIENT_CERT_OPT \
@@ -45,6 +45,7 @@ data:
           --data "${GQL}" \
             | grep -o '(?<=accessJWT":")[^"]*'
       )
+      echo "$ACCESS_JWT"
     }
 
     ######
@@ -152,7 +153,7 @@ data:
         URL_PATH="$URL_PATH?force_full=true"
       fi
 
-      echo /usr/bin/curl --silent \
+      /usr/bin/curl --silent \
         --header "${CONTENT_TYPE}" \
         $TOKEN_OPT \
         $CACERT_OPT \
@@ -173,7 +174,7 @@ data:
         GQL="{\"query\": \"mutation { backup(input: {destination: \\\"${BACKUP_DESTINATION}\\\" }) { response { message code } } }\"}"
       fi
 
-      echo /usr/bin/curl --silent \
+      /usr/bin/curl --silent \
         --header "Content-Type: application/json" \
         $TOKEN_OPT \
         $CACERT_OPT \

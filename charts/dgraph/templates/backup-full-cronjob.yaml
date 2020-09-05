@@ -19,7 +19,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  schedule: {{ .Values.backups.full.schedule }}
+  schedule: "{{ .Values.backups.full.schedule }}"
   jobTemplate:
     spec:
       template:
