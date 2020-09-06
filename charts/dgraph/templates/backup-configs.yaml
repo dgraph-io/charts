@@ -18,10 +18,8 @@ data:
       JSON="{\"userid\": \"${USER}\", \"password\": \"${PASSWORD}\" }"
       ACCESS_JWT=$(
         /usr/bin/curl --silent \
-          $AUTH_TOKEN_OPT \
-          $CACERT_OPT \
-          $CLIENT_CERT_OPT \
-          $CLIENT_KEY_OPT \
+          "${HEADERS[@]}" \
+          "${CERTOPTS[@]}" \
           --request POST \
           ${ALPHA_HOST}:8080/login \
           --data "${JSON}" #\
@@ -37,11 +35,8 @@ data:
       GQL="{\"query\": \"mutation { login(userId: \\\"${USER}\\\" password: \\\"${PASSWORD}\\\") { response { accessJWT } } }\"}"
       ACCESS_JWT=$(
         /usr/bin/curl --silent \
-          --header "Content-Type: application/json" \
-          $AUTH_TOKEN_OPT \
-          $CACERT_OPT \
-          $CLIENT_CERT_OPT \
-          $CLIENT_KEY_OPT \
+          "${HEADERS[@]}" \
+          "${CERTOPTS[@]}" \
           --request POST \
           ${ALPHA_HOST}:8080/admin \
           --data "${GQL}" \
@@ -74,33 +69,26 @@ data:
         return 1
       fi
 
-      ## configure optional authorization token
-      if [[ -z "$AUTH_TOKEN" ]]; then
-        AUTH_TOKEN_OPT=""
-      else
-        AUTH_TOKEN_OPT="--header 'X-Dgraph-AuthToken: $AUTH_TOKEN'"
+      if [[ ! -z "$AUTH_TOKEN" ]]; then
+        HEADERS+=('--header' "X-Dgraph-AuthToken: $AUTH_TOKEN")
       fi
 
-      ## configure optional TLS CA certificate
-      if [[ -z "$CACERT_PATH" ]]; then
-        CACERT_OPT=""
+      if [[ ! -z "$CACERT_PATH" ]]; then
+        CERTOPTS+=('--cacert' "$CACERT_PATH")
+        if [[ ! -z "$CLIENT_CERT_PATH" || ! -z "$CLIENT_KEY_PATH" ]]; then
+          CERTOPTS+=(
+            '--cert' "$CLIENT_CERT_PATH"
+            '--key' "$CLIENT_KEY_PATH"
+          )
+        fi
+        ALPHA_HOST=https://${ALPHA_HOST:-"localhost"}
       else
-        CACERT_OPT="--cacert $CACERT_PATH"
+        ALPHA_HOST=${ALPHA_HOST:-"localhost"}
       fi
 
-      ## configure optional client certficate and key
-      if [[ -z "$CLIENT_CERT_PATH" || -z "$CLIENT_KEY_PATH" ]]; then
-        CLIENT_CERT_OPT=""
-        CLIENT_KEY_OPT=""
-      else
-        CLIENT_CERT_OPT="--cert $CLIENT_CERT_PATH"
-        CLIENT_KEY_OPT="--key $CLIENT_KEY_PATH"
-      fi
-
-      ALPHA_HOST=${ALPHA_HOST:-"localhost"}
       API_TYPE=${API_TYPE:-"graphql"}
-
       if [[ "$API_TYPE" == "graphql" ]]; then
+        HEADERS+=('--header' "Content-Type: application/json")
         get_token_graphql
       else
         get_token_rest
@@ -127,7 +115,6 @@ data:
       CLIENT_CERT_PATH=${CLIENT_CERT_PATH:-""}
       CLIENT_KEY_PATH=${CLIENT_KEY_PATH:-""}
 
-      ALPHA_HOST=${ALPHA_HOST:-"localhost"}
       API_TYPE=${API_TYPE:-"graphql"}
 
       MINIO_SECURE=${MINIO_SECURE:-"false"}
@@ -136,41 +123,36 @@ data:
       [[ -z "$BACKUP_DESTINATION" ]] && \
         { echo "'BACKUP_DESTINATION' is not set. Exiting" >&2; return 1; }
 
-      if [[ -z "$ACCESS_TOKEN" ]]; then
-        ACCESS_TOKEN_OPT=""
-      else
-        ACCESS_TOKEN_OPT="--header 'X-Dgraph-AccessToken: $ACCESS_TOKEN'"
+      if [[ ! -z "$ACCESS_TOKEN" ]]; then
+        HEADERS+=('--header' "X-Dgraph-AccessToken: $ACCESS_TOKEN")
       fi
 
-      if [[ -z "$AUTH_TOKEN" ]]; then
-        AUTH_TOKEN_OPT=""
-      else
-        AUTH_TOKEN_OPT="--header 'X-Dgraph-AuthToken: $AUTH_TOKEN'"
+      if [[ ! -z "$AUTH_TOKEN" ]]; then
+        HEADERS+=('--header' "X-Dgraph-AuthToken: $AUTH_TOKEN")
       fi
 
-      if [[ -z "$CACERT_PATH" ]]; then
-        CACERT_OPT=""
-      else
-        CACERT_OPT="--cacert $CACERT_PATH"
-      fi
-
-      if [[ -z "$CLIENT_CERT_PATH" || -z "$CLIENT_KEY_PATH" ]]; then
-        CLIENT_CERT_OPT=""
-        CLIENT_KEY_OPT=""
-      else
-        CLIENT_CERT_OPT="--cert $CLIENT_CERT_PATH"
-        CLIENT_KEY_OPT="--key $CLIENT_KEY_PATH"
-      fi
-
-      if [[ "$BACKUP_DESTINATION" =~ ^minio ]]; then
-        if [[ "$MINIO_SECURE" == "true" ]]; then
-          BACKUP_DESTINATION="${BACKUP_DESTINATION}/dgraph_$(date +%Y%m%d)"
-        else
-          BACKUP_DESTINATION="${BACKUP_DESTINATION}/dgraph_$(date +%Y%m%d)?secure=false"
+      if [[ ! -z "$CACERT_PATH" ]]; then
+        CERTOPTS+=('--cacert' "$CACERT_PATH")
+        if [[ ! -z "$CLIENT_CERT_PATH" || ! -z "$CLIENT_KEY_PATH" ]]; then
+          CERTOPTS+=(
+            '--cert' "$CLIENT_CERT_PATH"
+            '--key' "$CLIENT_KEY_PATH"
+          )
         fi
+        ALPHA_HOST=https://${ALPHA_HOST:-"localhost"}
+      else
+        ALPHA_HOST=${ALPHA_HOST:-"localhost"}
+      fi
+
+      ## Configure destination with date stamp folder
+      BACKUP_DESTINATION="${BACKUP_DESTINATION}/dgraph_$(date +%Y%m%d)"
+      ## Configure Minio Configuration
+      if [[ "$MINIO_SECURE" == "false" && "$BACKUP_DESTINATION" =~ ^minio ]]; then
+          BACKUP_DESTINATION="${BACKUP_DESTINATION}?secure=false"
       fi
 
       if [[ "$API_TYPE" == "graphql" ]]; then
+        HEADERS+=('--header' "Content-Type: application/json")
         backup_graphql
       else
         backup_rest
@@ -182,17 +164,11 @@ data:
     # backup_rest - trigger backup using REST command for Dgraph 1.x
     ##########################
     backup_rest() {
-      URL_PATH="admin/backup"
-      if [[ "$FORCE_FULL" == "true" ]]; then
-        URL_PATH="$URL_PATH?force_full=true"
-      fi
+      URL_PATH="admin/backup?force_full=$FORCE_FULL"
 
       /usr/bin/curl --silent \
-        $ACCESS_TOKEN_OPT \
-        $AUTH_TOKEN_OPT \
-        $CACERT_OPT \
-        $CLIENT_CERT_OPT \
-        $CLIENT_KEY_OPT \
+        "${HEADERS[@]}" \
+        "${CERTOPTS[@]}" \
         --request POST \
         ${ALPHA_HOST}:8080/$URL_PATH \
         --data "destination=$BACKUP_DESTINATION"
@@ -202,21 +178,15 @@ data:
     # backup_graphql - trigger backup using GraphQL for Dgraph 20.03.1+
     ##########################
     backup_graphql() {
-      if [[ "$FORCE_FULL" == "true" ]]; then
-        GQL="{\"query\": \"mutation { backup(input: {destination: \\\"${BACKUP_DESTINATION}\\\" forceFull: true }) { response { message code } } }\"}"
-      else
-        GQL="{\"query\": \"mutation { backup(input: {destination: \\\"${BACKUP_DESTINATION}\\\" }) { response { message code } } }\"}"
-      fi
+      GQL="{\"query\": \"mutation { backup(input: {destination: \\\"${BACKUP_DESTINATION}\\\" forceFull: $FORCE_FULL }) { response { message code } } }\"}"
 
       /usr/bin/curl --silent \
-        --header "Content-Type: application/json" \
-        $ACCESS_TOKEN_OPT \
-        $AUTH_TOKEN_OPT \
-        $CACERT_OPT \
-        $CLIENT_CERT_OPT \
-        $CLIENT_KEY_OPT \
+        "${HEADERS[@]}" \
+        "${CERTOPTS[@]}" \
         --request POST \
         $ALPHA_HOST:8080/admin \
         --data "$GQL"
     }
+
+
 {{- end }}

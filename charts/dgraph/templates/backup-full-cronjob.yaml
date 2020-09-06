@@ -32,20 +32,17 @@ spec:
              - /usr/bin/bash
              - "-c"
              - |
-                set -e
                 {{- if .Values.backups.full.debug }}
-                set -x
+                set -ex
+                {{- else }}
+                set -e
                 {{- end }}
 
                 source /scripts/backup.sh
 
                 ## Use Single Alpha in Cluster to avoid potential issues with concurrent backups
                 ## ref https://discuss.dgraph.io/t/concurrent-backups-can-lead-to-issues/9934/2
-                {{- if .Values.alpha.tls.enabled }}
-                ALPHA_HOST="https://{{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local"
-                {{- else }}
-                ALPHA_HOST="http://{{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local"
-                {{- end }}
+                ALPHA_HOST="{{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local"
 
                 BACKUP_DESTINATION={{ .Values.backups.full.destination }}
                 API_TYPE={{ template "backups.api_type" . }}
@@ -61,7 +58,7 @@ spec:
                 {{- end }}
 
                 ## Full Backup with optional access and auth tokens
-                FORCE_FULL=true backup $ACCESS_TOKEN $AUTH_TOKEN
+                FORCE_FULL=true backup "$ACCESS_TOKEN" "$AUTH_TOKEN"
             volumeMounts:
             - name: backup-config-volume
               mountPath: /scripts
