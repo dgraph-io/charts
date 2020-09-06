@@ -214,7 +214,7 @@ spec:
       {{- if .Values.alpha.tls.enabled }}
       - name: tls-volume
         secret:
-          secretName: {{ template "dgraph.alpha.fullname" . }}-secret
+          secretName: {{ template "dgraph.alpha.fullname" . }}-tls-secret
       {{- end }}
       {{- if .Values.alpha.encryption.enabled }}
       - name: enc-volume

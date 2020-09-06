@@ -93,7 +93,7 @@ spec:
           {{- if .Values.alpha.tls.enabled }}
           - name: tls-volume
             secret:
-              secretName: {{ template "dgraph.alpha.fullname" . }}-secret
+              secretName: {{ template "dgraph.alpha.fullname" . }}-tls-secret
           {{- end }}
           {{- if or (.Values.alpha.acl.enabled) (.Values.backups.admin.auth_token) }}
           - name: backup-secret-volume
