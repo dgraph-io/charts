@@ -414,36 +414,6 @@ ratel:
 ##
 backups:
   name: backups
-  full:
-    enabled: false
-    ## enable bash debugging (set -x)
-    debug: false
-    ## full backup schedule
-    ## 12AM server time
-    schedule: 0 * * * *
-    ## destination is file path, s3, or minio
-    ## examples:
-    ##   /dgraph/backups
-    ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
-    ##   minio://my-release-minio.default.svc:9000/<bucketname>
-    destination: /path/to/backups
-    ## enable if minio service has https://
-    minioSecure: false
-  incremental:
-    enabled: false
-    ## enable bash debugging (set -x)
-    debug: false
-    ## incremental backup schedule
-    ## every hour, except 12AM serer time
-    schedule: 0 1-23 * * *
-    ## destination is file path, s3, or minio
-    ## examples:
-    ##   /dgraph/backups
-    ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
-    ##   minio://my-release-minio.default.svc:9000/<bucketname>
-    destination: ""
-    ## enable if minio service has https://
-    minioSecure: false
   admin:
     ## backup user and password that is a member of 'guardians'group used to
     ## login if ACLs are enabled.  This fetches an access token used to trigger backups
@@ -463,6 +433,46 @@ backups:
   ## default is to reuse dgraph image
   image:
     << : *image
+  ## NFS Configuration for mounting
+  ## Prerequisites: NFS Server required, e.g. Google Cloud File Store, EFS, Azure Blob, etc.
+  ## ref. https://kubernetes.io/docs/concepts/storage/volumes/#nfs
+  nfs:
+    enabled: true
+    server: ""
+    path: ""
+    storage: 512Gi
+    mountPath: &backups_path /dgraph/backups
+  full:
+    enabled: false
+    ## enable bash debugging (set -x)
+    debug: false
+    ## full backup schedule
+    ## 12AM server time
+    schedule: "0 * * * *"
+    ## destination is file path, s3, or minio
+    ## examples:
+    ##   /dgraph/backups
+    ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
+    ##   minio://my-release-minio.default.svc:9000/<bucketname>
+    destination: *backups_path
+    ## enable if minio service has https://
+    minioSecure: false
+  incremental:
+    enabled: false
+    ## enable bash debugging (set -x)
+    debug: false
+    ## incremental backup schedule
+    ## every hour, except 12AM serer time
+    schedule: "0 1-23 * * *"
+    ## destination is file path, s3, or minio
+    ## examples:
+    ##   /dgraph/backups
+    ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
+    ##   minio://my-release-minio.default.svc:9000/<bucketname>
+    destination: *backups_path
+    ## enable if minio service has https://
+    minioSecure: false
+
 
 global:
   ## Combined ingress resource for alpha and ratel services

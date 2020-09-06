@@ -157,16 +157,6 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
 | `backups.name`                           | Backups component name                                                | `backups`                                           |
-| `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
-| `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
-| `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
-| `backups.full.destination`               | Destination - file path, s3://, minio:                                | `nil`                                               |
-| `backups.full.minioSecure`               | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
-| `backups.incremental.enabled`            | Enable incremental backups cronjob                                    | `false`                                             |
-| `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |
-| `backups.incremental.schedule`           | Cronjob schedule                                                      | `"0 1-23 * * *"`                                    |
-| `backups.incremental.destination`        | Destination - file path, s3://, minio:                                | `nil`                                               |
-| `backups.incremental.minioSecure`        | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
 | `backups.amdin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
 | `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |
 | `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
@@ -175,6 +165,21 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
 | `backups.image.tag`                      | Container image tag                                                   | `v20.07.0`                                          |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
+| `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
+| `backups.nfs.server`                     | NFS Serve DNS or IP address                                           | `nil`                                               |
+| `backups.nfs.path`                       | NFS Serve file share path name                                        | `nil`                                               |
+| `backups.nfs.storage`                    | Storage allocated from NFS volume and claim                           | `512Gi`                                             |
+| `backups.nfs.mountPath`                  | Path to mount volume in Alpha (should match `destination`)            | `/dgraph/backups`                                   |
+| `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
+| `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
+| `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
+| `backups.full.destination`               | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
+| `backups.full.minioSecure`               | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
+| `backups.incremental.enabled`            | Enable incremental backups cronjob                                    | `false`                                             |
+| `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |
+| `backups.incremental.schedule`           | Cronjob schedule                                                      | `"0 1-23 * * *"`                                    |
+| `backups.incremental.destination`        | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
+| `backups.incremental.minioSecure`        | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
 | `global.ingress.enabled`                 | Enable global ingress resource (overrides alpha/ratel ingress)        | `false`                                             |
 | `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
 | `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
-    component: {{ .Values.alpha.name }}
+    component: {{ .Values.backups.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:

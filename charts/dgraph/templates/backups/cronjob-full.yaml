@@ -15,7 +15,7 @@ metadata:
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
-    component: {{ .Values.alpha.name }}
+    component: {{ .Values.backups.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -41,7 +41,7 @@ spec:
                 source /scripts/backup.sh
 
                 ## Use Single Alpha in Cluster to avoid potential issues with concurrent backups
-                ## ref https://discuss.dgraph.io/t/concurrent-backups-can-lead-to-issues/9934/2
+                ## ref. https://discuss.dgraph.io/t/concurrent-backups-can-lead-to-issues/9934/2
                 ALPHA_HOST="{{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local"
 
                 BACKUP_DESTINATION={{ .Values.backups.full.destination }}
@@ -50,11 +50,11 @@ spec:
 
                 ## Get Tokens
                 {{- if .Values.backups.admin.auth_token }}
-                AUTH_TOKEN={{ .Values.backups.admin.auth_token }}
+                AUTH_TOKEN=$(cat /backup_secrets/backup_auth_token)
                 {{- end }}
 
                 {{- if .Values.alpha.acl.enabled }}
-                ACCESS_TOKEN=$(get_token {{ .Values.backups.admin.user }} $(cat /backup_secrets/backup_admin_password $AUTH_TOKEN ))
+                ACCESS_TOKEN=$(get_token {{ .Values.backups.admin.user }} $(cat /backup_secrets/backup_admin_password) $AUTH_TOKEN ))
                 {{- end }}
 
                 ## Full Backup with optional access and auth tokens
