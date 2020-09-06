@@ -16,16 +16,23 @@ data:
     ##########################
     get_token_rest() {
       JSON="{\"userid\": \"${USER}\", \"password\": \"${PASSWORD}\" }"
-      ACCESS_JWT=$(
+      RESULT=$(
         /usr/bin/curl --silent \
           "${HEADERS[@]}" \
           "${CERTOPTS[@]}" \
           --request POST \
           ${ALPHA_HOST}:8080/login \
-          --data "${JSON}" #\
-            | grep -o '(?<=accessJWT":")[^"]*'
+          --data "${JSON}"
       )
-      echo "$ACCESS_JWT"
+
+      if grep -q errors <<< "$RESULT"; then
+        ERROR=$(grep -oP '(?<=message":")[^"]*' <<< $RESULT)
+        echo "ERROR: $ERROR"
+        return 1
+      fi
+
+      grep -oP '(?<=accessJWT":")[^"]*' <<< "$RESULT"
+
     }
 
     ######
@@ -33,16 +40,23 @@ data:
     ##########################
     get_token_graphql() {
       GQL="{\"query\": \"mutation { login(userId: \\\"${USER}\\\" password: \\\"${PASSWORD}\\\") { response { accessJWT } } }\"}"
-      ACCESS_JWT=$(
+      RESULT=$(
         /usr/bin/curl --silent \
           "${HEADERS[@]}" \
           "${CERTOPTS[@]}" \
           --request POST \
           ${ALPHA_HOST}:8080/admin \
-          --data "${GQL}" \
-            | grep -o '(?<=accessJWT":")[^"]*'
+          --data "${GQL}"
       )
-      echo "$ACCESS_JWT"
+
+      if grep -q errors <<< "$RESULT"; then
+        ERROR=$(grep -oP '(?<=message":")[^"]*' <<< $RESULT)
+        echo "ERROR: $ERROR"
+        return 1
+      fi
+
+      grep -oP '(?<=accessJWT":")[^"]*' <<< "$RESULT"
+
     }
 
     ######
@@ -166,12 +180,26 @@ data:
     backup_rest() {
       URL_PATH="admin/backup?force_full=$FORCE_FULL"
 
-      /usr/bin/curl --silent \
+      RESULT=$(/usr/bin/curl --silent \
         "${HEADERS[@]}" \
         "${CERTOPTS[@]}" \
         --request POST \
         ${ALPHA_HOST}:8080/$URL_PATH \
         --data "destination=$BACKUP_DESTINATION"
+      )
+
+      if grep -q errors <<< "$RESULT"; then
+        ERROR=$(grep -oP '(?<=message":")[^"]*' <<< $RESULT)
+        MESSAGE="ERROR: $ERROR"
+        if grep -q code <<< "$RESULT"; then
+          CODE=$(grep -oP '(?<=code":")[^"]*' <<< $RESULT)
+          echo "$MESSAGE REASON='$CODE'"
+        fi
+        return 1
+      fi
+
+      echo $RESULT
+
     }
 
     ######
@@ -180,13 +208,20 @@ data:
     backup_graphql() {
       GQL="{\"query\": \"mutation { backup(input: {destination: \\\"${BACKUP_DESTINATION}\\\" forceFull: $FORCE_FULL }) { response { message code } } }\"}"
 
-      /usr/bin/curl --silent \
+      RESULT=$(/usr/bin/curl --silent \
         "${HEADERS[@]}" \
         "${CERTOPTS[@]}" \
         --request POST \
         $ALPHA_HOST:8080/admin \
         --data "$GQL"
+      )
+
+      if grep -q errors <<< "$RESULT"; then
+        ERROR=$(grep -oP '(?<=message":")[^"]*' <<< $RESULT)
+        echo "ERROR: $ERROR"
+        return 1
+      fi
+
+      echo $RESULT
     }
-
-
 {{- end }}
