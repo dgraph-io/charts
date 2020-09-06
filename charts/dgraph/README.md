@@ -169,7 +169,8 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `backups.incremental.minioSecure`        | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
 | `backups.amdin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
 | `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |
-| `backups.admin.tls_user`                 | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
+| `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
+| `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
 | `backups.image.tag`                      | Container image tag                                                   | `v20.07.0`                                          |

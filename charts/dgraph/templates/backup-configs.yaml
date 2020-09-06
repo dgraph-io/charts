@@ -18,6 +18,7 @@ data:
       JSON="{\"userid\": \"${USER}\", \"password\": \"${PASSWORD}\" }"
       ACCESS_JWT=$(
         /usr/bin/curl --silent \
+          $AUTH_TOKEN_OPT \
           $CACERT_OPT \
           $CLIENT_CERT_OPT \
           $CLIENT_KEY_OPT \
@@ -37,6 +38,7 @@ data:
       ACCESS_JWT=$(
         /usr/bin/curl --silent \
           --header "Content-Type: application/json" \
+          $AUTH_TOKEN_OPT \
           $CACERT_OPT \
           $CLIENT_CERT_OPT \
           $CLIENT_KEY_OPT \
@@ -62,16 +64,41 @@ data:
     get_token() {
       USER=${1}
       PASSWORD=${2}
+      AUTH_TOKEN=${3:-""}
       CACERT_PATH=${CACERT_PATH:-""}
       CLIENT_CERT_PATH=${CLIENT_CERT_PATH:-""}
       CLIENT_KEY_PATH=${CLIENT_KEY_PATH:-""}
 
-      ALPHA_HOST=${ALPHA_HOST:-"localhost"}
-      API_TYPE=${API_TYPE:-"graphql"}
-
+      ## user/password required for login
       if [[ -z "$USER" || -z "$PASSWORD" ]]; then
         return 1
       fi
+
+      ## configure optional authorization token
+      if [[ -z "$AUTH_TOKEN" ]]; then
+        AUTH_TOKEN_OPT=""
+      else
+        AUTH_TOKEN_OPT="--header 'X-Dgraph-AuthToken: $AUTH_TOKEN'"
+      fi
+
+      ## configure optional TLS CA certificate
+      if [[ -z "$CACERT_PATH" ]]; then
+        CACERT_OPT=""
+      else
+        CACERT_OPT="--cacert $CACERT_PATH"
+      fi
+
+      ## configure optional client certficate and key
+      if [[ -z "$CLIENT_CERT_PATH" || -z "$CLIENT_KEY_PATH" ]]; then
+        CLIENT_CERT_OPT=""
+        CLIENT_KEY_OPT=""
+      else
+        CLIENT_CERT_OPT="--cert $CLIENT_CERT_PATH"
+        CLIENT_KEY_OPT="--key $CLIENT_KEY_PATH"
+      fi
+
+      ALPHA_HOST=${ALPHA_HOST:-"localhost"}
+      API_TYPE=${API_TYPE:-"graphql"}
 
       if [[ "$API_TYPE" == "graphql" ]]; then
         get_token_graphql
@@ -94,7 +121,8 @@ data:
     #    CLIENT_KEY_PATH - path to client cert (e.g. client.dgraphuser.key) for client TLS
     ##########################
     backup() {
-      TOKEN=${1:-""}
+      ACCESS_TOKEN=${1:-""}
+      AUTH_TOKEN=${2:-""}
       CACERT_PATH=${CACERT_PATH:-""}
       CLIENT_CERT_PATH=${CLIENT_CERT_PATH:-""}
       CLIENT_KEY_PATH=${CLIENT_KEY_PATH:-""}
@@ -108,10 +136,16 @@ data:
       [[ -z "$BACKUP_DESTINATION" ]] && \
         { echo "'BACKUP_DESTINATION' is not set. Exiting" >&2; return 1; }
 
-      if [[ -z "$TOKEN" ]]; then
-        TOKEN_OPT=""
+      if [[ -z "$ACCESS_TOKEN" ]]; then
+        ACCESS_TOKEN_OPT=""
       else
-        TOKEN_OPT="--header 'X-Dgraph-AccessToken: $TOKEN'"
+        ACCESS_TOKEN_OPT="--header 'X-Dgraph-AccessToken: $ACCESS_TOKEN'"
+      fi
+
+      if [[ -z "$AUTH_TOKEN" ]]; then
+        AUTH_TOKEN_OPT=""
+      else
+        AUTH_TOKEN_OPT="--header 'X-Dgraph-AuthToken: $AUTH_TOKEN'"
       fi
 
       if [[ -z "$CACERT_PATH" ]]; then
@@ -154,8 +188,8 @@ data:
       fi
 
       /usr/bin/curl --silent \
-        --header "${CONTENT_TYPE}" \
-        $TOKEN_OPT \
+        $ACCESS_TOKEN_OPT \
+        $AUTH_TOKEN_OPT \
         $CACERT_OPT \
         $CLIENT_CERT_OPT \
         $CLIENT_KEY_OPT \
@@ -176,7 +210,8 @@ data:
 
       /usr/bin/curl --silent \
         --header "Content-Type: application/json" \
-        $TOKEN_OPT \
+        $ACCESS_TOKEN_OPT \
+        $AUTH_TOKEN_OPT \
         $CACERT_OPT \
         $CLIENT_CERT_OPT \
         $CLIENT_KEY_OPT \

@@ -445,11 +445,20 @@ backups:
     ## enable if minio service has https://
     minioSecure: false
   admin:
-    ## backup user and password used to login if ACLs are enabled
+    ## backup user and password that is a member of 'guardians'group used to
+    ## login if ACLs are enabled.  This fetches an access token used to trigger backups
     ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/
     user: groot
     password: password
-    tls_user: ""
+    ## Mutual TLS client certficate and key can be used to secure transaction that was created with
+    ## dgraph cert --client <name-of-client> should be specified here.
+    ## ref. https://dgraph.io/docs/deploy/tls-configuration/
+    tls_client: ""
+    ## Authorization Token can be used to secure /login and /admin.  The auth token
+    ## string that is set Alpha configuration or environment variable needs to be
+    ## specified here so that backups can properly login.
+    ## ref. https://dgraph.io/docs/deploy/dgraph-administration/#securing-alter-operations
+    auth_token: ""
   ## Backups image - image needs at least curl command
   ## default is to reuse dgraph image
   image:

@@ -39,7 +39,7 @@ Create a default fully qualified data name.
 {{- end -}}
 
 {{/*
-Create a semVer/calVer version from image.tag so that it can be safely use in 
+Create a semVer/calVer version from image.tag so that it can be safely use in
 version comparisions used to toggle features or behavior.
 */}}
 {{- define "dgraph.version" -}}
@@ -54,9 +54,9 @@ version comparisions used to toggle features or behavior.
 
 
 {{/*
-Return the backup image name
+Return the backups image name
 */}}
-{{- define "backup.image" -}}
+{{- define "dgraph.backups.image" -}}
 {{- $registryName := .Values.backups.image.registry -}}
 {{- $repositoryName := .Values.backups.image.repository -}}
 {{- $tag := .Values.backups.image.tag | toString -}}
