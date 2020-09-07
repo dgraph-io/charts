@@ -449,14 +449,6 @@ backups:
     ## full backup schedule
     ## 12AM server time
     schedule: "0 * * * *"
-    ## destination is file path, s3, or minio
-    ## examples:
-    ##   /dgraph/backups
-    ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
-    ##   minio://my-release-minio.default.svc:9000/<bucketname>
-    destination: *backups_path
-    ## enable if minio service has https://
-    minioSecure: false
   incremental:
     enabled: false
     ## enable bash debugging (set -x)
@@ -464,15 +456,14 @@ backups:
     ## incremental backup schedule
     ## every hour, except 12AM serer time
     schedule: "0 1-23 * * *"
-    ## destination is file path, s3, or minio
-    ## examples:
-    ##   /dgraph/backups
-    ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
-    ##   minio://my-release-minio.default.svc:9000/<bucketname>
-    destination: *backups_path
-    ## enable if minio service has https://
-    minioSecure: false
-
+  ## destination is file path, s3, or minio
+  ## examples:
+  ##   /dgraph/backups
+  ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
+  ##   minio://my-release-minio.default.svc:9000/<bucketname>
+  destination: *backups_path
+  ## enable if minio service has https://
+  minioSecure: false
 
 global:
   ## Combined ingress resource for alpha and ratel services

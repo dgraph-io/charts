@@ -192,7 +192,7 @@ spec:
         - name: acl-volume
           mountPath: /dgraph/acl
         {{- end }}
-        {{- if or (.Values.backups.full.enabled) (.Values.backups.nfs.enabled) }}
+        {{- if and (or .Values.backups.full.enabled .Values.backups.incremental.enabled) (.Values.backups.nfs.enabled) }}
         - name: backups-volume
           mountPath: {{ .Values.backups.nfs.mountPath }}
         {{- end }}
@@ -201,7 +201,7 @@ spec:
       - name: datadir
         persistentVolumeClaim:
           claimName: datadir
-      {{- if or (.Values.backups.full.enabled) (.Values.backups.nfs.enabled) }}
+      {{- if and (or .Values.backups.full.enabled .Values.backups.incremental.enabled) (.Values.backups.nfs.enabled) }}
       - name: backups-volume
         persistentVolumeClaim:
           claimName: {{ template "dgraph.backups.fullname" . }}-claim

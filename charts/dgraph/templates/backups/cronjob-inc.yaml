@@ -7,11 +7,11 @@
 {{- end -}}
 {{- printf "%s" $apiType -}}
 {{- end -}}
-{{- if eq .Values.backups.full.enabled true -}}
+{{- if eq .Values.backups.incremental.enabled true -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ template "dgraph.backups.fullname" . }}-full
+  name: {{ template "dgraph.backups.fullname" . }}-inc
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
@@ -19,20 +19,20 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  schedule: "{{ .Values.backups.full.schedule }}"
+  schedule: "{{ .Values.backups.incremental.schedule }}"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: {{ template "dgraph.backups.fullname" . }}-full
+          - name: {{ template "dgraph.backups.fullname" . }}-inc
             image: {{ template "dgraph.backups.image" . }}
             imagePullPolicy: {{ .Values.backups.image.pullPolicy | quote }}
             command:
              - /usr/bin/bash
              - "-c"
              - |
-                {{- if .Values.backups.full.debug }}
+                {{- if .Values.backups.incremental.debug }}
                 set -ex
                 {{- else }}
                 set -e
@@ -57,8 +57,8 @@ spec:
                 ACCESS_TOKEN=$(get_token {{ .Values.backups.admin.user }} $(cat /backup_secrets/backup_admin_password) $AUTH_TOKEN )
                 {{- end }}
 
-                ## Full Backup with optional access and auth tokens
-                FORCE_FULL=true backup "$ACCESS_TOKEN" "$AUTH_TOKEN"
+                ## Incremental Backup with optional access and auth tokens
+                FORCE_FULL=false backup "$ACCESS_TOKEN" "$AUTH_TOKEN"
             volumeMounts:
             - name: backup-config-volume
               mountPath: /scripts

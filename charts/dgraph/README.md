@@ -173,13 +173,11 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
 | `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
-| `backups.full.destination`               | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
-| `backups.full.minioSecure`               | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
 | `backups.incremental.enabled`            | Enable incremental backups cronjob                                    | `false`                                             |
 | `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.incremental.schedule`           | Cronjob schedule                                                      | `"0 1-23 * * *"`                                    |
-| `backups.incremental.destination`        | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
-| `backups.incremental.minioSecure`        | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
+| `backups.destination`                    | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
+| `backups.minioSecure`                    | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
 | `global.ingress.enabled`                 | Enable global ingress resource (overrides alpha/ratel ingress)        | `false`                                             |
 | `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
 | `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |
