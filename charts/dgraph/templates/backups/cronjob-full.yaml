@@ -54,7 +54,7 @@ spec:
                 {{- end }}
 
                 {{- if .Values.alpha.acl.enabled }}
-                ACCESS_TOKEN=$(get_token {{ .Values.backups.admin.user }} $(cat /backup_secrets/backup_admin_password) $AUTH_TOKEN ))
+                ACCESS_TOKEN=$(get_token {{ .Values.backups.admin.user }} $(cat /backup_secrets/backup_admin_password) $AUTH_TOKEN )
                 {{- end }}
 
                 ## Full Backup with optional access and auth tokens
@@ -69,6 +69,11 @@ spec:
             {{- if .Values.alpha.acl.enabled }}
             - name: backup-secret-volume
               mountPath: /backup_secrets
+            {{- end }}
+            ## Mount NFS Backup so that datestamp directories can be created
+            {{- if or (.Values.backups.full.enabled) (.Values.backups.nfs.enabled) }}
+            - name: backups-volume
+              mountPath: {{ .Values.backups.nfs.mountPath }}
             {{- end }}
             env:
             - name: POD_NAMESPACE
@@ -99,5 +104,10 @@ spec:
           - name: backup-secret-volume
             secret:
               secretName: {{ template "dgraph.backups.fullname" . }}-secret
+          {{- end }}
+          {{- if or (.Values.backups.full.enabled) (.Values.backups.nfs.enabled) }}
+          - name: backups-volume
+            persistentVolumeClaim:
+              claimName: {{ template "dgraph.backups.fullname" . }}-claim
           {{- end }}
 {{- end }}

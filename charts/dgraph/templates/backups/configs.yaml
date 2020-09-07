@@ -165,6 +165,17 @@ data:
           BACKUP_DESTINATION="${BACKUP_DESTINATION}?secure=false"
       fi
 
+      ## Create date-stamped directory for file system
+      if [[ ! "$BACKUP_DESTINATION" =~ ^minio|^s3 ]]; then
+        ## Check destination directory exist
+        if [[ -d ${BACKUP_DESTINATION%/*} ]]; then
+          mkdir -p $BACKUP_DESTINATION
+        else
+          echo "Designated Backup Destination '${BACKUP_DESTINATION%/*}' does not exist. Aborting."
+          return 1
+        fi
+      fi
+
       if [[ "$API_TYPE" == "graphql" ]]; then
         HEADERS+=('--header' "Content-Type: application/json")
         backup_graphql
