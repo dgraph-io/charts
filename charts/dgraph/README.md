@@ -457,7 +457,7 @@ The Kubernetes CronJob will create jobs based on the schedule. To see the result
 1. Run `kubectl get jobs` to list the jobs
 2. Using a name from one of the jobs, run `kubectl get pods --selector job-name=<job-name>`
 
-As an example, you could get the logs of most recent jobs with the following:
+As an example, you could get the logs of the jobs with the following:
 
 ```bash
 JOBS=( $(kubectl get jobs --no-headers --output custom-columns=":metadata.name") )

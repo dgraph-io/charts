@@ -15,7 +15,7 @@ get_alpha_list() {
     LIST+=("$RELEASE-dgraph-alpha-$IDX.$RELEASE-dgraph-alpha-headless.$NAMESPACE.svc.$DOMAIN")
   done
 
-  ## Output Comma Seperated Left
+  ## Output Comma Seperated List
   IFS=,; echo "${LIST[*]}"
 }
 
