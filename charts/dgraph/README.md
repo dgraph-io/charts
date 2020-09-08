@@ -223,6 +223,8 @@ curl --silent --remote-name --location \
   https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/get_alpha_list.sh
 ## create CA, Server (localhost and alpha pod hostnames), Client cert/keys in ./tls directory
 dgraph cert --nodes localhost,$(bash get_alpha_list.sh) --client dgraphuser
+## other clients can be created if required
+dgraph cert --client backupuser
 ```
 
 #### Step 3: Creating Helm Chart Secrets Config
@@ -368,12 +370,84 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
-## Binary Backups
+## Binary Backups (Enterprise feature)
 
-Dgraph [Binary Backups](https://dgraph.io/docs/master/enterprise-features/binary-backups/) (Enterprise feature) is supported by Kubernetes CronJobs.  There are two types of Kubernets CronJobs supported
+Dgraph [Binary Backups](https://dgraph.io/docs/master/enterprise-features/binary-backups/) is supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
 
 * full backup at midnight: `0 * * * *`
 * incremental backups every hour, except midnight: `0 1-23 * * *`
+
+Binary Backups supports three types of _destinations_:
+
+* file path (network file system highly recommended)
+* [Amazon Simple Storage Service](https://aws.amazon.com/s3/) (S3)
+* [MinIO](https://min.io/) Object Storage
+
+### Using Amazon S3
+
+You can use [Amazon S3](https://aws.amazon.com/s3/) with Backup Cronjobs.  You will want to configure the following:
+
+* Alpha
+  * `alpha.extraEnvs` - configure keys `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+* Backups
+  * `backups.destination` - should be in this format `s3://s3.<region>.amazonaws.com/<bucket>`
+
+### Using Minio
+
+For this option, you will need to deploy a MinIO Server, or a MinIO Gateway such as [MinIO GCS Gateway](https://docs.min.io/docs/minio-gateway-for-gcs.html) or [MinIO Azure Gateway](https://docs.min.io/docs/minio-gateway-for-azure.html).  There's a [MinIO Helm Chart](https://helm.min.io/) that can be useful for this process.
+
+For Minio configuration, you will want to configure the following:
+
+* Alpha
+  * `alpha.extraEnvs` - configure keys `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY`
+* Backups
+  * `backups.destination` - should be in this format `minio://<server-address>:9000/<bucket>`.
+  * `minioSecure` (default: `false`) - configure this to `true` if you installed TLS certs/keys for MinIO server.
+
+### Using NFS
+
+Backup CronJobs can take advantage of NFS if you have a NFS server, such as [EFS](https://aws.amazon.com/efs/) or [GCFS](https://cloud.google.com/filestore), available that is accessible from Kubernetes Worker Nodes.  When this feature is enabled, a shared NFS volume will be mounted on each of the Alpha pods to `/dgraph/backups` by default.  The NFS volume will also be mounted by the Backup CronJobs, so that they can create datestamp directories to organize full and incremental backups.
+
+* Backups
+  * `backups.destination` (default: `/dgraph/backups`) - file path where alpha will save backups
+  * `backups.nfs.server`
+  * `backups.nfs.path` - NFS server path, e.g. [EFS](https://aws.amazon.com/efs/) uses `/`, while with [GCFS](https://cloud.google.com/filestore), the user specfies this during creation.
+  * `backups.nfs.storage` (default: `512Gi`) - storage allocated from NFS server
+  * `backups.nfs.mountPath` (default: `/dgraph/backups`) - this is mounted on Alpha pods, should be same as destination
+
+### Using Mutual TLS
+
+When certificates are used with `dgraph cert` tool, Backup Cronjobs will submit the requests using HTTPS.  If Mutual TLS client certificates is also used, you need to specify the name of the client certificate and key.
+
+* Alpha
+  * see [alpha-tls-options](#alpha-tls-options) above.
+* Backups
+  * `backups.admin.tls_client` - this should match the client cert and key that was created with `dgraph cert --client`, e.g. `backupuser`
+
+### Using Access Control List
+
+Binary Backups can be used with Access Control Lists, where the Kubernetes CronJob will login to the Alpha node, and then use AccessJWT token to perform backups.
+
+* Alpha
+  * see [alpha-tls-options](#alpha-tls-options) above.
+* Backups
+  * `backups.admin.user` - a user that is a member of `guardians` group will need to be specified.
+  * `backups.admin.password` - the corresponding password for that user will need to be specified.
+
+
+### Using Simple Auth Token
+
+When a simple Auth Token is used, Kubernetes CronJob will submit an auth token when triggering a backup.
+
+* Alpha
+  * Alpha will need to be configured with environment variable `DGRAPH_ALPHA_AUTH_TOKEN` or configuration with `auth_token` set.
+* Backups
+  * `backups.admin.auth_token` - this will need to have the same value configured in Alpha
+
+### Backup Image
+
+The default backup image uses the same Dgraph image specified under `image`.  This can be changed to an alternative image of your chosing under `backup.image`.
+The backup image will need `bash`, `grep`, and `curl` installed.
 
 ## Monitoring
 
