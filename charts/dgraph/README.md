@@ -450,6 +450,23 @@ When a simple Auth Token is used, the backup cronjob script will submit an auth 
 The default backup image uses the same Dgraph image specified under `image`.  This can be changed to an alternative image of your choosing under `backup.image`.
 The backup image will need `bash`, `grep`, and `curl` installed.
 
+### Troubleshooting Kubernetes CronJobs
+
+The Kubernetes CronJob will create jobs based on the schedule. To see the results of these scheduled jobs, you would do the following:
+
+1. Run `kubectl get jobs` to list the jobs
+2. Using a name from one of the jobs, run `kubectl get pods --selector job-name=<job-name>`
+
+As an example, you could get the logs of most recent jobs with the following:
+
+```bash
+JOBS=( $(kubectl get jobs --no-headers --output custom-columns=":metadata.name") )
+for JOB in "${JOBS[@]}"; do
+   POD=$(kubectl get pods --selector job-name=$JOB --no-headers --output custom-columns=":metadata.name")
+   kubectl logs $POD
+done
+```
+
 ## Monitoring
 
 Dgraph exposes Prometheus metrics to monitor the state of various components involved in
