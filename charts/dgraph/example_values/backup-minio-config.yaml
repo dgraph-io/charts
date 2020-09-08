@@ -14,6 +14,7 @@ backups:
   admin:
     user: alice
   ## Requires Installation of Minio
+  ## MinIO Helm Chart (https://helm.min.io/) that can be useful for this process.
   destination: minio://my-release-minio.default.svc:9000/<bucket>
 alpha:
   acl:
