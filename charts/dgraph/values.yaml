@@ -437,7 +437,7 @@ backups:
   ## Prerequisites: NFS Server required, e.g. Google Cloud FileStore, EFS, Azure Blob, etc.
   ## ref. https://kubernetes.io/docs/concepts/storage/volumes/#nfs
   nfs:
-    enabled: true
+    enabled: false
     server: ""
     path: ""
     storage: 512Gi

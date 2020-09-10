@@ -7,7 +7,7 @@
 {{- end -}}
 {{- printf "%s" $apiType -}}
 {{- end -}}
-{{- if eq .Values.backups.incremental.enabled true -}}
+{{- if .Values.backups.incremental.enabled -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -100,7 +100,7 @@ spec:
             secret:
               secretName: {{ template "dgraph.alpha.fullname" . }}-tls-secret
           {{- end }}
-          {{- if or (.Values.alpha.acl.enabled) (.Values.backups.admin.auth_token) }}
+          {{- if or .Values.alpha.acl.enabled .Values.backups.admin.auth_token }}
           - name: backup-secret-volume
             secret:
               secretName: {{ template "dgraph.backups.fullname" . }}-secret

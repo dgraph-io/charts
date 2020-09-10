@@ -7,7 +7,7 @@
 {{- end -}}
 {{- printf "%s" $apiType -}}
 {{- end -}}
-{{- if eq .Values.backups.full.enabled true -}}
+{{- if or .Values.backups.full.enabled -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
