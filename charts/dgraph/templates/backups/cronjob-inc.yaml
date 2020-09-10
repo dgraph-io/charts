@@ -5,7 +5,11 @@
 {{- if semverCompare "< 20.03" $safeVersion -}}
   {{- $apiType = "rest" -}}
 {{- end -}}
-{{- printf "%s" $apiType -}}
+{{- if .Values.backups.override_api_type -}}
+  {{- printf "%s" .Values.backups.override_api_type -}}
+{{- else -}}
+  {{- printf "%s" $apiType -}}
+{{- end -}}
 {{- end -}}
 {{- if .Values.backups.incremental.enabled -}}
 apiVersion: batch/v1beta1
@@ -45,6 +49,7 @@ spec:
                 ALPHA_HOST="{{ template "dgraph.alpha.fullname" . }}-0.{{ template "dgraph.alpha.fullname" . }}-headless.${POD_NAMESPACE}.svc.cluster.local"
 
                 BACKUP_DESTINATION={{ .Values.backups.destination }}
+                SUBPATH={{ .Values.backups.subpath }}
                 API_TYPE={{ template "backups.api_type" . }}
                 MINIO_SECURE={{ .Values.backups.minioSecure }}
 

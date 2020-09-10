@@ -462,6 +462,13 @@ backups:
   ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
   ##   minio://my-release-minio.default.svc:9000/<bucketname>
   destination: *backups_path
+  ## subpath directory useful to store full and reclated incremental backuups
+  ## in the same directory.
+  ## NOTE: It is important to create directory name that matches the schedule.
+  ##       For example, daily fulls and hourly incrementals, a directory could
+  ##       be named dgraph_$(date +%Y%m%d)
+  ## ref. `date` command: https://www.gnu.org/software/coreutils/manual/html_node/date-invocation.html#date-invocation
+  subpath: dgraph_$(date +%Y%m%d)
   ## enable if minio service has https://
   minioSecure: false
 

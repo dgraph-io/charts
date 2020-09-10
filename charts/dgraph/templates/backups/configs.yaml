@@ -159,7 +159,7 @@ data:
       fi
 
       ## Configure destination with date stamp folder
-      BACKUP_DESTINATION="${BACKUP_DESTINATION}/dgraph_$(date +%Y%m%d)"
+      BACKUP_DESTINATION="${BACKUP_DESTINATION}/${SUBPATH}"
       ## Configure Minio Configuration
       if [[ "$MINIO_SECURE" == "false" && "$BACKUP_DESTINATION" =~ ^minio ]]; then
           BACKUP_DESTINATION="${BACKUP_DESTINATION}?secure=false"
