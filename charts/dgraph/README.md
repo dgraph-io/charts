@@ -1,7 +1,7 @@
 # Dgraph
 
 Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions,
-consistent replication and linearizable reads. It's built from ground up to perform for a rich set
+consistent replication and linearizable reads. It's built from the ground up to perform for a rich set
 of queries. Being a native graph database, it tightly controls how the data is arranged on disk to
 optimize for query performance and throughput, reducing disk seeks and network calls in a cluster.
 
@@ -31,7 +31,7 @@ $ helm repo add dgraph https://charts.dgraph.io
 $ helm install my-release dgraph/dgraph
 ```
 
-These command deploy Dgraph on the Kubernetes cluster in the default configuration.
+These commands deploy Dgraph on the Kubernetes cluster in the default configuration.
 The [Configuration](#configuration) section lists the parameters that can be configured during installation:
 
 > **Tip**: List all releases using `helm list`
@@ -157,7 +157,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
 | `backups.name`                           | Backups component name                                                | `backups`                                           |
-| `backups.amdin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
+| `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
 | `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |
 | `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
@@ -166,10 +166,10 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.image.tag`                      | Container image tag                                                   | `v20.07.0`                                          |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
-| `backups.nfs.server`                     | NFS Serve DNS or IP address                                           | `nil`                                               |
-| `backups.nfs.path`                       | NFS Serve file share path name                                        | `nil`                                               |
+| `backups.nfs.server`                     | NFS Server DNS or IP address                                           | `nil`                                               |
+| `backups.nfs.path`                       | NFS Server file share path name                                        | `nil`                                               |
 | `backups.nfs.storage`                    | Storage allocated from NFS volume and claim                           | `512Gi`                                             |
-| `backups.nfs.mountPath`                  | Path to mount volume in Alpha (should match `destination`)            | `/dgraph/backups`                                   |
+| `backups.nfs.mountPath`                  | Path to mount volume in Alpha (should match `backup.destination`)     | `/dgraph/backups`                                   |
 | `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
 | `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
@@ -177,6 +177,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.incremental.schedule`           | Cronjob schedule                                                      | `"0 1-23 * * *"`                                    |
 | `backups.destination`                    | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
+| `backups.subpath`                        | Specify subpath where full + related incremental backups are stored   | `dgraph_$(date +%Y%m%d)`                            |
 | `backups.minioSecure`                    | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
 | `global.ingress.enabled`                 | Enable global ingress resource (overrides alpha/ratel ingress)        | `false`                                             |
 | `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
@@ -187,7 +188,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 
 ## Ingress Resource
 
-You can define ingress resources through `alpha.ingress` for the alpha http service and `ratel.ingress` for the ratel ui service, or you can use a combined single ingress with `global.ingress` for both alpha http and ratel ui services.
+You can define ingress resources through `alpha.ingress` for the alpha HTTP service and `ratel.ingress` for the ratel UI service, or you can use a combined single ingress with `global.ingress` for both alpha HTTP and ratel UI services.
 
 There are some example chart values for ingress resource configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
@@ -218,7 +219,7 @@ export REPLICAS=3
 export NAMESPACE="default"
 VERS=0.0.11
 
-## Downloard Script
+## Download Script
 curl --silent --remote-name --location \
   https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/get_alpha_list.sh
 ## create CA, Server (localhost and alpha pod hostnames), Client cert/keys in ./tls directory
@@ -243,7 +244,8 @@ bash make_tls_secrets.sh
 
 #### Step 4: Deploying Helm Chart
 
-With certificates created supported localhost and Alpha servers as hosts and a `secrets.yaml` file, we can deploy a Dgraph cluster.
+The certificates created support and Alpha internal headless Service DNS hostnames. We can deploy a Dgraph cluster using these certs.
+
 
 ```bash
 export RELEASE="my-release"
@@ -426,7 +428,7 @@ If Dgraph Alpha TLS options are used, backup cronjobs will submit the requests u
 * Backups
   * `backups.admin.tls_client` - this should match the client cert and key that was created with `dgraph cert --client`, e.g. `backupuser`
 
-### Using Access Control List
+### Using the Access Control List
 
 When ACLs are used, the backup cronjob will log in to the Alpha node using a specified user account.  Through this process, the backup cronjob script will receive an AccessJWT token that will be submitted when requesting a backup.
 
