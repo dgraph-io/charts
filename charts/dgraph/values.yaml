@@ -419,7 +419,7 @@ backups:
     ## login if ACLs are enabled.  This fetches an access token used to trigger backups
     ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/
     user: groot
-    password: password
+    # password: password
     ## Mutual TLS client certficate and key can be used to secure transaction that was created with
     ## dgraph cert --client <name-of-client> should be specified here.
     ## ref. https://dgraph.io/docs/deploy/tls-configuration/
@@ -471,7 +471,19 @@ backups:
   subpath: dgraph_$(date +%Y%m%d)
   ## enable if minio service has https://
   minioSecure: false
-
+  ## specify access keys required by MinIO or S3 
+  keys:
+    minio:
+      ## MINIO_ACCESS_KEY env var
+      access: ""
+      ## MINIO_SECRET_KEY env var
+      secret: ""
+    s3:
+      ## AWS_ACCESS_KEY_ID env var
+      access: ""
+      ## AWS_SECRET_ACCESS_KEY env var
+      secret: ""
+  
 global:
   ## Combined ingress resource for alpha and ratel services
   ## This will override existing ingress configurations under alpha and ratel

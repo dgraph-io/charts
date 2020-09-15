@@ -64,6 +64,40 @@ Return the backups image name
 {{- end -}}
 
 {{/*
+Return empty string if minio keys are not defined
+*/}}
+{{- define "dgraph.backups.keys.minio.enabled" -}}
+{{- $minioEnabled := "" -}}
+{{- if .Values.backups.enabled -}}
+  {{- if .Values.backups.keys  -}}
+    {{- if .Values.backups.keys.minio -}}
+      {{- if and .Values.backups.keys.minio.access .Values.backups.keys.minio.secret -}}
+        {{- $minioEnabled = true -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- printf "%s" $minioEnabled -}}
+{{- end -}}
+
+{{/*
+Return empty string if s3 keys are not defined
+*/}}
+{{- define "dgraph.backups.keys.s3.enabled" -}}
+{{- $s3Enabled := "" -}}
+{{- if .Values.backups.enabled -}}
+  {{- if .Values.backups.keys  -}}
+    {{- if .Values.backups.keys.s3 -}}
+      {{- if and .Values.backups.keys.s3.access .Values.backups.keys.s3.secret -}}
+        {{- $s3Enabled = true -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- printf "%s" $s3Enabled -}}
+{{- end -}}
+
+{{/*
 Return the proper image name (for the metrics image)
 */}}
 {{- define "dgraph.image" -}}

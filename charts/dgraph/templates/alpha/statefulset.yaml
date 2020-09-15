@@ -15,6 +15,9 @@
     {{- end -}}
   {{ end }}
 {{- end -}}
+{{- $hasS3Keys := include "dgraph.backups.keys.s3.enabled" . -}}
+{{- $hasMinioKeys := include "dgraph.backups.keys.minio.enabled" . -}}
+{{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -118,6 +121,30 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          {{- if and $backupsEnabled $hasMinioKeys }}
+          - name: MINIO_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "dgraph.backups.fullname" . }}-secret
+                key: minio_access_key
+          - name: MINIO_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "dgraph.backups.fullname" . }}-secret
+                key: minio_secret_key
+          {{- end }}
+          {{- if and $backupsEnabled $hasS3Keys }}
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "dgraph.backups.fullname" . }}-secret
+                key: s3_access_key
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "dgraph.backups.fullname" . }}-secret
+                key: s3_secret_key
+          {{- end }}
           {{- if .Values.alpha.configFile }}
           - name: DGRAPH_ALPHA_CONFIG
             value: /dgraph/config/{{ first (keys .Values.alpha.configFile | uniq | sortAlpha) }}
@@ -192,7 +219,7 @@ spec:
         - name: acl-volume
           mountPath: /dgraph/acl
         {{- end }}
-        {{- if and (or .Values.backups.full.enabled .Values.backups.incremental.enabled) .Values.backups.nfs.enabled }}
+        {{- if and $backupsEnabled .Values.backups.nfs.enabled }}
         - name: backups-volume
           mountPath: {{ .Values.backups.nfs.mountPath }}
         {{- end }}
@@ -201,7 +228,12 @@ spec:
       - name: datadir
         persistentVolumeClaim:
           claimName: datadir
-      {{- if and (or .Values.backups.full.enabled .Values.backups.incremental.enabled) .Values.backups.nfs.enabled }}
+      {{- if and $backupsEnabled (or $hasS3Keys $hasMinioKeys) }}
+      - name: backup-secret-volume
+        secret:
+          secretName: {{ template "dgraph.backups.fullname" . }}-secret
+      {{- end }}
+      {{- if and $backupsEnabled .Values.backups.nfs.enabled }}
       - name: backups-volume
         persistentVolumeClaim:
           claimName: {{ template "dgraph.backups.fullname" . }}-claim
@@ -221,7 +253,7 @@ spec:
         secret:
           secretName: {{ template "dgraph.alpha.fullname" . }}-encryption-secret
       {{- end }}
-      {{- if .Values.alpha.acl.enabled }}
+      {{- if or .Values.alpha.acl.enabled }}
       - name: acl-volume
         secret:
           secretName: {{ template "dgraph.alpha.fullname" . }}-acl-secret
