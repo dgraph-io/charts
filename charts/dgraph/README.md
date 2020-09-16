@@ -393,10 +393,10 @@ Binary Backups supports three types of _destinations_:
 
 You can use [Amazon S3](https://aws.amazon.com/s3/) with backup cronjobs.  You will want to configure the following:
 
-* Alpha
-  * `alpha.extraEnvs` - configure keys `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 * Backups
   * `backups.destination` - should be in this format `s3://s3.<region>.amazonaws.com/<bucket>`
+  * `keys.s3.access`  - set for `AWS_ACCESS_KEY_ID` used on Alpha pods, that is stored as a secret.
+  * `keys.s3.secret`  - set for `AWS_SECRET_ACCESS_KEY` used on Alpha pods, that is stored as a secret.
 
 ### Using Minio
 
@@ -404,11 +404,11 @@ For this option, you will need to deploy a MinIO Server or a MinIO Gateway such 
 
 For Minio configuration, you will want to configure the following:
 
-* Alpha
-  * `alpha.extraEnvs` - configure keys `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY`
 * Backups
   * `backups.destination` - should be in this format `minio://<server-address>:9000/<bucket>`.
   * `minioSecure` (default: `false`) - configure this to `true` if you installed TLS certs/keys for MinIO server.
+  * `keys.minio.access`  - set for `MINIO_ACCESS_KEY` used on Alpha pods, that is stored as a secret.
+  * `keys.minio.secret`  - set for `MINIO_SECRET_KEY` used on Alpha pods, that is stored as a secret.
 
 ### Using NFS
 

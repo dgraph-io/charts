@@ -27,10 +27,5 @@ alpha:
       tls_use_system_ca" = true
       auth_token         = "1234567890AbCdE"
       lru_mb             = 2048
-  extraEnvs:
-    ## AWS Profile for IAM User with attached policy that grants access to
-    ##  S3 Bucket (demo key/secret below)
-    - name: AWS_ACCESS_KEY_ID
-      value: AKIAABCD3FGH1JKLMN0P
-    - name: AWS_SECRET_ACCESS_KEY
-      value: aBcDeFgHiJkLmNoPqRsTuVwXyZ/+0124567890Ab
+
+

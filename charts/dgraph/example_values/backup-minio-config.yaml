@@ -15,6 +15,7 @@ backups:
     user: alice
   ## Requires Installation of Minio
   ## MinIO Helm Chart (https://helm.min.io/) that can be useful for this process.
+  ## Internal Kubernetes DNS scheme is <releaase>-minio.<namespace>.svc
   destination: minio://my-release-minio.default.svc:9000/<bucket>
 alpha:
   acl:
@@ -24,8 +25,3 @@ alpha:
       acl_secret_file = "/dgraph/acl/hmac_secret_file"
       whitelist       = "10.0.0.0/8,172.0.0.0/8,192.168.0.0/16"
       lru_mb          = 2048
-  extraEnvs:
-    - name: MINIO_ACCESS_KEY
-      value: minio
-    - name: MINIO_SECRET_KEY
-      value: minio123

@@ -28,7 +28,7 @@ spec:
       {{- if .Values.ratel.securityContext.enabled }}
       securityContext:
         fsGroup: {{ .Values.ratel.securityContext.fsGroup }}
-        runAsUser: {{ .Values.ratel.securityContext.runAsUser }}    
+        runAsUser: {{ .Values.ratel.securityContext.runAsUser }}
       {{- end }}
 {{- include "dgraph.imagePullSecrets" . | indent 6 }}
       containers:
@@ -63,7 +63,7 @@ spec:
         readinessProbe:
           httpGet:
             port: {{ .Values.ratel.readinessProbe.port }}
-            path: {{ .Values.ratel.readinessProbe.path }}          
+            path: {{ .Values.ratel.readinessProbe.path }}
           initialDelaySeconds: {{ .Values.ratel.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.ratel.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.ratel.readinessProbe.timeoutSeconds }}
