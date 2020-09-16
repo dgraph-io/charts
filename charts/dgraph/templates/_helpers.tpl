@@ -68,7 +68,8 @@ Return empty string if minio keys are not defined
 */}}
 {{- define "dgraph.backups.keys.minio.enabled" -}}
 {{- $minioEnabled := "" -}}
-{{- if .Values.backups.enabled -}}
+{{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
+{{- if $backupsEnabled -}}
   {{- if .Values.backups.keys  -}}
     {{- if .Values.backups.keys.minio -}}
       {{- if and .Values.backups.keys.minio.access .Values.backups.keys.minio.secret -}}
@@ -85,7 +86,8 @@ Return empty string if s3 keys are not defined
 */}}
 {{- define "dgraph.backups.keys.s3.enabled" -}}
 {{- $s3Enabled := "" -}}
-{{- if .Values.backups.enabled -}}
+{{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
+{{- if $backupsEnabled -}}
   {{- if .Values.backups.keys  -}}
     {{- if .Values.backups.keys.s3 -}}
       {{- if and .Values.backups.keys.s3.access .Values.backups.keys.s3.secret -}}
