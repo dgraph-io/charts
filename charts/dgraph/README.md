@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v20.07.0`                                          |
+| `image.tag`                              | Container image tag                                                   | `v20.07.1`                                          |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
@@ -163,7 +163,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
-| `backups.image.tag`                      | Container image tag                                                   | `v20.07.0`                                          |
+| `backups.image.tag`                      | Container image tag                                                   | `v20.07.1`                                          |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
 | `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `nil`                                               |
