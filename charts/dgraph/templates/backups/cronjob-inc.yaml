@@ -75,10 +75,15 @@ spec:
             - name: backup-secret-volume
               mountPath: /backup_secrets
             {{- end }}
-            ## Mount NFS Backup so that datestamp directories can be created
+            ## Mount NFS Backup volume so that datestamp directories can be created
             {{- if .Values.backups.nfs.enabled }}
-            - name: backups-volume
+            - name: backups-nfs-volume
               mountPath: {{ .Values.backups.nfs.mountPath }}
+            {{- end }}
+            ## Mount Backup volume so that datestamp directories can be created
+            {{- if .Values.backups.volume.enabled }}
+            - name: backups-vol-volume
+              mountPath: {{ .Values.backups.volume.mountPath }}
             {{- end }}
             env:
             - name: POD_NAMESPACE
@@ -111,8 +116,13 @@ spec:
               secretName: {{ template "dgraph.backups.fullname" . }}-secret
           {{- end }}
           {{- if .Values.backups.nfs.enabled }}
-          - name: backups-volume
+          - name: backups-nfs-volume
             persistentVolumeClaim:
               claimName: {{ template "dgraph.backups.fullname" . }}-claim
+          {{- end }}
+          {{- if .Values.backups.volume.enabled }}
+          - name: backups-vol-volume
+            persistentVolumeClaim:
+              claimName: {{ .Values.backups.volume.claim }}
           {{- end }}
 {{- end }}

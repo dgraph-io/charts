@@ -433,7 +433,7 @@ backups:
   ## default is to reuse dgraph image
   image:
     << : *image
-  ## NFS Configuration for mounting
+  ## NFS Configuration for mounting in Alpha pods
   ## Prerequisites: NFS Server required, e.g. Google Cloud FileStore, EFS, Azure Blob, etc.
   ## ref. https://kubernetes.io/docs/concepts/storage/volumes/#nfs
   nfs:
@@ -441,7 +441,13 @@ backups:
     server: ""
     path: ""
     storage: 512Gi
-    mountPath: &backups_path /dgraph/backups
+    mountPath: &nfs_backups_path /dgraph/backups
+  ## Volume Configuration for mounting in Alpha pods
+  ## Prerequisites: PV and PVC must be created beforehand. PVC must have suppose and set ReadWriteMany access mode.
+  volume:
+    enabled: false
+    claim: ""
+    mountPath: &vol_backups_path /dgraph/backups/
   full:
     enabled: false
     ## enable bash debugging (set -x)
@@ -461,7 +467,7 @@ backups:
   ##   /dgraph/backups
   ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
   ##   minio://my-release-minio.default.svc:9000/<bucketname>
-  destination: *backups_path
+  destination: *nfs_backups_path
   ## subpath directory useful to store full and reclated incremental backuups
   ## in the same directory.
   ## NOTE: It is important to create directory name that matches the schedule.

@@ -1,0 +1,23 @@
+## backup-volume-config.yaml
+## * https://dgraph.io/docs/master/enterprise-features/binary-backups/
+##
+## Demonstrates binary backups with custom PVC + PV
+## Note that the PV and PVC must have been previously created before installing
+## this chart.  The PVC must set ReadWriteMany access mode.
+backups:
+  volume:
+    enabled: true
+    claim: rook-celphfs-claim
+    mountPath: &path /dgraph/backups
+  full:
+    enabled: true
+    debug: true
+  incremental:
+    enabled: true
+    debug: true
+  destination: *path
+alpha:
+  configFile:
+    config.hcl: |
+      whitelist = "10.0.0.0/8,172.0.0.0/8,192.168.0.0/16"
+      lru_mb    = 2048

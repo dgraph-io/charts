@@ -170,6 +170,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.nfs.path`                       | NFS Server file share path name                                       | `nil`                                               |
 | `backups.nfs.storage`                    | Storage allocated from NFS volume and claim                           | `512Gi`                                             |
 | `backups.nfs.mountPath`                  | Path to mount volume in Alpha (should match `backup.destination`)     | `/dgraph/backups`                                   |
+| `backups.volume.enabled`                 | Enable mounted volume from a PVC for backups                          | `false`                                             |
+| `backups.volume.claim`                   | Name of PVC previously deployed                                       | `""`                                                |
+| `backups.volume.mountPath`               | Path to mount volume in Alpha (should match `backup.destination`)     | `/dgraph/backups`                                   |
 | `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
 | `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
