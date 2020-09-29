@@ -7,10 +7,10 @@
 #   imagePullSecrets:
 #     - myRegistryKeySecretName
 
-image:
+image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v20.07.0
+  tag: v20.07.1
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -409,11 +409,85 @@ ratel:
   customLivenessProbe: {}
   customReadinessProbe: {}
 
+## Binary Backup CronJob Configuration (Enterprise feature)
+## ref: https://dgraph.io/docs/enterprise-features/binary-backups/
+##
+backups:
+  name: backups
+  admin:
+    ## backup user and password that is a member of 'guardians'group used to
+    ## login if ACLs are enabled.  This fetches an access token used to trigger backups
+    ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/
+    user: groot
+    # password: password
+    ## Mutual TLS client certficate and key can be used to secure transaction that was created with
+    ## dgraph cert --client <name-of-client> should be specified here.
+    ## ref. https://dgraph.io/docs/deploy/tls-configuration/
+    tls_client: ""
+    ## Authorization Token can be used to secure /login and /admin.  The auth token
+    ## string that is set Alpha configuration or environment variable needs to be
+    ## specified here so that backups can properly login.
+    ## ref. https://dgraph.io/docs/deploy/dgraph-administration/#securing-alter-operations
+    auth_token: ""
+  ## Backups image - image needs at least curl command
+  ## default is to reuse dgraph image
+  image:
+    << : *image
+  ## NFS Configuration for mounting
+  ## Prerequisites: NFS Server required, e.g. Google Cloud FileStore, EFS, Azure Blob, etc.
+  ## ref. https://kubernetes.io/docs/concepts/storage/volumes/#nfs
+  nfs:
+    enabled: false
+    server: ""
+    path: ""
+    storage: 512Gi
+    mountPath: &backups_path /dgraph/backups
+  full:
+    enabled: false
+    ## enable bash debugging (set -x)
+    debug: false
+    ## full backup schedule
+    ## 12AM server time
+    schedule: "0 * * * *"
+  incremental:
+    enabled: false
+    ## enable bash debugging (set -x)
+    debug: false
+    ## incremental backup schedule
+    ## every hour, except 12AM serer time
+    schedule: "0 1-23 * * *"
+  ## destination is file path, s3, or minio
+  ## examples:
+  ##   /dgraph/backups
+  ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
+  ##   minio://my-release-minio.default.svc:9000/<bucketname>
+  destination: *backups_path
+  ## subpath directory useful to store full and reclated incremental backuups
+  ## in the same directory.
+  ## NOTE: It is important to create directory name that matches the schedule.
+  ##       For example, daily fulls and hourly incrementals, a directory could
+  ##       be named dgraph_$(date +%Y%m%d)
+  ## ref. `date` command: https://www.gnu.org/software/coreutils/manual/html_node/date-invocation.html#date-invocation
+  subpath: dgraph_$(date +%Y%m%d)
+  ## enable if minio service has https://
+  minioSecure: false
+  ## specify access keys required by MinIO or S3 
+  keys:
+    minio:
+      ## MINIO_ACCESS_KEY env var
+      access: ""
+      ## MINIO_SECRET_KEY env var
+      secret: ""
+    s3:
+      ## AWS_ACCESS_KEY_ID env var
+      access: ""
+      ## AWS_SECRET_ACCESS_KEY env var
+      secret: ""
+  
 global:
   ## Combined ingress resource for alpha and ratel services
   ## This will override existing ingress configurations under alpha and ratel
   ## This requires an ingress controller to be installed into your k8s cluster
-
   ingress:
     enabled: false
     annotations: {}

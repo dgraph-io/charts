@@ -1,0 +1,27 @@
+## backup-minio-config.yaml
+## * https://dgraph.io/docs/master/enterprise-features/binary-backups/
+##
+## Demonstrates
+## * Binary Backups to Minio
+## * ACL feature with Alice user (see https://dgraph.io/docs/enterprise-features/access-control-lists/)
+backups:
+  full:
+    enabled: true
+    schedule: "0 * * * *"
+  incremental:
+    enabled: true
+    schedule: "0 1-23 * * *"
+  admin:
+    user: alice
+  ## Requires Installation of Minio
+  ## MinIO Helm Chart (https://helm.min.io/) that can be useful for this process.
+  ## Internal Kubernetes DNS scheme is <releaase>-minio.<namespace>.svc
+  destination: minio://my-release-minio.default.svc:9000/<bucket>
+alpha:
+  acl:
+    enabled: true
+  configFile:
+    config.hcl: |
+      acl_secret_file = "/dgraph/acl/hmac_secret_file"
+      whitelist       = "10.0.0.0/8,172.0.0.0/8,192.168.0.0/16"
+      lru_mb          = 2048

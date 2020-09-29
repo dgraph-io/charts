@@ -1,0 +1,25 @@
+## backup-nfs-config.yaml
+## * https://dgraph.io/docs/master/enterprise-features/binary-backups/
+##
+## Demonstrates binary backups to NFS Server
+## Note that NFS server must be configured previously and firewall rules to allow
+#   access from Kubenetes worker nodes.
+backups:
+  nfs:
+    enabled: true
+    server: fs-01234567.efs.us-east-2.amazonaws.com
+    path: /
+    storage: 32Gi
+    mountPath: &path /dgraph/backups
+  full:
+    enabled: true
+    debug: true
+  incremental:
+    enabled: true
+    debug: true
+  destination: *path
+alpha:
+  configFile:
+    config.hcl: |
+      whitelist = "10.0.0.0/8,172.0.0.0/8,192.168.0.0/16"
+      lru_mb    = 2048

@@ -1,7 +1,7 @@
 # Dgraph
 
 Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions,
-consistent replication and linearizable reads. It's built from ground up to perform for a rich set
+consistent replication and linearizable reads. It's built from the ground up to perform for a rich set
 of queries. Being a native graph database, it tightly controls how the data is arranged on disk to
 optimize for query performance and throughput, reducing disk seeks and network calls in a cluster.
 
@@ -31,7 +31,7 @@ $ helm repo add dgraph https://charts.dgraph.io
 $ helm install my-release dgraph/dgraph
 ```
 
-These command deploy Dgraph on the Kubernetes cluster in the default configuration.
+These commands deploy Dgraph on the Kubernetes cluster in the default configuration.
 The [Configuration](#configuration) section lists the parameters that can be configured during installation:
 
 > **Tip**: List all releases using `helm list`
@@ -55,13 +55,13 @@ $ kubectl delete pvc -l release=my-release,chart=dgraph
 
 ## Configuration
 
-The following table lists the configurable parameters of the dgraph chart and their default values.
+The following table lists the configurable parameters of the `dgraph` chart and their default values.
 
 |              Parameter                   |                             Description                               |                       Default                       |
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v20.07.0`                                          |
+| `image.tag`                              | Container image tag                                                   | `v20.07.1`                                          |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
@@ -156,6 +156,33 @@ The following table lists the configurable parameters of the dgraph chart and th
 | `ratel.readinessProbe`                   | Ratel readiness probes                                                | See `values.yaml` for defaults                      |
 | `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
+| `backups.name`                           | Backups component name                                                | `backups`                                           |
+| `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
+| `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |
+| `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
+| `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
+| `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
+| `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
+| `backups.image.tag`                      | Container image tag                                                   | `v20.07.1`                                          |
+| `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
+| `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
+| `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `nil`                                               |
+| `backups.nfs.path`                       | NFS Server file share path name                                       | `nil`                                               |
+| `backups.nfs.storage`                    | Storage allocated from NFS volume and claim                           | `512Gi`                                             |
+| `backups.nfs.mountPath`                  | Path to mount volume in Alpha (should match `backup.destination`)     | `/dgraph/backups`                                   |
+| `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
+| `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
+| `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
+| `backups.incremental.enabled`            | Enable incremental backups cronjob                                    | `false`                                             |
+| `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |
+| `backups.incremental.schedule`           | Cronjob schedule                                                      | `"0 1-23 * * *"`                                    |
+| `backups.destination`                    | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
+| `backups.subpath`                        | Specify subpath where full + related incremental backups are stored   | `dgraph_$(date +%Y%m%d)`                            |
+| `backups.minioSecure`                    | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
+| `backups.keys.minio.access`              | Alpha env variable `MINIO_ACCESS_KEY` fetched from secrets            | ""                                                  |
+| `backups.keys.minio.secret`              | Alpha env variable `MINIO_SECRET_KEY` fetched from secrets            | ""                                                  |
+| `backups.keys.s3.access`                 | Alpha env variable `AWS_ACCESS_KEY_ID` fetched from secrets           | ""                                                  |
+| `backups.keys.s3.secret`                 | Alpha env variable `AWS_SECRET_ACCESS_KEY` fetched from secrets       | ""                                                  |
 | `global.ingress.enabled`                 | Enable global ingress resource (overrides alpha/ratel ingress)        | `false`                                             |
 | `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
 | `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |
@@ -165,7 +192,7 @@ The following table lists the configurable parameters of the dgraph chart and th
 
 ## Ingress Resource
 
-You can define ingress resources through `alpha.ingress` for the alpha http service and `ratel.ingress` for the ratel ui service, or you can use a combined single ingress with `global.ingress` for both alpha http and ratel ui services.
+You can define ingress resources through `alpha.ingress` for the alpha HTTP service and `ratel.ingress` for the ratel UI service, or you can use a combined single ingress with `global.ingress` for both alpha HTTP and ratel UI services.
 
 There are some example chart values for ingress resource configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
@@ -179,37 +206,76 @@ There are some example values files demonstrating how to add configuration with 
 
 The Dgraph alpha service can be configured to use Mutual TLS.  Instructions about this configuration can be found in `values.yaml`.  
 
-It is recommend that you keep secrets values and config values in separate yaml files.  To assist with this practice, you can use the [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh) script to generate a `secrets.yaml` file from an existing `./tls` directory that was previously generated by the `dgraph cert` command.
-
 There are some example chart values for Alpha TLS configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
 ### Alpha TLS Example
 
-As an example to test this feature, you can run the following:
+As an example to test this feature, you can run the following steps below.
+
+
+#### Step 1: Generating Certificates and Keys
+
+When generating the certificates and keys with `dgraph cert` command, you can use [get_alpha_list.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/get_alpha_list.sh) to generate a list of Alpha pod internal DNS names that can be used.  This way other services running on the cluster, such as a backup cronjob, can access the Alpha pod.
 
 ```bash
-RELNAME="my-release"
+export RELEASE="my-release"
+export REPLICAS=3
+export NAMESPACE="default"
+VERS=0.0.11
 
-# Prepare Certificates/Keys
-dgraph cert --nodes localhost --client dgraphuser
-# Create Dgraph alpha secrets
+## Download Script
+curl --silent --remote-name --location \
+  https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/get_alpha_list.sh
+## create CA, Server (localhost and alpha pod hostnames), Client cert/keys in ./tls directory
+dgraph cert --nodes localhost,$(bash get_alpha_list.sh) --client dgraphuser
+## other clients can be created if required
+dgraph cert --client backupuser
+```
+
+#### Step 3: Creating Helm Chart Secrets Config
+
+It is recommended that you keep secrets values and config values in separate YAML files.  To assist with this practice, you can use the [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh) script to generate a `secrets.yaml` file from an existing `./tls` directory that was previously generated by the `dgraph cert` command.
+
+```bash
+VERS=0.0.11
+## Download Script
 curl --silent --remote-name --location \
   https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/make_tls_secrets.sh
+
+## create secrets.yaml from ./tls directory
 bash make_tls_secrets.sh
-# Download Example Dgraph alpha config
+```
+
+#### Step 4: Deploying Helm Chart
+
+The certificates created support and Alpha internal headless Service DNS hostnames. We can deploy a Dgraph cluster using these certs.
+
+
+```bash
+export RELEASE="my-release"
+
+# Download Example Dgraph Alpha config
 curl --silent --remote-name --location \
  https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/example_values/alpha-tls-config.yaml
 
 # Install Chart with TLS Certificates
-helm install $RELNAME \
+helm install $RELEASE \
  --values secrets.yaml
  --values alpha-tls-config.yaml
  dgraph/dgraph
+ ```
+
+#### Step 6: Deploying Helm Chart
+
+Now we can test GRPC with `dgraph increment`, and HTTPS with `curl`:
+
+```bash
+export RELEASE="my-release"
 
 # Port Forward Alpha GRPC to localhost (use other terminal tab)
-kubectl port-forward $RELNAME-dgraph-alpha-0 9080:9080 &
+kubectl port-forward $RELEASE-dgraph-alpha-0 9080:9080 &
 # Port Forward Alpha HTTPS to localhost (use other terminal tab)
-kubectl port-forward $RELNAME-dgraph-alpha-0 8080:8080 &
+kubectl port-forward $RELEASE-dgraph-alpha-0 8080:8080 &
 
 # Test GRPC using Mutual TLS
 dgraph increment \
@@ -245,7 +311,7 @@ alpha:
       enc_key_file: MTIzNDU2Nzg5MDEyMzQ1Cg==
 ```
 
-Create a corresponding configuration enables and configures dgraph alpha to use this file:
+Create a corresponding configuration enables and configures Dgraph Alpha to use this file:
 
 ```yaml
 # alpha-enc-config.yaml
@@ -258,7 +324,7 @@ alpha:
       lru_mb = 2048
 ```
 
-Then deploy dgraph using the secret and config files:
+Then deploy Dgraph using the secret and config files:
 
 ```bash
 RELNAME=my-release
@@ -287,7 +353,7 @@ alpha:
       hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
 ```
 
-Create a corresponding configuration enables and configures dgraph alpha to use this file:
+Create a corresponding configuration enables and configures Dgraph Alpha to use this file:
 
 ```yaml
 # alpha-acl-config.yaml
@@ -300,7 +366,7 @@ alpha:
       lru_mb = 2048
 ```
 
-Then deploy dgraph using the secret and config files:
+Then deploy Dgraph using the secret and config files:
 
 ```bash
 RELNAME=my-release
@@ -310,10 +376,106 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
+## Binary Backups (Enterprise feature)
+
+Dgraph [Binary Backups](https://dgraph.io/docs/master/enterprise-features/binary-backups/) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
+
+* Full backup at midnight: `0 * * * *`
+* Incremental backups every hour, except midnight: `0 1-23 * * *`
+
+Binary Backups supports three types of _destinations_:
+
+* File path (Network File System recommended)
+* [Amazon Simple Storage Service](https://aws.amazon.com/s3/) (S3)
+* [MinIO](https://min.io/) Object Storage
+
+### Using Amazon S3
+
+You can use [Amazon S3](https://aws.amazon.com/s3/) with backup cronjobs.  You will want to configure the following:
+
+* Backups
+  * `backups.destination` - should be in this format `s3://s3.<region>.amazonaws.com/<bucket>`
+  * `keys.s3.access`  - set for `AWS_ACCESS_KEY_ID` used on Alpha pods, that is stored as a secret.
+  * `keys.s3.secret`  - set for `AWS_SECRET_ACCESS_KEY` used on Alpha pods, that is stored as a secret.
+
+### Using Minio
+
+For this option, you will need to deploy a MinIO Server or a MinIO Gateway such as [MinIO GCS Gateway](https://docs.min.io/docs/minio-gateway-for-gcs.html) or [MinIO Azure Gateway](https://docs.min.io/docs/minio-gateway-for-azure.html).  The [MinIO Helm Chart](https://helm.min.io/) can be useful for this process.
+
+For Minio configuration, you will want to configure the following:
+
+* Backups
+  * `backups.destination` - should be in this format `minio://<server-address>:9000/<bucket>`.
+  * `minioSecure` (default: `false`) - configure this to `true` if you installed TLS certs/keys for MinIO server.
+  * `keys.minio.access`  - set for `MINIO_ACCESS_KEY` used on Alpha pods, that is stored as a secret.
+  * `keys.minio.secret`  - set for `MINIO_SECRET_KEY` used on Alpha pods, that is stored as a secret.
+
+### Using NFS
+
+Backup cronjobs can take advantage of NFS if you have an NFS server available, such as [EFS](https://aws.amazon.com/efs/) or [GCFS](https://cloud.google.com/filestore).  For external NFS servers outside of the Kubernetes cluster, the NFS server will need to be accessible from Kubernetes Worker Nodes.  
+
+When this feature is enabled, a shared NFS volume will be mounted on each of the Alpha pods to `/dgraph/backups` by default. The NFS volume will also be mounted on backup cronjob pods so that the backup script can create datestamp named directories to organize full and incremental backups.
+
+* Backups
+  * `backups.destination` (default: `/dgraph/backups`) - file-path where Dgraph Alpha will save backups
+  * `backups.nfs.server` - NFS server IP address or DNS name.  If external to the Kubernetes, the NFS server should be accessible from Kubernetes worker nodes.
+  * `backups.nfs.path` - NFS server path, e.g. [EFS](https://aws.amazon.com/efs/) uses `/`, while with [GCFS](https://cloud.google.com/filestore), the user specifies this during creation.
+  * `backups.nfs.storage` (default: `512Gi`) - storage allocated from NFS server
+  * `backups.nfs.mountPath` (default: `/dgraph/backups`) - this is mounted on Alpha pods, should be same as `backups.destination`
+
+### Using Mutual TLS
+
+If Dgraph Alpha TLS options are used, backup cronjobs will submit the requests using HTTPS.  If Mutual TLS client certificates are configured as well, you need to specify the name of the client certificate and key so that the backup cronjob script can find them.
+
+* Alpha
+  * see [Alpha TLS Options](#alpha-tls-options) above.
+* Backups
+  * `backups.admin.tls_client` - this should match the client cert and key that was created with `dgraph cert --client`, e.g. `backupuser`
+
+### Using the Access Control List
+
+When ACLs are used, the backup cronjob will log in to the Alpha node using a specified user account.  Through this process, the backup cronjob script will receive an AccessJWT token that will be submitted when requesting a backup.
+
+* Alpha
+  * see [Alpha Access Control Lists](#alpha-access-control-lists-enterprise-feature) above.
+* Backups
+  * `backups.admin.user` (default: `groot`) - a user that is a member of `guardians` group will need to be specified.
+  * `backups.admin.password` (default: `password`) - the corresponding password for that user will need to be specified.
+
+### Using Auth Token
+
+When a simple Auth Token is used, the backup cronjob script will submit an auth token when requesting a backup.
+
+* Alpha
+  * Alpha will need to be configured with environment variable `DGRAPH_ALPHA_AUTH_TOKEN` or configuration with `auth_token` set.
+* Backups
+  * `backups.admin.auth_token` - this will need to have the same value configured in Alpha
+
+### Using a Different Backup Image
+
+The default backup image uses the same Dgraph image specified under `image`.  This can be changed to an alternative image of your choosing under `backup.image`.
+The backup image will need `bash`, `grep`, and `curl` installed.
+
+### Troubleshooting Kubernetes CronJobs
+
+The Kubernetes CronJob will create jobs based on the schedule. To see the results of these scheduled jobs, you would do the following:
+
+1. Run `kubectl get jobs` to list the jobs
+2. Using a name from one of the jobs, run `kubectl get pods --selector job-name=<job-name>`
+
+As an example, you could get the logs of the jobs with the following:
+
+```bash
+JOBS=( $(kubectl get jobs --no-headers --output custom-columns=":metadata.name") )
+for JOB in "${JOBS[@]}"; do
+   POD=$(kubectl get pods --selector job-name=$JOB --no-headers --output custom-columns=":metadata.name")
+   kubectl logs $POD
+done
+```
 
 ## Monitoring
 
-Dgraph exposes prometheus metrics to monitor the state of various components involved in
+Dgraph exposes Prometheus metrics to monitor the state of various components involved in
 the cluster, this includes Dgraph Alpha and Dgraph Zero.
 
 Further information can be found in the [Monitoring in Kubernetes](https://dgraph.io/docs/deploy/kubernetes/#monitoring-in-kubernetes) documentation.

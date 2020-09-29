@@ -32,6 +32,74 @@ Create a default fully qualified data name.
 {{- end -}}
 
 {{/*
+Create a default fully qualified data name.
+*/}}
+{{- define "dgraph.backups.fullname" -}}
+{{ template "dgraph.fullname" . }}-{{ .Values.backups.name }}
+{{- end -}}
+
+{{/*
+Create a semVer/calVer version from image.tag so that it can be safely use in
+version comparisions used to toggle features or behavior.
+*/}}
+{{- define "dgraph.version" -}}
+{{- $safeVersion := .Values.image.tag -}}
+{{- if (eq $safeVersion "shuri") -}}
+  {{- $safeVersion = "v20.07.0" -}}
+{{- else if  (regexMatch "^[^v].*" $safeVersion) -}}
+  {{- $safeVersion = "v50.0.0" -}}
+{{- end -}}
+{{- printf "%s" $safeVersion -}}
+{{- end -}}
+
+
+{{/*
+Return the backups image name
+*/}}
+{{- define "dgraph.backups.image" -}}
+{{- $registryName := .Values.backups.image.registry -}}
+{{- $repositoryName := .Values.backups.image.repository -}}
+{{- $tag := .Values.backups.image.tag | toString -}}
+{{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
+{{- end -}}
+
+{{/*
+Return empty string if minio keys are not defined
+*/}}
+{{- define "dgraph.backups.keys.minio.enabled" -}}
+{{- $minioEnabled := "" -}}
+{{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
+{{- if $backupsEnabled -}}
+  {{- if .Values.backups.keys  -}}
+    {{- if .Values.backups.keys.minio -}}
+      {{- if and .Values.backups.keys.minio.access .Values.backups.keys.minio.secret -}}
+        {{- $minioEnabled = true -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- printf "%s" $minioEnabled -}}
+{{- end -}}
+
+{{/*
+Return empty string if s3 keys are not defined
+*/}}
+{{- define "dgraph.backups.keys.s3.enabled" -}}
+{{- $s3Enabled := "" -}}
+{{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
+{{- if $backupsEnabled -}}
+  {{- if .Values.backups.keys  -}}
+    {{- if .Values.backups.keys.s3 -}}
+      {{- if and .Values.backups.keys.s3.access .Values.backups.keys.s3.secret -}}
+        {{- $s3Enabled = true -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- printf "%s" $s3Enabled -}}
+{{- end -}}
+
+{{/*
 Return the proper image name (for the metrics image)
 */}}
 {{- define "dgraph.image" -}}
@@ -97,8 +165,3 @@ Create a default fully qualified ratel name.
 {{- define "dgraph.ratel.fullname" -}}
 {{ template "dgraph.fullname" . }}-{{ .Values.ratel.name }}
 {{- end -}}
-
-
-
-
-

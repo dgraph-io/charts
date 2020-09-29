@@ -12,4 +12,3 @@ alpha:
     files:
 $(for F in ./tls/*; do echo "      ${F##*/}: `cat $F | base64 | tr -d '\n'`"; done)
 EOF
-
