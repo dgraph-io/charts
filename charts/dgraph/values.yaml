@@ -443,7 +443,9 @@ backups:
     storage: 512Gi
     mountPath: &nfs_backups_path /dgraph/backups
   ## Volume Configuration for mounting in Alpha pods
-  ## Prerequisites: PV and PVC must be created beforehand. PVC must have suppose and set ReadWriteMany access mode.
+  ## Prerequisites: PV and PVC must be created beforehand.
+  ## On cluster with 2+ alpha pods, RWX (ReadWriteMany) access mode is required.
+  ## ref. https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   volume:
     enabled: false
     claim: ""
@@ -477,7 +479,7 @@ backups:
   subpath: dgraph_$(date +%Y%m%d)
   ## enable if minio service has https://
   minioSecure: false
-  ## specify access keys required by MinIO or S3 
+  ## specify access keys required by MinIO or S3
   keys:
     minio:
       ## MINIO_ACCESS_KEY env var
@@ -489,7 +491,7 @@ backups:
       access: ""
       ## AWS_SECRET_ACCESS_KEY env var
       secret: ""
-  
+
 global:
   ## Combined ingress resource for alpha and ratel services
   ## This will override existing ingress configurations under alpha and ratel
