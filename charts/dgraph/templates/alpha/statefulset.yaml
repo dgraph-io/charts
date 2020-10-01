@@ -220,8 +220,12 @@ spec:
           mountPath: /dgraph/acl
         {{- end }}
         {{- if and $backupsEnabled .Values.backups.nfs.enabled }}
-        - name: backups-volume
+        - name: backups-nfs-volume
           mountPath: {{ .Values.backups.nfs.mountPath }}
+        {{- end }}
+        {{- if and $backupsEnabled .Values.backups.volume.enabled }}
+        - name: backups-vol-volume
+          mountPath: {{ .Values.backups.volume.mountPath }}
         {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
@@ -234,9 +238,14 @@ spec:
           secretName: {{ template "dgraph.backups.fullname" . }}-secret
       {{- end }}
       {{- if and $backupsEnabled .Values.backups.nfs.enabled }}
-      - name: backups-volume
+      - name: backups-nfs-volume
         persistentVolumeClaim:
           claimName: {{ template "dgraph.backups.fullname" . }}-claim
+      {{- end }}
+      {{- if and $backupsEnabled .Values.backups.volume.enabled }}
+      - name: backups-vol-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.backups.volume.claim }}
       {{- end }}
       {{- if .Values.alpha.configFile }}
       - name: config-volume

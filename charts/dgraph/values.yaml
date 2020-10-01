@@ -433,15 +433,23 @@ backups:
   ## default is to reuse dgraph image
   image:
     << : *image
-  ## NFS Configuration for mounting
-  ## Prerequisites: NFS Server required, e.g. Google Cloud FileStore, EFS, Azure Blob, etc.
+  ## NFS Configuration for mounting a filepath in Alpha pods
+  ## Prerequisites: NFS Server required, e.g. Google Cloud FileStore, EFS, etc.
   ## ref. https://kubernetes.io/docs/concepts/storage/volumes/#nfs
   nfs:
     enabled: false
     server: ""
     path: ""
     storage: 512Gi
-    mountPath: &backups_path /dgraph/backups
+    mountPath: &nfs_backups_path /dgraph/backups
+  ## Volume Configuration for mounting a filepath in Alpha pods
+  ## Prerequisites: PVC must be created beforehand.
+  ## On cluster with 2+ alpha pods, RWX (ReadWriteMany) access mode is required.
+  ## ref. https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+  volume:
+    enabled: false
+    claim: ""
+    mountPath: &vol_backups_path /dgraph/backups/
   full:
     enabled: false
     ## enable bash debugging (set -x)
@@ -461,7 +469,7 @@ backups:
   ##   /dgraph/backups
   ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
   ##   minio://my-release-minio.default.svc:9000/<bucketname>
-  destination: *backups_path
+  destination: *nfs_backups_path
   ## subpath directory useful to store full and reclated incremental backuups
   ## in the same directory.
   ## NOTE: It is important to create directory name that matches the schedule.
@@ -471,7 +479,7 @@ backups:
   subpath: dgraph_$(date +%Y%m%d)
   ## enable if minio service has https://
   minioSecure: false
-  ## specify access keys required by MinIO or S3 
+  ## specify access keys required by MinIO or S3
   keys:
     minio:
       ## MINIO_ACCESS_KEY env var
@@ -483,7 +491,7 @@ backups:
       access: ""
       ## AWS_SECRET_ACCESS_KEY env var
       secret: ""
-  
+
 global:
   ## Combined ingress resource for alpha and ratel services
   ## This will override existing ingress configurations under alpha and ratel
