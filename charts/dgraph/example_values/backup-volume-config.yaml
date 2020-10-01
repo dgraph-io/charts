@@ -7,7 +7,7 @@
 backups:
   volume:
     enabled: true
-    claim: rook-celphfs-claim
+    claim: rook-cephfs-claim
     mountPath: &path /dgraph/backups
   full:
     enabled: true

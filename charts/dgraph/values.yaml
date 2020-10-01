@@ -433,8 +433,8 @@ backups:
   ## default is to reuse dgraph image
   image:
     << : *image
-  ## NFS Configuration for mounting in Alpha pods
-  ## Prerequisites: NFS Server required, e.g. Google Cloud FileStore, EFS, Azure Blob, etc.
+  ## NFS Configuration for mounting a filepath in Alpha pods
+  ## Prerequisites: NFS Server required, e.g. Google Cloud FileStore, EFS, etc.
   ## ref. https://kubernetes.io/docs/concepts/storage/volumes/#nfs
   nfs:
     enabled: false
@@ -442,8 +442,8 @@ backups:
     path: ""
     storage: 512Gi
     mountPath: &nfs_backups_path /dgraph/backups
-  ## Volume Configuration for mounting in Alpha pods
-  ## Prerequisites: PV and PVC must be created beforehand.
+  ## Volume Configuration for mounting a filepath in Alpha pods
+  ## Prerequisites: PVC must be created beforehand.
   ## On cluster with 2+ alpha pods, RWX (ReadWriteMany) access mode is required.
   ## ref. https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   volume:
