@@ -45,7 +45,7 @@ version comparisions used to toggle features or behavior.
 {{- define "dgraph.version" -}}
 {{- $safeVersion := .Values.image.tag -}}
 {{- if (eq $safeVersion "shuri") -}}
-  {{- $safeVersion = "v20.07.0" -}}
+  {{- $safeVersion = "v20.07.1" -}}
 {{- else if  (regexMatch "^[^v].*" $safeVersion) -}}
   {{- $safeVersion = "v50.0.0" -}}
 {{- end -}}
@@ -97,6 +97,16 @@ Return empty string if s3 keys are not defined
   {{- end -}}
 {{- end -}}
 {{- printf "%s" $s3Enabled -}}
+{{- end -}}
+
+{{/*
+Return the initContainers image name
+*/}}
+{{- define "dgraph.initContainers.generic.image" -}}
+{{- $registryName := .Values.alpha.initContainers.generic.image.registry -}}
+{{- $repositoryName := .Values.alpha.initContainers.generic.image.repository -}}
+{{- $tag := .Values.alpha.initContainers.generic.image.tag | toString -}}
+{{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
 {{- end -}}
 
 {{/*

@@ -105,6 +105,21 @@ spec:
       tolerations:
 {{ toYaml .Values.alpha.tolerations | indent 8 }}
       {{- end }}
+      {{- if .Values.alpha.initContainers.enabled }}
+      initContainers:
+      - name: {{ template "dgraph.alpha.fullname" . }}-init-generic
+        image: {{ template "dgraph.initContainers.generic.image" . }}
+        imagePullPolicy: {{ .Values.alpha.initContainers.generic.image.pullPolicy | quote }}
+        command:
+        {{- range .Values.alpha.initContainers.generic.command }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.alpha.persistence.enabled }}
+        volumeMounts:
+        - name: datadir
+          mountPath: /dgraph
+        {{- end }}
+      {{- end }}
       containers:
       - name: {{ template "dgraph.alpha.fullname" . }}
         image: {{ template "dgraph.image" . }}
