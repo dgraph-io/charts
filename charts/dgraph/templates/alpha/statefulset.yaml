@@ -157,7 +157,7 @@ spec:
          - "-c"
          - |
             set -ex
-            dgraph alpha --my=$(hostname -f):7080 --zero {{ template "multi_zeros" . }}
+            dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}
