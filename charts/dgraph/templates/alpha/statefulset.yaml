@@ -9,7 +9,7 @@
   {{- end -}}
   {{- /* Create comma-separated list of zeros */}}
   {{- range $idx := until $max }}
-    {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc.cluster.local:5080" $zeroFullName $idx $zeroFullName -}}
+    {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc:5080" $zeroFullName $idx $zeroFullName -}}
     {{- if ne $idx (sub $max 1) -}}
       {{- print "," -}}
     {{- end -}}
