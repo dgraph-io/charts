@@ -345,7 +345,7 @@ alpha:
   ##   (ref. https://dgraph.io/docs/enterprise-features/binary-backups/#restore-from-backup)
   ## * bulk loader (ref. https://dgraph.io/docs/deploy/fast-data-loading/#bulk-loader)
   initContainers:
-    generic:
+    init:
       enabled: false
       image:
         << : *image

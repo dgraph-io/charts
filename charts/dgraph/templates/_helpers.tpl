@@ -102,10 +102,10 @@ Return empty string if s3 keys are not defined
 {{/*
 Return the initContainers image name
 */}}
-{{- define "dgraph.initContainers.generic.image" -}}
-{{- $registryName := .Values.alpha.initContainers.generic.image.registry -}}
-{{- $repositoryName := .Values.alpha.initContainers.generic.image.repository -}}
-{{- $tag := .Values.alpha.initContainers.generic.image.tag | toString -}}
+{{- define "dgraph.initContainers.init.image" -}}
+{{- $registryName := .Values.alpha.initContainers.init.image.registry -}}
+{{- $repositoryName := .Values.alpha.initContainers.init.image.repository -}}
+{{- $tag := .Values.alpha.initContainers.init.image.tag | toString -}}
 {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
 {{- end -}}
 

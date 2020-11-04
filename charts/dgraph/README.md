@@ -138,12 +138,12 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.customStartupProbe`               | Alpha custom startup probes (if `alpha.startupProbe` not enabled)     | `{}`                                                |
 | `alpha.customLivenessProbe`              | Alpha custom liveness probes (if `alpha.livenessProbe` not enabled)   | `{}`                                                |
 | `alpha.customReadinessProbe`             | Alpha custom readiness probes (if `alpha.readinessProbe` not enabled) | `{}`                                                |
-| `alpha.initContainers.generic.enabled`   | Alpha generic initContainer enabled                                   | `true`                                              |
-| `alpha.initContainers.generic.image.registry`   | generic initContainer registry name                            | `docker.io`                                         |
-| `alpha.initContainers.generic.image.repository` | generic initContainer image name                               | `dgraph/dgraph`                                     |
-| `alpha.initContainers.generic.image.tag`        | generic initContainer image tag                                | `v20.07.2`                                          |
-| `alpha.initContainers.generic.image.pullPolicy` | generic initContainer pull policy                              | `IfNotPresent`                                      |
-| `alpha.initContainers.generic.command`   | Alpha generic initContainer command line to execute                   | See `values.yaml` for defaults                      |
+| `alpha.initContainers.init.enabled`      | Alpha initContainer enabled                                           | `true`                                              |
+| `alpha.initContainers.init.image.registry`   | Alpha initContainer registry name                                 | `docker.io`                                         |
+| `alpha.initContainers.init.image.repository` | Alpha initContainer image name                                    | `dgraph/dgraph`                                     |
+| `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v20.07.2`                                          |
+| `alpha.initContainers.init.image.pullPolicy` | Alpha initContainer pull policy                                   | `IfNotPresent`                                      |
+| `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `true`                                              |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |

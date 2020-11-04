@@ -18,7 +18,7 @@
 {{- $hasS3Keys := include "dgraph.backups.keys.s3.enabled" . -}}
 {{- $hasMinioKeys := include "dgraph.backups.keys.minio.enabled" . -}}
 {{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
-{{- $initContainerEnabled := .Values.alpha.initContainers.generic.enabled }}
+{{- $initContainerEnabled := .Values.alpha.initContainers.init.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -108,12 +108,12 @@ spec:
       {{- end }}
       {{- if $initContainerEnabled }}
       initContainers:
-      {{- if .Values.alpha.initContainers.generic.enabled }}
-      - name: {{ template "dgraph.alpha.fullname" . }}-init-generic
-        image: {{ template "dgraph.initContainers.generic.image" . }}
-        imagePullPolicy: {{ .Values.alpha.initContainers.generic.image.pullPolicy | quote }}
+      {{- if .Values.alpha.initContainers.init.enabled }}
+      - name: {{ template "dgraph.alpha.fullname" . }}-init-init
+        image: {{ template "dgraph.initContainers.init.image" . }}
+        imagePullPolicy: {{ .Values.alpha.initContainers.init.image.pullPolicy | quote }}
         command:
-        {{- range .Values.alpha.initContainers.generic.command }}
+        {{- range .Values.alpha.initContainers.init.command }}
           - {{ . | quote }}
         {{- end }}
         {{- if .Values.alpha.persistence.enabled }}
