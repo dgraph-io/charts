@@ -10,7 +10,7 @@
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v20.07.1
+  tag: v20.07.2
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -339,6 +339,23 @@ alpha:
   customLivenessProbe: {}
   customReadinessProbe: {}
 
+  ## You may want to initialize the Alphas with data before starting Alpha containers.
+  ## Examples can include:
+  ## * offline data restore from binary backups with `dgraph restore`
+  ##   (ref. https://dgraph.io/docs/enterprise-features/binary-backups/#restore-from-backup)
+  ## * bulk loader (ref. https://dgraph.io/docs/deploy/fast-data-loading/#bulk-loader)
+  initContainers:
+    init:
+      enabled: false
+      image:
+        << : *image
+      command:
+        - bash
+        - "-c"
+        - |
+          trap "exit" SIGINT SIGTERM
+          echo "Write to /dgraph/doneinit when ready."
+          until [ -f /dgraph/doneinit ]; do sleep 2; done
 
 ratel:
   name: ratel

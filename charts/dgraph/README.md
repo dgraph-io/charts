@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v20.07.1`                                          |
+| `image.tag`                              | Container image tag                                                   | `v20.07.2`                                          |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
@@ -138,6 +138,12 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.customStartupProbe`               | Alpha custom startup probes (if `alpha.startupProbe` not enabled)     | `{}`                                                |
 | `alpha.customLivenessProbe`              | Alpha custom liveness probes (if `alpha.livenessProbe` not enabled)   | `{}`                                                |
 | `alpha.customReadinessProbe`             | Alpha custom readiness probes (if `alpha.readinessProbe` not enabled) | `{}`                                                |
+| `alpha.initContainers.init.enabled`      | Alpha initContainer enabled                                           | `true`                                              |
+| `alpha.initContainers.init.image.registry`   | Alpha initContainer registry name                                 | `docker.io`                                         |
+| `alpha.initContainers.init.image.repository` | Alpha initContainer image name                                    | `dgraph/dgraph`                                     |
+| `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v20.07.2`                                          |
+| `alpha.initContainers.init.image.pullPolicy` | Alpha initContainer pull policy                                   | `IfNotPresent`                                      |
+| `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `true`                                              |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
@@ -163,7 +169,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
-| `backups.image.tag`                      | Container image tag                                                   | `v20.07.1`                                          |
+| `backups.image.tag`                      | Container image tag                                                   | `v20.07.2`                                          |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
 | `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `nil`                                               |
@@ -224,7 +230,7 @@ When generating the certificates and keys with `dgraph cert` command, you can us
 export RELEASE="my-release"
 export REPLICAS=3
 export NAMESPACE="default"
-VERS=0.0.11
+VERS=0.0.12
 
 ## Download Script
 curl --silent --remote-name --location \
@@ -240,7 +246,7 @@ dgraph cert --client backupuser
 It is recommended that you keep secrets values and config values in separate YAML files.  To assist with this practice, you can use the [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh) script to generate a `secrets.yaml` file from an existing `./tls` directory that was previously generated by the `dgraph cert` command.
 
 ```bash
-VERS=0.0.11
+VERS=0.0.12
 ## Download Script
 curl --silent --remote-name --location \
   https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/make_tls_secrets.sh

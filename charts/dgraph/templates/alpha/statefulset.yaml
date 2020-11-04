@@ -18,6 +18,7 @@
 {{- $hasS3Keys := include "dgraph.backups.keys.s3.enabled" . -}}
 {{- $hasMinioKeys := include "dgraph.backups.keys.minio.enabled" . -}}
 {{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
+{{- $initContainerEnabled := .Values.alpha.initContainers.init.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -104,6 +105,23 @@ spec:
       {{- if .Values.alpha.tolerations }}
       tolerations:
 {{ toYaml .Values.alpha.tolerations | indent 8 }}
+      {{- end }}
+      {{- if $initContainerEnabled }}
+      initContainers:
+      {{- if .Values.alpha.initContainers.init.enabled }}
+      - name: {{ template "dgraph.alpha.fullname" . }}-init-init
+        image: {{ template "dgraph.initContainers.init.image" . }}
+        imagePullPolicy: {{ .Values.alpha.initContainers.init.image.pullPolicy | quote }}
+        command:
+        {{- range .Values.alpha.initContainers.init.command }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.alpha.persistence.enabled }}
+        volumeMounts:
+        - name: datadir
+          mountPath: /dgraph
+        {{- end }}
+      {{- end }}
       {{- end }}
       containers:
       - name: {{ template "dgraph.alpha.fullname" . }}
