@@ -15,12 +15,22 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.alpha.service.type }}
+  {{- if .Values.alpha.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.alpha.service.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.alpha.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.alpha.service.externalTrafficPolicy }}
+  {{- end }}
   ports:
   - port: 8080
     targetPort: 8080
     name: http-alpha
   - port: 9080
     name: grpc-alpha
+  {{- with .Values.alpha.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   publishNotReadyAddresses: {{ .Values.alpha.service.publishNotReadyAddresses }}
   selector:
     app: {{ template "dgraph.name" . }}
