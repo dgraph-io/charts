@@ -109,7 +109,7 @@ spec:
       {{- if $initContainerEnabled }}
       initContainers:
       {{- if .Values.alpha.initContainers.init.enabled }}
-      - name: {{ template "dgraph.alpha.fullname" . }}-init-init
+      - name: {{ template "dgraph.alpha.fullname" . }}-init
         image: {{ template "dgraph.initContainers.init.image" . }}
         imagePullPolicy: {{ .Values.alpha.initContainers.init.image.pullPolicy | quote }}
         command:
@@ -172,14 +172,20 @@ spec:
         {{- end }}
         {{/* NOTE: awk '{gsub(/\.$/,"") needed to trim */}}
         command:
-         - bash
-         - "-c"
-         ## NOTE: awk gsub is needed to trim trailing period otherwise it causes
-         ##       crash for Kubernetes without the domain name
-         {{/* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
-         - |
-            set -ex
-            dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}
+        {{- if .Values.alpha.command.override }}
+        {{- range .Values.alpha.command.override }}
+        - {{ . | quote }}
+        {{- end }}
+        {{- else }}
+        - bash
+        - "-c"
+        ## NOTE: awk gsub is needed to trim trailing period otherwise it causes
+        ##       crash for Kubernetes without the domain name
+        {{- /* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
+        - |
+           set -ex
+           dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}
+        {{- end }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}
