@@ -7,12 +7,10 @@ get_alpha_list() {
   RELEASE=${RELEASE:-"my-release"}
   ## namespace used during deployment
   NAMESPACE=${NAMESPACE:-"default"}
-  ## kubernetes domain, typically cluster.local
-  DOMAIN=${DOMAIN:-"cluster.local"}
 
   ## Build List
   for (( IDX=0; IDX<REPLICAS; IDX++ )); do
-    LIST+=("$RELEASE-dgraph-alpha-$IDX.$RELEASE-dgraph-alpha-headless.$NAMESPACE.svc.$DOMAIN")
+    LIST+=("$RELEASE-dgraph-alpha-$IDX.$RELEASE-dgraph-alpha-headless.$NAMESPACE.svc")
   done
 
   ## Output Comma Separated List
