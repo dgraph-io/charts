@@ -172,20 +172,14 @@ spec:
         {{- end }}
         {{/* NOTE: awk '{gsub(/\.$/,"") needed to trim */}}
         command:
-        {{- if .Values.alpha.command.override }}
-        {{- range .Values.alpha.command.override }}
-        - {{ . | quote }}
-        {{- end }}
-        {{- else }}
-        - bash
-        - "-c"
-        ## NOTE: awk gsub is needed to trim trailing period otherwise it causes
-        ##       crash for Kubernetes without the domain name
-        {{- /* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
-        - |
-           set -ex
-           dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}
-        {{- end }}
+          - bash
+          - "-c"
+          ## NOTE: awk gsub is needed to trim trailing period otherwise it causes
+          ##       crash for Kubernetes without the domain name
+          {{- /* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
+          - |
+            set -ex
+            dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }} {{ .Values.alpha.extraFlags }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}

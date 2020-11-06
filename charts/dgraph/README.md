@@ -77,7 +77,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.podAntiAffinitytopologyKey`        | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
 | `zero.nodeAffinity`                      | Zero node affinity policy                                             | `{}`                                                |
 | `zero.extraEnvs`                         | extra env vars                                                        | `[]`                                                |
-| `zero.command.override`                  | Zero command override that replaces default command                   | `[]`                                                |
+| `zero.extraFlags`                        | Zero extra flags for command line                                     | `""`                                                |
 | `zero.configFile`                        | Zero config file                                                      | `{}`                                                |
 | `zero.service.type`                      | Zero service type                                                     | `ClusterIP`                                         |
 | `zero.service.annotations`               | Zero service annotations                                              | `{}`                                                |
@@ -109,7 +109,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.podAntiAffinitytopologyKey`       | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
 | `alpha.nodeAffinity`                     | Alpha node affinity policy                                            | `{}`                                                |
 | `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
-| `alpha.command.override`                 | Alpha command override that replaces default command                  | `[]`                                                |
+| `alpha.extraFlags`                       | Alpha extra flags for command                                         | `""`                                                |
 | `alpha.configFile`                       | Alpha config file                                                     | `{ config.yaml: 'lru_mb: 2048' }`                   |
 | `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
 | `alpha.service.annotations`              | Alpha service annotations                                             | `{}`                                                |
