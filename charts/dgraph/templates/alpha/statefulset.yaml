@@ -174,8 +174,9 @@ spec:
         command:
          - bash
          - "-c"
-         ## NOTE: awk gsub need to trim trailing period as it causes crash for Kubernetes w/o domain name
-         {{/* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 merged and back-ported. */}}
+         ## NOTE: awk gsub is needed to trim trailing period otherwise it causes
+         ##       crash for Kubernetes without the domain name
+         {{/* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
          - |
             set -ex
             dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}
