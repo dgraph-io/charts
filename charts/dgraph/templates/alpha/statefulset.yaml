@@ -152,9 +152,12 @@ spec:
         {{- with .Values.alpha.extraEnvs }}
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{/* NOTE: awk '{gsub(/\.$/,"") needed to trim */}}
         command:
          - bash
          - "-c"
+         ## NOTE: awk gsub need to trim trailing period as it causes crash for Kubernetes w/o domain name
+         {{/* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 merged and back-ported. */}}
          - |
             set -ex
             dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}
