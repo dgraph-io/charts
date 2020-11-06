@@ -9,7 +9,7 @@
   {{- end -}}
   {{- /* Create comma-separated list of zeros */}}
   {{- range $idx := until $max }}
-    {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc.cluster.local:5080" $zeroFullName $idx $zeroFullName -}}
+    {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc:5080" $zeroFullName $idx $zeroFullName -}}
     {{- if ne $idx (sub $max 1) -}}
       {{- print "," -}}
     {{- end -}}
@@ -170,12 +170,15 @@ spec:
         {{- with .Values.alpha.extraEnvs }}
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{/* NOTE: awk '{gsub(/\.$/,"") needed to trim */}}
         command:
          - bash
          - "-c"
+         ## NOTE: awk gsub need to trim trailing period as it causes crash for Kubernetes w/o domain name
+         {{/* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 merged and back-ported. */}}
          - |
             set -ex
-            dgraph alpha --my=$(hostname -f):7080 --zero {{ template "multi_zeros" . }}
+            dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}
