@@ -76,6 +76,9 @@ zero:
   ## Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
 
+  ## Extra flags for command line flags in command
+  extraFlags: ""
+
   ## Configuration file for dgraph zero used as an alternative to command-line options
   ## Ref: https://dgraph.io/docs/deploy/#config
   configFile: {}
@@ -208,6 +211,9 @@ alpha:
     #   value: "XXXXXXXXXXXXXXXXXXXX"
     # - name: AWS_SECRET_ACCESS_KEY
     #   value: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+  ## Extra flags for command line flags in command
+  extraFlags: ""
 
   ## Configuration file for dgraph alpha used as an alternative to command-line options
   ## Ref: https://dgraph.io/docs/deploy/#config
