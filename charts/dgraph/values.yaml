@@ -93,6 +93,25 @@ zero:
     ## communicate to each other in order to enter a ready state.
     publishNotReadyAddresses: true
 
+    ## References:
+    ##  * General: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+    ##  * GKE: https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing#lb_subnet
+    ##  * AKS: https://docs.microsoft.com/en-us/azure/aks/ingress-static-ip
+    loadBalancerIP: ""
+
+    ## References:
+    ## * General: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ## * EKS: https://aws.amazon.com/blogs/opensource/network-load-balancer-support-in-kubernetes-1-9/
+    ## * AKS: https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard#maintain-the-clients-ip-on-inbound-connections
+    externalTrafficPolicy: ""
+
+    ## References:
+    ## * General: https://kubernetes.io/docs/concepts/services-networking/service/#aws-nlb-support
+    ## * GKE: https://cloud.google.com/kubernetes-engine/docs/concepts/security-overview#filtering_load_balanced_traffic
+    ## * EKS: https://aws.amazon.com/premiumsupport/knowledge-center/eks-cidr-ip-address-loadbalancer/
+    ## * AKS: https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard#restrict-inbound-traffic-to-specific-ip-ranges
+    loadBalancerSourceRanges: []
+
   ## dgraph Pod Security Context
   securityContext:
     enabled: false
@@ -189,7 +208,7 @@ alpha:
   ##
   replicaCount: 3
 
-  ## zero server pod termination grace period
+  ## alpha server pod termination grace period
   ##
   terminationGracePeriodSeconds: 600
 
@@ -230,6 +249,25 @@ alpha:
     ## StatefulSet pods will need to have addresses published in order to
     ## communicate to each other in order to enter a ready state.
     publishNotReadyAddresses: true
+
+    ## References:
+    ##  * General: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+    ##  * GKE: https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing#lb_subnet
+    ##  * AKS: https://docs.microsoft.com/en-us/azure/aks/ingress-static-ip
+    loadBalancerIP: ""
+
+    ## References:
+    ## * General: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ## * EKS: https://aws.amazon.com/blogs/opensource/network-load-balancer-support-in-kubernetes-1-9/
+    ## * AKS: https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard#maintain-the-clients-ip-on-inbound-connections
+    externalTrafficPolicy: ""
+
+    ## References:
+    ## * General: https://kubernetes.io/docs/concepts/services-networking/service/#aws-nlb-support
+    ## * GKE: https://cloud.google.com/kubernetes-engine/docs/concepts/security-overview#filtering_load_balanced_traffic
+    ## * EKS: https://aws.amazon.com/premiumsupport/knowledge-center/eks-cidr-ip-address-loadbalancer/
+    ## * AKS: https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard#restrict-inbound-traffic-to-specific-ip-ranges
+    loadBalancerSourceRanges: []
 
   ## alpha ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
@@ -382,6 +420,26 @@ ratel:
   service:
     type: ClusterIP
     annotations: {}
+
+    ## References:
+    ##  * General: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+    ##  * GKE: https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing#lb_subnet
+    ##  * AKS: https://docs.microsoft.com/en-us/azure/aks/ingress-static-ip
+    loadBalancerIP: ""
+
+    ## References:
+    ## * General: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ## * EKS: https://aws.amazon.com/blogs/opensource/network-load-balancer-support-in-kubernetes-1-9/
+    ## * AKS: https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard#maintain-the-clients-ip-on-inbound-connections
+    externalTrafficPolicy: ""
+
+    ## References:
+    ## * General: https://kubernetes.io/docs/concepts/services-networking/service/#aws-nlb-support
+    ## * GKE: https://cloud.google.com/kubernetes-engine/docs/concepts/security-overview#filtering_load_balanced_traffic
+    ## * EKS: https://aws.amazon.com/premiumsupport/knowledge-center/eks-cidr-ip-address-loadbalancer/
+    ## * AKS: https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard#restrict-inbound-traffic-to-specific-ip-ranges
+    loadBalancerSourceRanges: []
+
 
   ## ratel ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster

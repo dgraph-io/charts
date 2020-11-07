@@ -82,6 +82,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.service.type`                      | Zero service type                                                     | `ClusterIP`                                         |
 | `zero.service.annotations`               | Zero service annotations                                              | `{}`                                                |
 | `zero.service.publishNotReadyAddresses`  | publish address if pods not in ready state                            | `true`                                              |
+| `zero.service.loadBalancerIP`            | specify static IP address for LoadBalancer type                       | `""`                                                |
+| `zero.service.externalTrafficPolicy`     | route external traffic to node-local or cluster-wide endpoints        | `""`                                                |
+| `zero.service.loadBalancerSourceRanges`  | restrict CIDR IP addresses for a LoadBalancer type                    | `[]`                                                |
 | `zero.securityContext.enabled`           | Security context for zero nodes enabled                               | `false`                                             |
 | `zero.securityContext.fsGroup`           | Group id of the zero container                                        | `1001`                                              |
 | `zero.securityContext.runAsUser`         | User ID for the zero container                                        | `1001`                                              |
@@ -114,6 +117,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
 | `alpha.service.annotations`              | Alpha service annotations                                             | `{}`                                                |
 | `alpha.service.publishNotReadyAddresses` | publish address if pods not in ready state                            | `true`                                              |
+| `alpha.service.loadBalancerIP`           | specify static IP address for LoadBalancer type                       | `""`                                                |
+| `alpha.service.externalTrafficPolicy`    | route external traffic to node-local or cluster-wide endpoints        | `""`                                                |
+| `alpha.service.loadBalancerSourceRanges` | restrict CIDR IP addresses for a LoadBalancer type                    | `[]`                                                |
 | `alpha.ingress.enabled`                  | Alpha Ingress resource enabled                                        | `false`                                             |
 | `alpha.ingress.hostname`                 | Alpha Ingress virtual hostname                                        | `nil`                                               |
 | `alpha.ingress.annotations`              | Alpha Ingress annotations                                             | `nil`                                               |
@@ -152,6 +158,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.extraEnvs`                        | Extra env vars                                                        | `[]`                                                |
 | `ratel.service.type`                     | Ratel service type                                                    | `ClusterIP`                                         |
 | `ratel.service.annotations`              | Ratel Service annotations                                             | `ClusterIP`                                         |
+| `ratel.service.loadBalancerIP`           | specify static IP address for LoadBalancer type                       | `""`                                                |
+| `ratel.service.externalTrafficPolicy`    | route external traffic to node-local or cluster-wide endpoints        | `""`                                                |
+| `ratel.service.loadBalancerSourceRanges` | restrict CIDR IP addresses for a LoadBalancer type                    | `[]`                                                |
 | `ratel.ingress.enabled`                  | Ratel Ingress resource enabled                                        | `false`                                             |
 | `ratel.ingress.hostname`                 | Ratel Ingress virtual hostname                                        | `nil`                                               |
 | `ratel.ingress.annotations`              | Ratel Ingress annotations                                             | `nil`                                               |
