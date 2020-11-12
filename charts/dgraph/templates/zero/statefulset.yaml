@@ -41,6 +41,9 @@ spec:
         release: {{ .Release.Name }}
         component: {{ .Values.zero.name }}
     spec:
+      {{- if .Values.zero.schedulerName }}
+      schedulerName: {{ .Values.zero.schedulerName }}
+      {{- end }}
       {{- if or (eq .Values.zero.antiAffinity "hard") (eq .Values.zero.antiAffinity "soft") .Values.zero.nodeAffinity }}
       affinity:
       {{- end }}

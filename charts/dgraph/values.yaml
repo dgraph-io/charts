@@ -38,6 +38,11 @@ zero:
   ##
   updateStrategy: RollingUpdate
 
+  ## Scheduler name
+  ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  # schedulerName: stork
+
   ## Partition update strategy
   ## https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#partitions
   ##
@@ -193,6 +198,11 @@ alpha:
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
   ##
   updateStrategy: RollingUpdate
+
+  ## Scheduler name
+  ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  # schedulerName: stork
 
   ## Partition update strategy
   ## https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#partitions
@@ -404,6 +414,11 @@ alpha:
 ratel:
   name: ratel
 
+  ## Scheduler name
+  ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  # schedulerName: stork
+
   ## Enable Ratel service
   enabled: true
 
@@ -494,6 +509,12 @@ ratel:
 ## ref: https://dgraph.io/docs/enterprise-features/binary-backups/
 ##
 backups:
+
+  ## Scheduler name
+  ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  # schedulerName: stork
+
   name: backups
   admin:
     ## backup user and password that is a member of 'guardians'group used to
