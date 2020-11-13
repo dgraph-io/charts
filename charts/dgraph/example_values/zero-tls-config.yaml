@@ -1,0 +1,29 @@
+## Interim Testing
+image:
+  tag: v20.11.0-rc1-5-g2d2aabe9c
+
+alpha:
+  tls:
+    enabled: true
+  configFile:
+    config.yaml: |
+      tls_cacert: /dgraph/tls/ca.crt
+      tls_cert: /dgraph/tls/client.internaluser.crt
+      tls_client_auth: VERIFYIFGIVEN
+      tls_internal_port_enabled: true
+      tls_node_cert: /dgraph/tls/node.crt
+      tls_node_key: /dgraph/tls/node.key
+      tls_use_system_ca: true
+zero:
+  tls:
+    enabled: true
+  configFile:
+    config.yaml: |
+      tls_cacert: /dgraph/tls/zero/ca.crt
+      tls_cert: /dgraph/tls/zero/client.internaluser.crt
+      tls_client_auth: VERIFYIFGIVEN
+      tls_internal_port_enabled: true
+      tls_node_cert: /dgraph/tls/zero/node.crt
+      tls_node_key: /dgraph/tls/zero/node.key
+      tls_use_system_ca: true
+
