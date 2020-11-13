@@ -582,6 +582,7 @@ backups:
       secret: ""
 
 global:
+  domain: cluster.local
   ## Combined ingress resource for alpha and ratel services
   ## This will override existing ingress configurations under alpha and ratel
   ## This requires an ingress controller to be installed into your k8s cluster

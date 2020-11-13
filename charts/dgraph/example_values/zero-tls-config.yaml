@@ -2,6 +2,9 @@
 image:
   tag: v20.11.0-rc1-5-g2d2aabe9c
 
+global:
+  domain: cluster.local
+
 alpha:
   tls:
     enabled: true

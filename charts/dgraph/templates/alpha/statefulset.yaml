@@ -7,9 +7,16 @@
   {{- if semverCompare "< 1.2.3 || 20.03.0" $safeVersion -}}
      {{- $max = 1 -}}
   {{- end -}}
+
+  {{- /* Append domain suffix if domain is used */}}
+  {{- $domainSuffix := "" -}}
+  {{- if .Values.global.domain -}}
+  {{- $domainSuffix = printf ".%s" .Values.global.domain -}}
+  {{- end -}}
+
   {{- /* Create comma-separated list of zeros */}}
   {{- range $idx := until $max }}
-    {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc:5080" $zeroFullName $idx $zeroFullName -}}
+    {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc%s:5080" $zeroFullName $idx $zeroFullName $domainSuffix -}}
     {{- if ne $idx (sub $max 1) -}}
       {{- print "," -}}
     {{- end -}}
