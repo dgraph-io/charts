@@ -50,10 +50,13 @@ get_node_list() {
   RELEASE=${RELEASE:-"my-release"}
   ## namespace used during deployment
   NAMESPACE=${NAMESPACE:-"default"}
+  ## domain name is required
+  DOMAIN=${DOMAIN:-'cluster.local'}
+
 
   ## Build List
   for (( IDX=0; IDX<REPLICAS; IDX++ )); do
-    LIST+=("$RELEASE-dgraph-$TYPE-$IDX.$RELEASE-dgraph-$TYPE-headless.$NAMESPACE.svc")
+    LIST+=("$RELEASE-dgraph-$TYPE-$IDX.$RELEASE-dgraph-$TYPE-headless.$NAMESPACE.svc.$DOMAIN")
   done
 
   ## Output Comma Separated List
@@ -61,4 +64,3 @@ get_node_list() {
 }
 
 main $@
-
