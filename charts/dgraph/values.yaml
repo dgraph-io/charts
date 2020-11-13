@@ -118,6 +118,14 @@ zero:
     fsGroup: 1001
     runAsUser: 1001
 
+  ## TLS Configuration
+  tls:
+    enabled: false
+    ## Files created from './tls' directory set with `dgraph cert` command
+    ## Can use make_tls_secrets.sh to generate secrets.yaml
+    files: {}
+
+
   ## dgraph data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning

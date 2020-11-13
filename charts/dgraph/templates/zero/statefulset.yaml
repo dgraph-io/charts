@@ -168,6 +168,10 @@ spec:
         - name: config-volume
           mountPath: /dgraph/config
         {{- end }}
+        {{- if .Values.zero.tls.enabled }}
+        - name: tls-volume
+          mountPath: /dgraph/tls
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.zero.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
@@ -177,6 +181,11 @@ spec:
       - name: config-volume
         configMap:
           name: {{ template "dgraph.zero.fullname" . }}-config
+      {{- end }}
+      {{- if .Values.zero.tls.enabled }}
+      - name: tls-volume
+        secret:
+          secretName: {{ template "dgraph.zero.fullname" . }}-tls-secret
       {{- end }}
 {{- if .Values.zero.persistence.enabled }}
   volumeClaimTemplates:
