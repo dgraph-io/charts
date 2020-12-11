@@ -100,7 +100,7 @@ spec:
               value: /dgraph/tls/client.{{ .Values.backups.admin.tls_client }}.key
             {{- end }}
             {{- end }}
-          restartPolicy: OnFailure
+          restartPolicy: {{ .Values.backups.incremental.restartPolicy }}
           volumes:
           - name: backup-config-volume
             configMap:

@@ -193,9 +193,11 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
 | `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
+| `backups.full.restartPolicy`             | Restart policy                                                        | `Never`                                             |
 | `backups.incremental.enabled`            | Enable incremental backups cronjob                                    | `false`                                             |
 | `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.incremental.schedule`           | Cronjob schedule                                                      | `"0 1-23 * * *"`                                    |
+| `backups.incremental.restartPolicy`      | Restart policy                                                        | `Never`                                             |
 | `backups.destination`                    | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
 | `backups.subpath`                        | Specify subpath where full + related incremental backups are stored   | `dgraph_$(date +%Y%m%d)`                            |
 | `backups.minioSecure`                    | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |

@@ -538,6 +538,8 @@ backups:
     ## full backup schedule
     ## 12AM server time
     schedule: "0 * * * *"
+    ## restart policy
+    restartPolicy: Never
   incremental:
     enabled: false
     ## enable bash debugging (set -x)
@@ -545,6 +547,8 @@ backups:
     ## incremental backup schedule
     ## every hour, except 12AM serer time
     schedule: "0 1-23 * * *"
+    ## restart policy
+    restartPolicy: Never
   ## destination is file path, s3, or minio
   ## examples:
   ##   /dgraph/backups
