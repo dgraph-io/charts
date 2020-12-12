@@ -25,8 +25,14 @@ metadata:
 spec:
   schedule: "{{ .Values.backups.incremental.schedule }}"
   jobTemplate:
+    metadata:
+      labels:
+        cronjob: {{ template "dgraph.backups.fullname" . }}-inc
     spec:
       template:
+        metadata:
+          labels:
+            cronjob: {{ template "dgraph.backups.fullname" . }}-inc
         spec:
           containers:
           - name: {{ template "dgraph.backups.fullname" . }}-inc
