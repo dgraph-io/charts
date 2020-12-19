@@ -37,7 +37,7 @@ spec:
             - name: PORT
               value: "{{ .Values.service.targetPort | default 8686 }}"
           {{- with .Values.env }}
-            {{- toYaml . | nindent 10 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
             - name: http
