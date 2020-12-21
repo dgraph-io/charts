@@ -1,0 +1,16 @@
+# ingress-nginx with certificate manager
+# * https://cert-manager.io/
+# * https://kubernetes.github.io/ingress-nginx/
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+  tls:
+  - hosts:
+    - lambda.example.com
+    secretName: lambda-tls
+  hosts: lambda.example.com
+  paths:
+    - /*

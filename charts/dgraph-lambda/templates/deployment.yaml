@@ -33,24 +33,24 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env: 
+          env:
             - name: PORT
               value: "{{ .Values.service.targetPort | default 8686 }}"
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: http
+            - name: http-lambda
               containerPort: {{ .Values.service.targetPort | default 8686 }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http-lambda
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http-lambda
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
