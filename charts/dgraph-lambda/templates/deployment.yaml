@@ -43,16 +43,19 @@ spec:
             - name: http-lambda
               containerPort: {{ .Values.service.targetPort | default 8686 }}
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http-lambda
-          # readinessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http-lambda
+          {{- if .Values.script.enabled }}
+          volumeMounts:
+            - name: script
+              mountPath: /scripts
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.script.enabled }}
+      volumes:
+        - name: script
+          configMap:
+            name: {{ include "dgraph-lambda.fullname" . }}-config
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -14,6 +14,9 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+script: 
+  enabled: false
+  script: ""
 
 env:
   ## DGRAPH_URL is the URL used to reach Dgraph Alpha

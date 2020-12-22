@@ -1,0 +1,23 @@
+## Lambda Example
+## This deploys dgraph with a release name of "dev" and dgraph-lambda with a release name of "lambda"
+releases:
+  - name: dev
+    namespace: default
+    chart: {{ env "PWD" }}/../charts/dgraph
+    values:
+      - alpha:
+          extraEnvs:
+            - name: DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL
+              ## http://<helm-chart-release-name>-dgraph-lambda.<namesapce>.svc:8686/graphql-worker
+              value: http://lambda-dgraph-lambda.default.svc:8686/graphql-worker
+            - name: DGRAPH_ALPHA_WHITELIST
+              value: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+
+  - name: lambda
+    namespace: default
+    chart: {{ env "PWD" }}/../charts/dgraph-lambda
+    values:
+      - env:
+        - name: DGRAPH_URL
+          ## http://<helm-chart-release-name>-dgraph-alpha-headless.<namespace>.svc:8080
+          value: http://dev-dgraph-alpha-headless.default.svc:8080
