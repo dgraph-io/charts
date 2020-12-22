@@ -1,3 +1,10 @@
+/*
+ This is included in script.yaml
+ Original Sourdce is from:
+   * https://dgraph.io/docs/graphql/lambda/query/
+   * https://dgraph.io/docs/graphql/lambda/mutation/
+*/
+
 async function authorsByName({args, dql}) {
     const results = await dql.query(`query queryAuthor($name: string) {
         queryAuthor(func: type(Author)) @filter(eq(Author.name, $name)) {

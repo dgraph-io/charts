@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v20.07.2`                                          |
+| `image.tag`                              | Container image tag                                                   | `v20.11.0`                                          |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
@@ -149,7 +149,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.initContainers.init.enabled`      | Alpha initContainer enabled                                           | `true`                                              |
 | `alpha.initContainers.init.image.registry`   | Alpha initContainer registry name                                 | `docker.io`                                         |
 | `alpha.initContainers.init.image.repository` | Alpha initContainer image name                                    | `dgraph/dgraph`                                     |
-| `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v20.07.2`                                          |
+| `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v20.11.0`                                          |
 | `alpha.initContainers.init.image.pullPolicy` | Alpha initContainer pull policy                                   | `IfNotPresent`                                      |
 | `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
@@ -180,7 +180,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
-| `backups.image.tag`                      | Container image tag                                                   | `v20.07.2`                                          |
+| `backups.image.tag`                      | Container image tag                                                   | `v20.11.0`                                          |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
 | `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `nil`                                               |

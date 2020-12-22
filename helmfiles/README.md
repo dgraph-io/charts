@@ -23,13 +23,13 @@ Article:
 
 ## Usage
 
-Helmfile uses `helmfile.yaml` in the current working directory, but can use alternative filepath with `--file` argument.
+Helmfile uses `helmfile.yaml` in the current working directory, so you can cd to that directory or use `--file` argument.
 
 ```bash
 ## diff releases from state file against env (helm diff)
-helmfile diff --file path/to/helmfile/lambda.yaml
+helmfile --file path/to/helmfile.yaml diff
 ## apply all resources from state file only when there are changes
-helmfile apply --file path/to/helmfile/lambda.yaml
+helmfile --file path/to/helmfile.yaml apply
 ## sync all resources from state file (repos, releases and chart deps)
-helmfile sync --file path/to/helmfile/lambda.yaml
+helmfile --file path/to/helmfile.yaml sync
 ```

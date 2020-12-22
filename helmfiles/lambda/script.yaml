@@ -1,10 +1,6 @@
-## TESTING:
-## cd charts/charts
-## helm install test --dry-run --debug ./dgraph-lambda/ --values ../helmfiles/lambda_with_script/script.yaml
-
 script:
   enabled: true
-  script: |            
+  script: |
     async function authorsByName({args, dql}) {
         const results = await dql.query(`query queryAuthor($name: string) {
             queryAuthor(func: type(Author)) @filter(eq(Author.name, $name)) {
@@ -33,4 +29,3 @@ script:
         "Query.authorsByName": authorsByName,
         "Mutation.newAuthor": newAuthor
     })
-
