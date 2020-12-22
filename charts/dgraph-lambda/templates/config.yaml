@@ -6,5 +6,5 @@ metadata:
   labels:
     {{- include "dgraph-lambda.labels" . | nindent 4 }}
 data:
-  script.js: {{ .Values.script.script }}
+  script.js: {{ .Values.script.script | quote }}
 {{- end -}}

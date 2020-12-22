@@ -37,8 +37,6 @@ env:
   #   value: development
   # - name: INTEGRATION_TEST
   #   value: "false"
-  # - name: SCRIPT_PATH
-  #   value: ./script/script.js
 
 
 serviceAccount:
