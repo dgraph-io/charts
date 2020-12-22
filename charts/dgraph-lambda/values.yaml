@@ -14,7 +14,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-script: 
+script:
   enabled: false
   script: ""
 
@@ -63,7 +63,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 8686
+  port: 80
   targetPort: 8686
 
 ingress:
@@ -90,13 +90,6 @@ resources: {}
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
