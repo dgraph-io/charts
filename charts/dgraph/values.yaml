@@ -10,7 +10,7 @@
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v20.07.2
+  tag: v20.11.0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -546,6 +546,8 @@ backups:
     ## full backup schedule
     ## 12AM server time
     schedule: "0 * * * *"
+    ## restart policy
+    restartPolicy: Never
   incremental:
     enabled: false
     ## enable bash debugging (set -x)
@@ -553,6 +555,8 @@ backups:
     ## incremental backup schedule
     ## every hour, except 12AM serer time
     schedule: "0 1-23 * * *"
+    ## restart policy
+    restartPolicy: Never
   ## destination is file path, s3, or minio
   ## examples:
   ##   /dgraph/backups

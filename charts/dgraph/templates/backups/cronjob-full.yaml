@@ -25,8 +25,14 @@ metadata:
 spec:
   schedule: "{{ .Values.backups.full.schedule }}"
   jobTemplate:
+    metadata:
+      labels:
+        cronjob: {{ template "dgraph.backups.fullname" . }}-full
     spec:
       template:
+        metadata:
+          labels:
+            cronjob: {{ template "dgraph.backups.fullname" . }}-full
         spec:
           containers:
           - name: {{ template "dgraph.backups.fullname" . }}-full
@@ -100,7 +106,7 @@ spec:
               value: /dgraph/tls/client.{{ .Values.backups.admin.tls_client }}.key
             {{- end }}
             {{- end }}
-          restartPolicy: OnFailure
+          restartPolicy: {{ .Values.backups.incremental.restartPolicy }}
           volumes:
           - name: backup-config-volume
             configMap:

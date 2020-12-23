@@ -1,0 +1,22 @@
+## Lambda Example
+
+releases:
+  - name: dev
+    namespace: default
+    chart: {{ env "PWD" }}/../../charts/dgraph
+    values:
+      - alpha:
+          extraEnvs:
+            - name: DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL
+              ## http://<helm-chart-release-name>-dgraph-lambda.<namespace>.svc/graphql-worker
+              value: http://lambda-dgraph-lambda.default.svc/graphql-worker
+
+  - name: lambda
+    namespace: default
+    chart: {{ env "PWD" }}/../../charts/dgraph-lambda
+    values:
+      - ./example/script.yaml
+      - env:
+        - name: DGRAPH_URL
+          ## http://<helm-chart-release-name>-dgraph-alpha-headless.<namespace>.svc:8080
+          value: http://dev-dgraph-alpha-headless.default.svc:8080

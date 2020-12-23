@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v20.07.2`                                          |
+| `image.tag`                              | Container image tag                                                   | `v20.11.0`                                          |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
@@ -149,7 +149,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.initContainers.init.enabled`      | Alpha initContainer enabled                                           | `true`                                              |
 | `alpha.initContainers.init.image.registry`   | Alpha initContainer registry name                                 | `docker.io`                                         |
 | `alpha.initContainers.init.image.repository` | Alpha initContainer image name                                    | `dgraph/dgraph`                                     |
-| `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v20.07.2`                                          |
+| `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v20.11.0`                                          |
 | `alpha.initContainers.init.image.pullPolicy` | Alpha initContainer pull policy                                   | `IfNotPresent`                                      |
 | `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
@@ -180,7 +180,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
-| `backups.image.tag`                      | Container image tag                                                   | `v20.07.2`                                          |
+| `backups.image.tag`                      | Container image tag                                                   | `v20.11.0`                                          |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
 | `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `nil`                                               |
@@ -193,9 +193,11 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
 | `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
+| `backups.full.restartPolicy`             | Restart policy                                                        | `Never`                                             |
 | `backups.incremental.enabled`            | Enable incremental backups cronjob                                    | `false`                                             |
 | `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |
 | `backups.incremental.schedule`           | Cronjob schedule                                                      | `"0 1-23 * * *"`                                    |
+| `backups.incremental.restartPolicy`      | Restart policy                                                        | `Never`                                             |
 | `backups.destination`                    | Destination - file path, s3://, minio:                                | `/dgraph/backups`                                   |
 | `backups.subpath`                        | Specify subpath where full + related incremental backups are stored   | `dgraph_$(date +%Y%m%d)`                            |
 | `backups.minioSecure`                    | Set to true if Minio server specified in minio:// supports TLS        | `false`                                             |
@@ -241,7 +243,7 @@ When generating the certificates and keys with `dgraph cert` command, you can us
 export RELEASE="my-release"
 export REPLICAS=3
 export NAMESPACE="default"
-VERS=0.0.12
+VERS=0.0.13
 
 ## Download Script
 curl --silent --remote-name --location \
@@ -257,7 +259,7 @@ dgraph cert --client backupuser
 It is recommended that you keep secrets values and config values in separate YAML files.  To assist with this practice, you can use the [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh) script to generate a `secrets.yaml` file from an existing `./tls` directory that was previously generated by the `dgraph cert` command.
 
 ```bash
-VERS=0.0.12
+VERS=0.0.13
 ## Download Script
 curl --silent --remote-name --location \
   https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/make_tls_secrets.sh
@@ -317,8 +319,8 @@ curl --silent \
 You can generate a secret for the key file using `base64` tool:
 
 ```bash
-base64 <<< '123456789012345'
-# MTIzNDU2Nzg5MDEyMzQ1Cg==
+printf '123456789012345' | base64
+# MTIzNDU2Nzg5MDEyMzQ1
 ```
 
 Then create a Helm chart value config file with the secret:
@@ -328,7 +330,7 @@ Then create a Helm chart value config file with the secret:
 alpha:
   encryption:
     file:
-      enc_key_file: MTIzNDU2Nzg5MDEyMzQ1Cg==
+      enc_key_file: MTIzNDU2Nzg5MDEyMzQ1
 ```
 
 Create a corresponding configuration enables and configures Dgraph Alpha to use this file:
@@ -359,8 +361,8 @@ helm install $RELNAME \
 You can generate a secret for the secrets file using `base64` tool:
 
 ```bash
-base64 <<< '1234567890123456789012345678901'
-# MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
+printf '12345678901234567890123456789012' | base64
+# MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
 ```
 
 Then create a Helm chart value config file with the secret:
@@ -370,7 +372,7 @@ Then create a Helm chart value config file with the secret:
 alpha:
   acl:
     file:
-      hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
+      hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
 ```
 
 Create a corresponding configuration enables and configures Dgraph Alpha to use this file:
