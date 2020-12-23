@@ -1,6 +1,6 @@
 /*
  This is included in script.yaml
- Original Sourdce is from:
+ Original Source is from:
    * https://dgraph.io/docs/graphql/lambda/query/
    * https://dgraph.io/docs/graphql/lambda/mutation/
 */
