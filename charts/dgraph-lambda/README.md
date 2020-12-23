@@ -21,13 +21,13 @@ helm install "my-lambda" dgraph/dgraph-lambda
 In order to use `dgraph-lambda`, you must do the following:
 
 1. deploy Dgraph Alpha configured to point to `dgraph-lambda`
-1. configure lambda script helm override for `dgraph-lambda`
+1. configure lambda script helm override values for `dgraph-lambda`
 1. deploy Dgraph Lambda service configured to point to Dgraph Alpha services
 1. add GraphQL schema for the resolvers added by the lambda script
 
 #### Environment
 
-For these steps, the set up the following environment variables:
+For these steps, set up the following environment variables:
 
 ```bash
 export NS=default
@@ -36,8 +36,6 @@ export DGRAPH_REL=my-release
 ```
 
 #### Deploy Dgraph Alpha
-
-Using the helm chart, you can add environment variables for the configuration
 
 Dgraph Alpha will need to be configured with the `--graphql_lambda_url` and `--whitelist` arguments (see: [lambda server](https://dgraph.io/docs/graphql/lambda/server/)) to support `dgraph-lambda`.  You can use environment variables to configure this:
 
@@ -50,7 +48,7 @@ helm install $DGRAPH_REL dgraph/dgraph \
   --set alpha.extraEnvs[1].value='10.0.0.0\/8\,172.16.0.0/12\,192.168.0.0\/16'
 ```
 
-The `DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL` environment variable will point to Dgraph Lambda service that will be deployed in the next step.  The format Dgraph Lambda domain name is formatted as the following: following:
+The `DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL` environment variable will point to Dgraph Lambda service that will be deployed in the next step.  The format Dgraph Lambda domain name is formatted as the following:
 
 ```
 http://<helm-chart-release-name>-dgraph-lambda.<namesapce>.svc/graphql-worker
@@ -58,7 +56,7 @@ http://<helm-chart-release-name>-dgraph-lambda.<namesapce>.svc/graphql-worker
 
 #### Configure Lambda script
 
-First we can create a Helm override values like the one below with the lambda script embedded into it like the example below:
+First we can create a Helm override values with the lambda script embedded into it like the example below:
 
 ```yaml
 # my-lambda.yaml
@@ -154,24 +152,24 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `image.repository`                       | Container repository name                                             | `dgraph/dgraph-lambda`                              |
 | `image.pullPolicy`                       | Container image pull policy                                           | `IfNotPresent`                                      |
 | `image.tag`                              | Container image tag                                                   | `v20.11.0`                                          |
-| `imagePullSecrets`                       | Image pull secrets auth tokens used to access private registry        | `[]`                                                |
-| `nameOverride`                           | Name override of default chart name                                   | `""`                                                |
-| `fullnameOverride`                       | Full Name override of release name + chart name                       | `""`                                                |
-| `script.enabled`                         | Enable adding script                                                  | `false`                                             |
-| `script.script`                          | Embedded lambda script                                                | `""`                                                |
+| `imagePullSecrets`                       | Image pull secrets auth tokens used to access a private registry      | `[]`                                                |
+| `nameOverride`                           | Name override of the default chart name                               | `""`                                                |
+| `fullnameOverride`                       | Full Name override of the release name + chart name                   | `""`                                                |
+| `script.enabled`                         | Enable adding a lambda script                                         | `false`                                             |
+| `script.script`                          | Embedded lambda script stored in a config map                         | `""`                                                |
 | `env`                                    | Environment variables                                                 | see `values.yaml`                                   |
 | `serviceAccount.create`                  | Specifies if service account should be created                        | `true`                                              |
 | `serviceAccount.annotations`             | Service Account annotations                                           | `{}`                                                |
-| `serviceAccount.name`                    | Service Account nae                                                   | `""`                                                |
+| `serviceAccount.name`                    | Service Account name                                                  | `""`                                                |
 | `podAnnotations`                         | Additional pod annotations                                            | `{}`                                                |
 | `podSecurityContext`                     | Pod Security context to define privilege and access control           | `{}`                                                |
 | `securityContext`                        | Container Security context to define privilege and access control     | `{}      `                                          |
 | `service.type`                           | Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)                | `ClusterIP`                                         |
-| `service.port`                           | Service port for inbound port                                         | `80`                                                |
-| `service.targetPort`                     | Service targetPort is the port service                                | `8686`                                              |
+| `service.port`                           | Service inbound port                                                  | `80`                                                |
+| `service.targetPort`                     | Service targetPort of dgraph-lambda service                           | `8686`                                              |
 | `ingress.enabled`                        | Ingress enabled                                                       | `false`                                             |
-| `ingress.annotations`                    | Ingress annoations                                                    | `{}`                                                |
-| `ingress.hosts`                          | Ingress hosts list to configure virtual hosts and routes to service   | see `values.yaml`                                   |
+| `ingress.annotations`                    | Ingress annotations                                                   | `{}`                                                |
+| `ingress.hosts`                          | Ingress hosts list to configure virtual hosts + routes to the service | see `values.yaml`                                   |
 | `ingress.tls`                            | Ingress tls configuration                                             | `[]`                                                |
 | `resources`                              | Resource limites and requests                                         | `{}`                                                |
 | `nodeSelector`                           | Node selection constraints                                            | `{}`                                                |
