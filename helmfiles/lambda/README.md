@@ -14,14 +14,14 @@ This will install `dgraph` (Helm Release Name: `dev`, Namespace: `default`) and 
 
 ### Add schema
 
-Once the Dgraph cluster is deployed where Dgraph Alpha pods are in `Running` state, you can run the following to upload the schema:
+Once the Dgraph cluster is deployed where Dgraph Alpha pods are in a `Running` state, you can run the following to upload the schema:
 
 ```bash
 kubectl port-forward dev-dgraph-alpha-0 8080:8080
 curl http://localhost:8080/admin/schema --upload-file schema.graphql
 ```
 
-You can verify schema is uploaded with [jq](https://stedolan.github.io/jq/) tool:
+You can verify schema is uploaded with the optional [jq](https://stedolan.github.io/jq/) tool:
 
 ```bash
 curl http://localhost:8080/admin --silent \
