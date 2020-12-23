@@ -1,3 +1,0 @@
-env:
-  - name: DGRAPH_URL
-    value: http://my-release-dgraph-alpha-headless.default.svc:8080

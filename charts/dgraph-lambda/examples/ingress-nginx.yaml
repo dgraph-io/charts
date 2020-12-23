@@ -13,4 +13,4 @@ ingress:
     secretName: lambda-tls
   hosts: lambda.example.com
   paths:
-    - /*
+    - /

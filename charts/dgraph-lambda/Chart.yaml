@@ -1,6 +1,6 @@
 apiVersion: v2
 name: dgraph-lambda
-description: Serverless platform for running JS on Slash GraphQL (or Dgraph).
+description: Serverless platform for running JavaScript on Slash GraphQL (or Dgraph).
 keywords:
 - dgraph
 - database
@@ -9,10 +9,11 @@ keywords:
 - nosql
 - serverless
 - lambda
+- JavaScript
 type: application
 version: 0.0.1
 appVersion: v1.2.1
-sources: 
+sources:
   - https://github.com/dgraph-io/dgraph-lambda
 maintainers:
   - name: dgraph

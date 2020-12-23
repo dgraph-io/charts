@@ -91,14 +91,14 @@ If you would like to forgo using `helmfile` and instead just use the vanilla `he
 ```bash
 helm install dev ../../charts/dgraph \
   --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL \
-  --set alpha.extraEnvs[0].value=http://lambda-dgraph-lambda.default.svc:80/graphql-worker \
+  --set alpha.extraEnvs[0].value=http://lambda-dgraph-lambda.default.svc/graphql-worker \
   --set alpha.extraEnvs[1].name=DGRAPH_ALPHA_WHITELIST \
   --set alpha.extraEnvs[1].value='10.0.0.0\/8\,172.16.0.0/12\,192.168.0.0\/16'
 
 helm install lambda ../../charts/dgraph-lambda \
   --values script.yaml \
-  --set alpha.extraEnvs[0].name=DGRAPH_URL \
-  --set alpha.extraEnvs[0].value=http://dev-dgraph-alpha-headless.default.svc:8080
+  --set alpha.env[0].name=DGRAPH_URL \
+  --set alpha.env[0].value=http://dev-dgraph-alpha-headless.default.svc:8080
 ```
 
 You can clean up with:
