@@ -14,7 +14,7 @@ helm install "my-lambda" dgraph/dgraph-lambda
 - Kubernetes 1.16+
 - Helm 3.0+
 - Dgraph v20.11.0 or greater
-  - configured with `graphql_lambda_url` and `whitelist`
+  - configured with `graphql_lambda_url`
 
 ### Configuration
 
@@ -27,7 +27,7 @@ In order to use `dgraph-lambda`, you must do the following:
 
 #### Environment
 
-For these steps, set up following environment variables:
+For these steps, set up the following environment variables:
 
 ```bash
 export NS=default
@@ -37,15 +37,13 @@ export DGRAPH_REL=my-release
 
 #### Deploy Dgraph Alpha
 
-Dgraph Alpha will need to be configured with the `--graphql_lambda_url` and `--whitelist` arguments (see: [lambda server](https://dgraph.io/docs/graphql/lambda/server/)) to support `dgraph-lambda`.  You can use environment variables to configure this:
+Dgraph Alpha will need to be configured with the `--graphql_lambda_url` argument (see: [lambda server](https://dgraph.io/docs/graphql/lambda/server/)) to support `dgraph-lambda`.  You can use environment variables to configure this:
 
 ```bash
 helm install $DGRAPH_REL dgraph/dgraph \
   --namespace $NS \
   --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL \
-  --set alpha.extraEnvs[0].value=http://$LAMBDA_REL-dgraph-lambda.$NS.svc:80/graphql-worker \
-  --set alpha.extraEnvs[1].name=DGRAPH_ALPHA_WHITELIST \
-  --set alpha.extraEnvs[1].value='10.0.0.0\/8\,172.16.0.0/12\,192.168.0.0\/16'
+  --set alpha.extraEnvs[0].value=http://$LAMBDA_REL-dgraph-lambda.$NS.svc:80/graphql-worker
 ```
 
 The `DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL` environment variable will point to Dgraph Lambda service that will be deployed in the next step.  The format Dgraph Lambda domain name is formatted as the following:
@@ -101,8 +99,8 @@ We can deploy the example above, named `my-lambda.yaml`, with the follwing:
 helm install $LAMBDA_REL dgraph/dgraph-lambda \
   --namespace $NS \
   --values my-lambda.yaml \
-  --set alpha.env[0].name=DGRAPH_URL \
-  --set alpha.env[0].value=http://$DGRAPH_REL-dgraph-alpha-headless.$NS.svc:8080
+  --set env[0].name=DGRAPH_URL \
+  --set env[0].value=http://$DGRAPH_REL-dgraph-alpha-headless.$NS.svc:8080
 ```
 
 The `DGRAPH_URL` environment variable will point to Dgraph Alpha service deployed in the previous step.  The format Dgraph Alpha domain name is formatted as the following:

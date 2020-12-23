@@ -89,14 +89,12 @@ If you would like to forgo using `helmfile` and instead just use the vanilla `he
 ```bash
 helm install dev ../../charts/dgraph \
   --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL \
-  --set alpha.extraEnvs[0].value=http://lambda-dgraph-lambda.default.svc/graphql-worker \
-  --set alpha.extraEnvs[1].name=DGRAPH_ALPHA_WHITELIST \
-  --set alpha.extraEnvs[1].value='10.0.0.0\/8\,172.16.0.0/12\,192.168.0.0\/16'
+  --set alpha.extraEnvs[0].value=http://lambda-dgraph-lambda.default.svc/graphql-worker
 
 helm install lambda ../../charts/dgraph-lambda \
   --values example/script.yaml \
-  --set alpha.env[0].name=DGRAPH_URL \
-  --set alpha.env[0].value=http://dev-dgraph-alpha-headless.default.svc:8080
+  --set env[0].name=DGRAPH_URL \
+  --set env[0].value=http://dev-dgraph-alpha-headless.default.svc:8080
 ```
 
 You can clean up with:
@@ -105,4 +103,27 @@ You can clean up with:
 helm delete dev
 helm delete lambda
 kubectl delete pvc --selector release=dev
+```
+
+## Addendum: Troubleshooting Dgraph Lambda tips
+
+Here are a few commands that may be useful in checking settings of Dgraph Lamba service and configuration:
+
+```bash
+LAMBDA_POD=$(kubectl get pod --selector app.kubernetes.io/name=dgraph-lambda --output jsonpath={.items[0].metadata.name})
+# print env vars and verify correctness
+kubectl get pod/$LAMBDA_POD --output jsonpath="{range .spec.containers[0].env[*]}{.name}={.value}{\"\n\"}{end}"
+## check script from mounted path
+kubectl exec -t $LAMBDA_POD -- ls -l /script/script.js
+## verify script contents
+kubectl exec -t $LAMBDA_POD -- cat /script/script.js
+
+## check configmap configuration if missing script
+kubectl get cm/lambda-dgraph-lambda-config --output jsonpath='{.data.script\.js}'
+
+## verify schema on Dgraph Alpha
+curl http://localhost:8080/admin --silent \
+  --header "Content-Type: application/json" \
+  --data '{"query": "{ getGQLSchema { schema } }"}' \
+   | jq -r .data.getGQLSchema.schema
 ```

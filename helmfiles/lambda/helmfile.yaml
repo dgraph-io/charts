@@ -10,8 +10,6 @@ releases:
             - name: DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL
               ## http://<helm-chart-release-name>-dgraph-lambda.<namesapce>.svc/graphql-worker
               value: http://lambda-dgraph-lambda.default.svc/graphql-worker
-            - name: DGRAPH_ALPHA_WHITELIST
-              value: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
 
   - name: lambda
     namespace: default
