@@ -1,0 +1,14 @@
+type Author {
+    id: ID!
+    name: String! @search(by: [hash, trigram])
+    dob: DateTime
+    reputation: Float
+}
+
+type Query {
+    authorsByName(name: String!): [Author] @lambda
+}
+
+type Mutation {
+    newAuthor(name: String!): ID! @lambda
+}
