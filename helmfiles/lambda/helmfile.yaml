@@ -8,7 +8,7 @@ releases:
       - alpha:
           extraEnvs:
             - name: DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL
-              ## http://<helm-chart-release-name>-dgraph-lambda.<namesapce>.svc/graphql-worker
+              ## http://<helm-chart-release-name>-dgraph-lambda.<namespace>.svc/graphql-worker
               value: http://lambda-dgraph-lambda.default.svc/graphql-worker
 
   - name: lambda
