@@ -2,7 +2,7 @@
 
 The `helmfile` is a useful tool to manage values dynamically across several helm charts.  Normally, with only with the `helm` tool by itself, you would use static values and install one chart at a time.
 
-This can be useful to install Dgraph with Lambda function support, as well as other charts, such as monitoring with Prometheus, observability with Jaeger, logging with EKF (ElasticSearch-Fluentd-Kibana) or PLG (Promtial-Loki-Grafana), MinIO for backup storage, and so on.
+This can be useful to install Dgraph with Lambda function support, as well as other charts, such as monitoring with Prometheus, observability with Jaeger, logging with EFK (ElasticSearch-Fluentd-Kibana) or PLG (Promtail-Loki-Grafana), MinIO for backup storage, and so on.
 
 This directory will have example helmfile scripts that you can adapt for your environments.
 

@@ -1,5 +1,8 @@
 script:
   enabled: true
+  ## Original Source is from:
+  ##   * https://dgraph.io/docs/graphql/lambda/query/
+  ##   * https://dgraph.io/docs/graphql/lambda/mutation/
   script: |
     async function authorsByName({args, dql}) {
         const results = await dql.query(`query queryAuthor($name: string) {

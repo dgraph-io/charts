@@ -21,13 +21,13 @@ helm install "my-lambda" dgraph/dgraph-lambda
 In order to use `dgraph-lambda`, you must do the following:
 
 1. deploy Dgraph Alpha configured to point to `dgraph-lambda`
-1. configure lambda script helm override values for `dgraph-lambda`
-1. deploy Dgraph Lambda service configured to point to Dgraph Alpha services
-1. add GraphQL schema for the resolvers added by the lambda script
+2. configure lambda script helm override values for `dgraph-lambda`
+3. deploy Dgraph Lambda service configured to point to Dgraph Alpha services
+4. add GraphQL schema for the resolvers added by the lambda script
 
 #### Environment
 
-For these steps, set up the following environment variables:
+For these steps, set up following environment variables:
 
 ```bash
 export NS=default
@@ -113,7 +113,7 @@ http://<helm-chart-release-name>-dgraph-alpha-headless.<namespace>.svc:8080
 
 #### Add GraphQL schema
 
-After deploying both services with the lambda script, upload load a schema:
+After deploying both services with the lambda script, upload a schema:
 
 ```bash
 ## create schema file
