@@ -18,7 +18,7 @@ Once the Dgraph cluster is deployed where Dgraph Alpha pods are in a `Running` s
 
 ```bash
 kubectl port-forward dev-dgraph-alpha-0 8080:8080
-curl http://localhost:8080/admin/schema --upload-file schema.graphql
+curl http://localhost:8080/admin/schema --upload-file example/schema.graphql
 ```
 
 You can verify schema is uploaded with the optional [jq](https://stedolan.github.io/jq/) tool:
@@ -60,7 +60,7 @@ To delete the Dgraph cluster and the dgraph-lambda, you can do the following:
 
 ```bash
 helmfile delete
-kubectl delete pvc -l release=dev
+kubectl delete pvc --selector release=dev
 ```
 
 ## Addendum: mutation and query with curl
@@ -68,20 +68,18 @@ kubectl delete pvc -l release=dev
 If you would like to quickly test the functionality from the command line with `curl`, you can do the following below to convert graphql to rest json format, and perform the query or mutation.
 
 ```bash
-## gql2json() to convert graphql query file to escaped REST(JSON) formatted string
-function gql2json {
-  GQL=$(cat $1 | tr '\r\n\t' ' ' | tr -s ' ' | sed 's/"/\\"/g')
-  echo "{\"query\":\"${GQL}\"}"
-}
-
 ## Port forward Alpha pod to localhost (skip if this is already completed)
 kubectl port-forward dev-dgraph-alpha-0 8080:8080
 
 ## run graphql mutation
-curl http://localhost:8080/graphql -sH "Content-Type: application/json" -d"$(gql2json mutation.graphql)"
+curl http://localhost:8080/graphql --silent --request POST \
+  --header "Content-Type: application/graphql" \
+  --upload-file example/mutation.graphql
 
 ## perform graphql query
-curl http://localhost:8080/graphql -sH "Content-Type: application/json" -d"$(gql2json query.graphql)"
+curl http://localhost:8080/graphql --silent --request POST \
+  --header "Content-Type: application/graphql" \
+  --upload-file example/query.graphql
 ```
 
 ## Addendum: Using vanilla helm
@@ -96,7 +94,7 @@ helm install dev ../../charts/dgraph \
   --set alpha.extraEnvs[1].value='10.0.0.0\/8\,172.16.0.0/12\,192.168.0.0\/16'
 
 helm install lambda ../../charts/dgraph-lambda \
-  --values script.yaml \
+  --values example/script.yaml \
   --set alpha.env[0].name=DGRAPH_URL \
   --set alpha.env[0].value=http://dev-dgraph-alpha-headless.default.svc:8080
 ```
@@ -106,5 +104,5 @@ You can clean up with:
 ```bash
 helm delete dev
 helm delete lambda
-kubectl delete pvc -l release=dev
+kubectl delete pvc --selector release=dev
 ```

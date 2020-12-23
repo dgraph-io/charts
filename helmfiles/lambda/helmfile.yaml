@@ -17,7 +17,7 @@ releases:
     namespace: default
     chart: {{ env "PWD" }}/../../charts/dgraph-lambda
     values:
-      - ./script.yaml
+      - ./example/script.yaml
       - env:
         - name: DGRAPH_URL
           ## http://<helm-chart-release-name>-dgraph-alpha-headless.<namespace>.svc:8080
