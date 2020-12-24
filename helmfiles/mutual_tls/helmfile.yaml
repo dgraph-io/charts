@@ -1,0 +1,17 @@
+## Mutual TLS Example
+
+## Environments enabled with helmfile --environment <environment>
+environments:
+  ## Dgraph Alpha secures external ports 8080 (HTTPS) and 9080 (GRPC)
+  alpha_tls:
+  ## Dgraph Alpha and Zero secret internal ports, pod-to-pod communications
+  zero_tls_internal:
+
+releases:
+  - name: {{ env "RELEASE" | default "my-release" }}
+    namespace: {{ env "NAMESPACE" | default "default" }}
+    chart: {{ env "PWD" }}/../../charts/dgraph
+    values:
+      ## set tls_client_auth with env var TLS_CLIENT_AUTH (defaults to VERIFYGIVEN)
+      - ./examples/{{ .Environment.Name }}.yaml.gotmpl
+      - ./examples/{{ env "TLS_DIR" | default "dgraph_tls" }}//secrets.yaml
