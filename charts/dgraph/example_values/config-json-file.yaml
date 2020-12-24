@@ -1,3 +1,4 @@
+## some default configurations consistent with dgraph v20.11.x
 alpha:
   configFile:
     config.json: |
@@ -5,9 +6,7 @@ alpha:
         "abort_older_than": "5m",
         "alsologtostderr": true,
         "badger": {
-          "compression_level": 3,
-          "tables": "mmap",
-          "vlog": "mmap"
+          "compression_level": "snappy",
         },
         "bindall": true,
         "enable_sentry": true,
@@ -15,7 +14,6 @@ alpha:
         "graphql_introspection": true,
         "log_backtrace_at": ":0",
         "logtostderr": true,
-        "lru_mb": 2048,
         "ludicrous_mode": false,
         "max_retries": -1,
         "mutations": "allow",
@@ -26,21 +24,20 @@ alpha:
         "query_edge_limit": 1000000,
         "snapshot_after": 10000,
         "telemetry": true,
-        "trace": 1,
+        "trace": 0.01,
         "wal": "/dgraph/data/w"
       }
 zero:
   configFile:
-    config.json: |      
+    config.json: |
       {
         "alsologtostderr": true,
         "bindall": true,
         "enable_sentry": true,
         "log_backtrace_at": ":0",
         "logtostderr": true,
-        "ludicrous_mode": false,
         "rebalance_interval": "8m0s",
         "telemetry": true,
-        "trace": 1,
+        "trace": 0.01,
         "wal": "/dgraph/data/zw"
       }
