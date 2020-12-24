@@ -1,4 +1,4 @@
-{{- /* Generate comma-separated list of Zeros */}}
+{{- /* Generate domain name for first zero in cluster */}}
 {{- define "peer_zero" -}}
   {{- $zeroFullName := include "dgraph.zero.fullname" . -}}
 
