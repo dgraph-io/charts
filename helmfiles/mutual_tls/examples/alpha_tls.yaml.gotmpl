@@ -1,9 +1,11 @@
+## Alpha TLS configuration for external ports
 alpha:
   tls:
     enabled: true
   configFile:
     config.yaml: |
       tls_cacert: /dgraph/tls/ca.crt
+      tls_client_auth: {{ env "TLS_CLIENT_AUTH" | default "VERIFYIFGIVEN" }}
       tls_node_cert: /dgraph/tls/node.crt
       tls_node_key: /dgraph/tls/node.key
       tls_use_system_ca: true
