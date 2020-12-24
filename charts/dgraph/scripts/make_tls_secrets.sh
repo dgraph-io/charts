@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-
-
 ######
 # main - runs the script
 ##########################
 main() {
+  check_environment
   parse_command $@
-  create_certs
+  create_certificates
 }
 
 ######
@@ -32,6 +31,16 @@ Flags:
      --tls_dir             Path to top level TLS directory (default "./dgraph_tls")
  -z, --zero                Create certificates for zero as well
 USAGE
+}
+
+
+######
+# check_environment - verify dgraph binary exists
+##########################
+check_environment() {
+  ## Check for dgraph command
+  command -v dgraph > /dev/null || \
+    { echo "[ERROR]: 'dgraph' command not not found" 1>&2; exit 1; }
 }
 
 ######
@@ -108,7 +117,7 @@ parse_command() {
       -c | --client) CLIENT_NAME="$2"; shift 2 ;;
       --domain) LOCAL_DOMAIN="$2"; shift 2 ;;
       -d | --debug) DEBUG=true; shift ;;
-      -e | --extra) EXTRA_ADDRESSES="$2"; shift 2 ;;
+      -e | --extra) EXTRA_LIST="$2"; shift 2 ;;
       -h | --help) usage; exit;;
       -n | --namespace) NAMESPACE="$2"; shift 2 ;;
       -r | --release) RELEASE="$2"; shift 2 ;;
@@ -129,25 +138,69 @@ parse_command() {
 }
 
 ######
-# create_certs - create TLS certs/keys for Alpha and optionally Zero for K8S system
+# get_node_list - create list of domain names for nodes based on replicas
 ##########################
-create_certs() {
+get_node_list() {
+  local LIST=()
+
+  TYPE=${1:-"alpha"}
+
+  [[ -z "$REPLICAS" ]] && \
+    { echo "[ERROR]: Env var 'REPLICAS' not defined" 1>&2; exit 1; }
+  [[ -z "$RELEASE" ]] && \
+    { echo "[ERROR]: Env var 'RELEASE' not defined" 1>&2; exit 1; }
+  [[ -z "$NAMESPACE" ]] && \
+    { echo "[ERROR]: Env var 'NAMESPACE' not defined" 1>&2; exit 1; }
+  [[ -z "$DOMAIN" ]] && \
+    { echo "[ERROR]: Env var 'DOMAIN' not defined" 1>&2; exit 1; }
+
+  ## Build List
+  for (( IDX=0; IDX<REPLICAS; IDX++ )); do
+    LIST+=("$RELEASE-dgraph-$TYPE-$IDX.$RELEASE-dgraph-$TYPE-headless.$NAMESPACE.svc.$DOMAIN")
+  done
+
+  ## Output Comma Separated List
+  local IFS=,; echo "${LIST[*]}"
+}
+
+######
+# create_certificates - create TLS certs/keys for Alpha and optionally Zero for K8S system
+##########################
+create_certificates() {
   if [[ $DEBUG == "true" ]]; then
     set -ex
   else
     set -e
   fi
 
-  echo "ZERO_ENABLED=$ZERO_ENABLED"
-  echo "NAMESPACE=$NAMESPACE"
-  echo "REPLICAS=$REPLICAS"
-  echo "RELEASE=$RELEASE"
-  echo "TLS_DIR=$TLS_DIR"
-  echo "ZERO_ENABLED=$ZERO_ENABLED"
-  echo "LOCAL_DOMAIN=$LOCAL_DOMAIN"
-  echo "EXTRA_ADDRESSES=$EXTRA_ADDRESSES"
+  ## Add optional client certificate for MutualTLS
+  if ! [[ -z $CLIENT_NAME ]]; then
+    CLIENT_OPT="--client $CLIENT_NAME"
+  fi
 
+  ## Build List of Zero nodes and Alpha nodes
+  ALPHA_LIST=localhost,$(get_node_list alpha)
+  ZERO_LIST=localhost,$(get_node_list zero)
+  ## Append list of extra specified addresses
+  if ! [[ -z $EXTRA_LIST ]]; then
+    ALPHA_LIST=$ALPHA_LIST,$EXTRA_LIST
+    ZERO_LIST=$ZERO_LIST,$EXTRA_LIST
+  fi
+
+  # Make Alpah Keys/Certs
+  mkdir -p $TLS_DIR/alpha
+  dgraph cert --nodes $ALPHA_LIST $CLIENT_OPT --dir $TLS_DIR/alpha
+
+  # Make Zero Keys/Certs with rootCA and client keys/certs from Alpha dir
+  if [[ $ZERO_ENABLED == "true" ]]; then
+    mkdir -p $TLS_DIR/zero
+    ## Copy Root CA to zero
+    cp $TLS_DIR/alpha/ca.* $TLS_DIR/zero
+    ## Copy Client Cert/Key to zero if client cert name specified
+    [[ -z $CLIENT_NAME ]] || cp $TLS_DIR/alpha/client.${CLIENT_NAME}.* $TLS_DIR/zero
+    ## Make Zero Keys/Cert
+    dgraph cert --nodes $ZERO_LIST --dir $TLS_DIR/zero
+  fi
 }
-
 
 main $@
