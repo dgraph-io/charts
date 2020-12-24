@@ -20,6 +20,7 @@ alpha:
   acl:
     enabled: true
   configFile:
+    ## NOTE: lru_mb deprecated after v20.11.0 and is no longer needed
     config.hcl: |
       whitelist          = "10.0.0.0/8,172.0.0.0/8,192.168.0.0/16"
       tls_client_auth    = "REQUIREANDVERIFY"
@@ -27,5 +28,3 @@ alpha:
       tls_use_system_ca" = true
       auth_token         = "1234567890AbCdE"
       lru_mb             = 2048
-
-

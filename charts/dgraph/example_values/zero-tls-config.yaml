@@ -1,7 +1,4 @@
-## Interim Testing
-image:
-  tag: v20.11.0-rc1-5-g2d2aabe9c
-
+## NOTE: TLS Encryption for Zero is only available in v20.11.0+
 global:
   domain: cluster.local
 

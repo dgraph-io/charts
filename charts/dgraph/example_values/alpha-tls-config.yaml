@@ -5,6 +5,7 @@ alpha:
   tls:
     enabled: true
   configFile:
+    ## NOTE: lru_mb deprecated after v20.11.0 and is no longer needed
     config.yaml: |
       tls_client_auth: VERIFYIFGIVEN
       tls_dir: /dgraph/tls
