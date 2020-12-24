@@ -7,6 +7,7 @@ main() {
   check_environment
   parse_command $@
   create_certificates
+  create_secret_value_file
 }
 
 ######
@@ -32,7 +33,6 @@ Flags:
  -z, --zero                Create certificates for zero as well
 USAGE
 }
-
 
 ######
 # check_environment - verify dgraph binary exists
@@ -151,12 +151,12 @@ get_node_list() {
     { echo "[ERROR]: Env var 'RELEASE' not defined" 1>&2; exit 1; }
   [[ -z "$NAMESPACE" ]] && \
     { echo "[ERROR]: Env var 'NAMESPACE' not defined" 1>&2; exit 1; }
-  [[ -z "$DOMAIN" ]] && \
+  [[ -z "$LOCAL_DOMAIN" ]] && \
     { echo "[ERROR]: Env var 'DOMAIN' not defined" 1>&2; exit 1; }
 
   ## Build List
   for (( IDX=0; IDX<REPLICAS; IDX++ )); do
-    LIST+=("$RELEASE-dgraph-$TYPE-$IDX.$RELEASE-dgraph-$TYPE-headless.$NAMESPACE.svc.$DOMAIN")
+    LIST+=("$RELEASE-dgraph-$TYPE-$IDX.$RELEASE-dgraph-$TYPE-headless.$NAMESPACE.svc.$LOCAL_DOMAIN")
   done
 
   ## Output Comma Separated List
@@ -167,6 +167,9 @@ get_node_list() {
 # create_certificates - create TLS certs/keys for Alpha and optionally Zero for K8S system
 ##########################
 create_certificates() {
+  [[ -z "$TLS_DIR" ]] && \
+    { echo "[ERROR]: Env var 'TLS_DIR' not defined" 1>&2; exit 1; }
+
   if [[ $DEBUG == "true" ]]; then
     set -ex
   else
@@ -195,11 +198,36 @@ create_certificates() {
   if [[ $ZERO_ENABLED == "true" ]]; then
     mkdir -p $TLS_DIR/zero
     ## Copy Root CA to zero
-    cp $TLS_DIR/alpha/ca.* $TLS_DIR/zero
+    cp -f $TLS_DIR/alpha/ca.* $TLS_DIR/zero
     ## Copy Client Cert/Key to zero if client cert name specified
-    [[ -z $CLIENT_NAME ]] || cp $TLS_DIR/alpha/client.${CLIENT_NAME}.* $TLS_DIR/zero
+    [[ -z $CLIENT_NAME ]] || cp -f $TLS_DIR/alpha/client.${CLIENT_NAME}.* $TLS_DIR/zero
     ## Make Zero Keys/Cert
     dgraph cert --nodes $ZERO_LIST --dir $TLS_DIR/zero
+  fi
+}
+
+######
+# create_certificates - create TLS certs/keys for Alpha and optionally Zero for K8S system
+##########################
+create_secret_value_file() {
+  [[ -z "$TLS_DIR" ]] && \
+    { echo "[ERROR]: Env var 'TLS_DIR' not defined" 1>&2; exit 1; }
+
+
+  cat <<-EOF > $TLS_DIR/secrets.yaml
+alpha:
+  tls:
+    files:
+$(for F in $TLS_DIR/alpha/*; do echo "      ${F##*/}: `cat $F | base64 | tr -d '\n'`"; done)
+EOF
+
+  if [[ $ZERO_ENABLED == "true" ]]; then
+    cat <<-EOF >> $TLS_DIR/secrets.yaml
+zero:
+  tls:
+    files:
+$(for F in $TLS_DIR/zero/*; do echo "      ${F##*/}: `cat $F | base64 | tr -d '\n'`"; done)
+EOF
   fi
 }
 
