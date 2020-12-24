@@ -63,15 +63,15 @@ Here are some examples that can be use to test TLS and MutualTLS with client aut
 ### Testing Dgraph Alpha (TLS without client auth)
 
 ```bash
-## Port forward a Dgraph Alpha pod to localhost (HTTPS)
-kubectl port-forward my-release-dgraph-alpha-0 8080:8080
+# Port Forward Alpha HTTPS to localhost (use other terminal tab)
+kubectl port-forward my-release-dgraph-alpha-0 8080:8080 &
 ## Test with Curl (VERIFYGIVEN)
 curl --silent \
   --cacert ./examples/dgraph_tls/alpha/ca.crt \
   https://localhost:8080/state | jq
 
-## Port forward a Dgraph Alpha pod to localhost (GRPC)
-kubectl port-forward my-release-dgraph-alpha-0 9080:9080
+  # Port Forward Alpha GRPC to localhost (use other terminal tab)
+kubectl port-forward my-release-dgraph-alpha-0 9080:9080 &
 ## Test GRPC with Dgraph Increment (VERIFYGIVEN)
 dgraph increment \
  --tls_cacert ./examples/dgraph_tls/alpha/ca.crt \
@@ -82,8 +82,8 @@ dgraph increment \
 ### Testing Dgraph Alpha (mTLS with client auth)
 
 ```bash
-## Port forward a Dgraph Alpha pod to localhost
-kubectl port-forward my-release-dgraph-alpha-0 8080:8080
+# Port Forward Alpha HTTPS to localhost (use other terminal tab)
+kubectl port-forward my-release-dgraph-alpha-0 8080:8080 &
 ## Test with Curl (REQUIREANDVERIFY)
 curl --silent \
   --cacert ./examples/dgraph_tls/alpha/ca.crt \
@@ -91,8 +91,9 @@ curl --silent \
   --key ./examples/dgraph_tls/alpha/client.dgraphuser.key \
   https://localhost:8080/state | jq
 
-## Test GRPC with Dgraph Increment (REQUIREANDVERIFY)
+# Port Forward Alpha GRPC to localhost (use other terminal tab)
 kubectl port-forward my-release-dgraph-alpha-0 9080:9080
+## Test GRPC with Dgraph Increment (REQUIREANDVERIFY)
 dgraph increment \
  --tls_cacert ./examples/dgraph_tls/alpha/ca.crt \
  --tls_cert ./examples/dgraph_tls/alpha/client.dgraphuser.crt \
@@ -104,8 +105,8 @@ dgraph increment \
 ### Testing Dgraph Zero (mTLS with client auth)
 
 ```bash
-## Port forward a Dgraph Zero pod to localhost
-kubectl port-forward my-release-dgraph-zero-0 6080:6080
+# Port Forward Zero HTTPS to localhost (use other terminal tab)
+kubectl port-forward my-release-dgraph-zero-0 6080:6080 &
 ## Test with Curl (REQUIREANDVERIFY)
 curl --silent \
   --cacert ./examples/dgraph_tls/zero/ca.crt \

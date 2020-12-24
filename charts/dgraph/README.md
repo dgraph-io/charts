@@ -8,8 +8,8 @@ optimize for query performance and throughput, reducing disk seeks and network c
 ### TL;DR;
 
 ```sh
-$ helm repo add dgraph https://charts.dgraph.io
-$ helm install my-release dgraph/dgraph
+helm repo add dgraph https://charts.dgraph.io
+helm install "my-release" dgraph/dgraph
 ```
 
 ### Introduction
@@ -19,7 +19,7 @@ Kubernetes cluster using [Helm](https://helm.sh) package manager.
 
 ### Prerequisites
 
-- Kubernetes 1.14+
+- Kubernetes 1.16+
 - Helm 3.0+
 
 ### Installing the Chart
@@ -27,8 +27,8 @@ Kubernetes cluster using [Helm](https://helm.sh) package manager.
 To install the chart with the release name `my-release`:
 
 ```bash
-$ helm repo add dgraph https://charts.dgraph.io
-$ helm install my-release dgraph/dgraph
+helm repo add dgraph https://charts.dgraph.io
+helm install "my-release" dgraph/dgraph
 ```
 
 These commands deploy Dgraph on the Kubernetes cluster in the default configuration.
@@ -36,12 +36,12 @@ The [Configuration](#configuration) section lists the parameters that can be con
 
 > **Tip**: List all releases using `helm list`
 
-### Uninstalling the Chart
+### Uninstalling the chart
 
 To uninstall/delete the `my-release` resources:
 
 ```bash
-$ helm delete my-release
+helm delete "my-release"
 ```
 
 The command above removes all the Kubernetes components associated
@@ -49,8 +49,8 @@ with the chart and deletes the release.
 
 Deletion of the StatefulSet doesn't cascade to deleting associated PVCs. To delete them:
 
-```
-$ kubectl delete pvc -l release=my-release,chart=dgraph
+```bash
+kubectl delete pvc --selector release=my-release
 ```
 
 ## Configuration
@@ -124,9 +124,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.ingress.hostname`                 | Alpha Ingress virtual hostname                                        | `nil`                                               |
 | `alpha.ingress.annotations`              | Alpha Ingress annotations                                             | `nil`                                               |
 | `alpha.ingress.tls`                      | Alpha Ingress TLS settings                                            | `nil`                                               |
-| `alpha.securityContext.enabled`          | Security context for alpha nodes enabled                              | `false`                                             |
-| `alpha.securityContext.fsGroup`          | Group id of the alpha container                                       | `1001`                                              |
-| `alpha.securityContext.runAsUser`        | User ID for the alpha container                                       | `1001`                                              |
+| `alpha.securityContext.enabled`          | Security context for Alpha nodes enabled                              | `false`                                             |
+| `alpha.securityContext.fsGroup`          | Group id of the Alpha container                                       | `1001`                                              |
+| `alpha.securityContext.runAsUser`        | User ID for the Alpha container                                       | `1001`                                              |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
 | `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
 | `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled (Enterprise feature)                 | `false`                                             |
@@ -205,70 +205,55 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.keys.minio.secret`              | Alpha env variable `MINIO_SECRET_KEY` fetched from secrets            | ""                                                  |
 | `backups.keys.s3.access`                 | Alpha env variable `AWS_ACCESS_KEY_ID` fetched from secrets           | ""                                                  |
 | `backups.keys.s3.secret`                 | Alpha env variable `AWS_SECRET_ACCESS_KEY` fetched from secrets       | ""                                                  |
-| `global.ingress.enabled`                 | Enable global ingress resource (overrides alpha/ratel ingress)        | `false`                                             |
+| `global.ingress.enabled`                 | Enable global ingress resource (overrides Alpha/Ratel ingress)        | `false`                                             |
 | `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
 | `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |
-| `global.ingress.ratel_hostname`          | global ingress virtual host name for ratel service                    | `""`                                                |
-| `global.ingress.alpha_hostname`          | global ingress virtual host name for alpha service                    | `""`                                                |
+| `global.ingress.ratel_hostname`          | global ingress virtual host name for Ratel service                    | `""`                                                |
+| `global.ingress.alpha_hostname`          | global ingress virtual host name for Alpha service                    | `""`                                                |
 
 
-## Ingress Resource
+## Ingress resource
 
-You can define ingress resources through `alpha.ingress` for the alpha HTTP service and `ratel.ingress` for the ratel UI service, or you can use a combined single ingress with `global.ingress` for both alpha HTTP and ratel UI services.
+You can define ingress resources through `alpha.ingress` for the Alpha HTTP service and `ratel.ingress` for the ratel UI service, or you can use a combined single ingress with `global.ingress` for both Alpha HTTP and ratel UI services.
 
 There are some example chart values for ingress resource configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
-## Zero and Alpha Configuration
+## Zero and Alpha configuration
 
 Should you need additional configuration options you can add these either through environment variables or a configuration file, e.g. `config.toml`. Instructions about this configuration can be found in `values.yaml`.
 
 There are some example values files demonstrating how to add configuration with HCL, JSON, Java Properties, TOML, and YAML file formats in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
-## Alpha TLS Options
+## Alpha TLS options
 
-The Dgraph alpha service can be configured to use Mutual TLS.  Instructions about this configuration can be found in `values.yaml`.  
+The Dgraph Alpha service can be configured to use Mutual TLS.  Instructions about this configuration can be found in `values.yaml`.  
 
 There are some example chart values for Alpha TLS configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 
-### Alpha TLS Example
+### Alpha TLS example
 
 As an example to test this feature, you can run the following steps below.
 
 
-#### Step 1: Generating Certificates and Keys
+#### Step 1: Create certificates, keys, and Helm Chart secrets config
 
-When generating the certificates and keys with `dgraph cert` command, you can use [get_alpha_list.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/get_alpha_list.sh) to generate a list of Alpha pod internal DNS names that can be used.  This way other services running on the cluster, such as a backup cronjob, can access the Alpha pod.
-
-```bash
-export RELEASE="my-release"
-export REPLICAS=3
-export NAMESPACE="default"
-VERS=0.0.13
-
-## Download Script
-curl --silent --remote-name --location \
-  https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/get_alpha_list.sh
-## create CA, Server (localhost and alpha pod hostnames), Client cert/keys in ./tls directory
-dgraph cert --nodes localhost,$(bash get_alpha_list.sh) --client dgraphuser
-## other clients can be created if required
-dgraph cert --client backupuser
-```
-
-#### Step 3: Creating Helm Chart Secrets Config
-
-It is recommended that you keep secrets values and config values in separate YAML files.  To assist with this practice, you can use the [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh) script to generate a `secrets.yaml` file from an existing `./tls` directory that was previously generated by the `dgraph cert` command.
+When generating the certificates and keys with `dgraph cert` command, you can use [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh) to generate a list of Alpha pod internal DNS names, the certificates and keys, and a Helm chart configuration `secrets.yaml`. This way other services running on the cluster, such as a backup cronjob, can access the Alpha pod.
 
 ```bash
 VERS=0.0.13
+
 ## Download Script
 curl --silent --remote-name --location \
   https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/make_tls_secrets.sh
-
-## create secrets.yaml from ./tls directory
-bash make_tls_secrets.sh
+bash make_tls_secrets.sh \
+  --release "my-release" \
+  --namespace "default" \
+  --replicas 3 \
+  --client "dgraphuser" \
+  --tls_dir ~/dgraph_tls
 ```
 
-#### Step 4: Deploying Helm Chart
+#### Step 2: Deploy
 
 The certificates created support and Alpha internal headless Service DNS hostnames. We can deploy a Dgraph cluster using these certs.
 
@@ -282,12 +267,12 @@ curl --silent --remote-name --location \
 
 # Install Chart with TLS Certificates
 helm install $RELEASE \
- --values secrets.yaml
+ --values ~/dgraph_tls/secrets.yaml
  --values alpha-tls-config.yaml
  dgraph/dgraph
  ```
 
-#### Step 6: Deploying Helm Chart
+#### Step 3: Testing mutual TLS with Dgraph Alpha
 
 Now we can test GRPC with `dgraph increment`, and HTTPS with `curl`:
 
@@ -301,20 +286,81 @@ kubectl port-forward $RELEASE-dgraph-alpha-0 8080:8080 &
 
 # Test GRPC using Mutual TLS
 dgraph increment \
- --tls_cacert ./tls/ca.crt \
- --tls_cert ./tls/client.dgraphuser.crt \
- --tls_key ./tls/client.dgraphuser.key \
+ --tls_cacert ~/dgraph_tls/alpha/ca.crt \
+ --tls_cert ~/dgraph_tls/alpha/client.dgraphuser.crt \
+ --tls_key ~/dgraph_tls/alpha/client.dgraphuser.key \
  --tls_server_name "localhost"
 
 # Test HTTPS using Mutual TLS
 curl --silent \
-  --cacert ./tls/ca.crt \
-  --cert ./tls/client.dgraphuser.crt \
-  --key ./tls/client.dgraphuser.key \
+  --cacert ~/dgraph_tls/alpha/ca.crt \
+  --cert ~/dgraph_tls/alpha/client.dgraphuser.crt \
+  --key ~/dgraph_tls/alpha/client.dgraphuser.key \
   https://localhost:8080/state  
 ```
 
-## Alpha Encryption at Rest (Enterprise Feature)
+## Securing internal communication with mutual TLS
+
+Both Alpha and Zero can now secure internal communication with Mutual TLS starting with Dgraph `v20.11.0`. As an example, see [zero-tls-config.yaml](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/zero-tls-config.yaml) for an example configuration.
+
+### Securing internal Communication mutual TLS example
+
+#### Step 1: Create certificates, keys, and Helm chart secrets config
+
+Similar to the above process in generating the certificate, keys, and configuration with [make_tls_secrets.sh](https://github.com/dgraph-io/charts/blob/master/charts/dgraph/scripts/make_tls_secrets.sh), you will add a `--zero` argument to generate the node certificate and key for the Dgraph Zero service in addition to the Dgraph Alpha service.
+
+```bash
+VERS=0.0.13
+
+## Download Script
+curl --silent --remote-name --location \
+  https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/scripts/make_tls_secrets.sh
+bash make_tls_secrets.sh \
+  --release "my-release" \
+  --namespace "default" \
+  --replicas 3 \
+  --client "dgraphuser" \
+  --zero \
+  --tls_dir ~/dgraph_tls
+```
+
+#### Step 2: Deploy
+
+The certificates created support and Alpha and Zero internal headless Service DNS hostnames. We can deploy a Dgraph cluster using these certs.
+
+```bash
+export RELEASE="my-release"
+
+# Download Example Dgraph Alpha config
+curl --silent --remote-name --location \
+ https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/example_values/zero-tls-config.yaml
+
+# Install Chart with TLS Certificates
+helm install $RELEASE \
+ --values ~/dgraph_tls/secrets.yaml
+ --values zero-tls-config.yaml
+ dgraph/dgraph
+ ```
+
+#### Step 3: Testing mutual TLS with Dgraph Zero
+
+Now we can test Dgraph Zero HTTPS with `curl` below.  For testing Alpha, see [Step 3: Testing mutual TLS with Dgraph Alpha](#step-3-testing-mutual-tls-with-dgraph-alpha).
+
+```bash
+export RELEASE="my-release"
+
+# Port Forward Zero HTTPS to localhost (use other terminal tab)
+kubectl port-forward $RELEASE-dgraph-zero-0 6080:6080 &
+
+# Test HTTPS using Mutual TLS
+curl --silent \
+  --cacert ~/dgraph_tls/zero/ca.crt \
+  --cert ~/dgraph_tls/zero/client.dgraphuser.crt \
+  --key ~/dgraph_tls/zero/client.dgraphuser.key \
+  https://localhost:6080/state
+```
+
+## Alpha encryption at rest (enterprise feature)
 
 You can generate a secret for the key file using `base64` tool:
 
@@ -356,7 +402,7 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
-## Alpha Access Control Lists (Enterprise Feature)
+## Alpha access control lists (enterprise feature)
 
 You can generate a secret for the secrets file using `base64` tool:
 
@@ -398,7 +444,7 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
-## Binary Backups (Enterprise feature)
+## Binary backups (enterprise feature)
 
 Dgraph [Binary Backups](https://dgraph.io/docs/master/enterprise-features/binary-backups/) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
 
@@ -420,7 +466,7 @@ You can use [Amazon S3](https://aws.amazon.com/s3/) with backup cronjobs.  You w
   * `keys.s3.access`  - set for `AWS_ACCESS_KEY_ID` used on Alpha pods, that is stored as a secret.
   * `keys.s3.secret`  - set for `AWS_SECRET_ACCESS_KEY` used on Alpha pods, that is stored as a secret.
 
-### Using Minio
+### Using MinIO
 
 For this option, you will need to deploy a MinIO Server or a MinIO Gateway such as [MinIO GCS Gateway](https://docs.min.io/docs/minio-gateway-for-gcs.html) or [MinIO Azure Gateway](https://docs.min.io/docs/minio-gateway-for-azure.html).  The [MinIO Helm Chart](https://helm.min.io/) can be useful for this process.
 
@@ -445,7 +491,7 @@ When this feature is enabled, a shared NFS volume will be mounted on each of the
   * `backups.nfs.storage` (default: `512Gi`) - storage allocated from NFS server
   * `backups.nfs.mountPath` (default: `/dgraph/backups`) - this is mounted on Alpha pods, should be same as `backups.destination`
 
-### Using Mutual TLS
+### Using mutual TLS
 
 If Dgraph Alpha TLS options are used, backup cronjobs will submit the requests using HTTPS.  If Mutual TLS client certificates are configured as well, you need to specify the name of the client certificate and key so that the backup cronjob script can find them.
 
@@ -454,7 +500,7 @@ If Dgraph Alpha TLS options are used, backup cronjobs will submit the requests u
 * Backups
   * `backups.admin.tls_client` - this should match the client cert and key that was created with `dgraph cert --client`, e.g. `backupuser`
 
-### Using the Access Control List
+### Using the access control list
 
 When ACLs are used, the backup cronjob will log in to the Alpha node using a specified user account.  Through this process, the backup cronjob script will receive an AccessJWT token that will be submitted when requesting a backup.
 
@@ -464,7 +510,7 @@ When ACLs are used, the backup cronjob will log in to the Alpha node using a spe
   * `backups.admin.user` (default: `groot`) - a user that is a member of `guardians` group will need to be specified.
   * `backups.admin.password` (default: `password`) - the corresponding password for that user will need to be specified.
 
-### Using Auth Token
+### Using an auth token
 
 When a simple Auth Token is used, the backup cronjob script will submit an auth token when requesting a backup.
 
@@ -473,7 +519,7 @@ When a simple Auth Token is used, the backup cronjob script will submit an auth 
 * Backups
   * `backups.admin.auth_token` - this will need to have the same value configured in Alpha
 
-### Using a Different Backup Image
+### Using a different backup image
 
 The default backup image uses the same Dgraph image specified under `image`.  This can be changed to an alternative image of your choosing under `backup.image`.
 The backup image will need `bash`, `grep`, and `curl` installed.
