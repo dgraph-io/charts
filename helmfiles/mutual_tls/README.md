@@ -17,7 +17,7 @@ dgraph version | awk -F: '/Dgraph version/{print $2}'
 
 ### Generate Certificates and Keys
 
-First you need to generate certificates and keys for Dgraph Alpha service and Dgraph Zero service.  There's a script that can help automate creating certificates and keys, as well as a helm value `secrets.yaml` that can be use for the helm chart.  See [README.md](../../charts/dgraph/scripts/README.md).
+First you need to generate certificates and keys for Dgraph Alpha service and Dgraph Zero service.  There's a script that can help automate creating certificates and keys, as well as a helm value `secrets.yaml` that can be used for the helm chart.  See [README.md](../../charts/dgraph/scripts/README.md).
 
 You can run this locally with:
 
@@ -40,7 +40,7 @@ dgraph cert ls --dir ./examples/dgraph_tls/zero
 
 With Dgraph TLS support, you can choose the type of authentication, such as whether MutualTLS is optional or explicitly required.  For more information see [Client Authentication Options](https://dgraph.io/docs/deploy/tls-configuration/#client-authentication-options).
 
-You can set this value using the environment variable `TLS_CLIENT_AUTH` for use with helmfile.  If this enviroment variable is not set, the default configuration will be `VERIFYIFGIVEN`. As an example:
+You can set this value using the environment variable `TLS_CLIENT_AUTH` for use with helmfile.  If this environment variable is not set, the default configuration will be `VERIFYIFGIVEN`. As an example:
 
 ```bash
 export TLS_CLIENT_AUTH=REQUIREANDVERIFY
