@@ -66,17 +66,32 @@ Here are some examples that can be use to test TLS and MutualTLS with client aut
 
 ### Testing Dgraph Alpha (TLS without client auth)
 
+The Dgraph Alpha service will be configured with either `REQUEST` or `VERIFYIFGIVEN` (default) for the TLS client authentication method.
+
+
+Use port forwarding for Dgraph Alpha HTTPS to make it available on localhost using another terminal tab:
+
 ```bash
-# Port Forward Alpha HTTPS to localhost (use other terminal tab)
-kubectl port-forward my-release-dgraph-alpha-0 8080:8080 &
-## Test with Curl (VERIFYIFGIVEN)
+kubectl port-forward my-release-dgraph-alpha-0 8080:8080
+```
+
+Now test against `localhost` using `curl`:
+
+```bash
 curl --silent \
   --cacert ./examples/dgraph_tls/alpha/ca.crt \
   https://localhost:8080/state | jq
+```
 
-  # Port Forward Alpha GRPC to localhost (use other terminal tab)
-kubectl port-forward my-release-dgraph-alpha-0 9080:9080 &
-## Test GRPC with Dgraph Increment (VERIFYIFGIVEN)
+Use port forwarding for Dgraph Alpha GRPC to make it available on localhost using another terminal tab:
+
+```bash
+kubectl port-forward my-release-dgraph-alpha-0 9080:9080
+```
+
+Now test against `localhost` using `dgraph increment`:
+
+```bash
 dgraph increment \
  --tls_cacert ./examples/dgraph_tls/alpha/ca.crt \
  --tls_server_name localhost \
@@ -85,19 +100,33 @@ dgraph increment \
 
 ### Testing Dgraph Alpha (mTLS with client auth)
 
+The Dgraph Alpha service will be configured with either `REQUIREANY` or `REQUIREANDVERIFY` for the TLS client authentication method.
+
+Use port forwarding for Dgraph Alpha HTTPS to make it available on localhost using another terminal tab:
+
 ```bash
-# Port Forward Alpha HTTPS to localhost (use other terminal tab)
-kubectl port-forward my-release-dgraph-alpha-0 8080:8080 &
-## Test with Curl (REQUIREANDVERIFY)
+kubectl port-forward my-release-dgraph-alpha-0 8080:8080
+```
+
+Now test against `localhost` using `curl`:
+
+```bash
 curl --silent \
   --cacert ./examples/dgraph_tls/alpha/ca.crt \
   --cert ./examples/dgraph_tls/alpha/client.dgraphuser.crt \
   --key ./examples/dgraph_tls/alpha/client.dgraphuser.key \
   https://localhost:8080/state | jq
+```
 
-# Port Forward Alpha GRPC to localhost (use other terminal tab)
+Use port forwarding for Dgraph Alpha GRPC to make it available on localhost using another terminal tab:
+
+```bash
 kubectl port-forward my-release-dgraph-alpha-0 9080:9080
-## Test GRPC with Dgraph Increment (REQUIREANDVERIFY)
+```
+
+Now test against `localhost` using `dgraph increment`:
+
+```bash
 dgraph increment \
  --tls_cacert ./examples/dgraph_tls/alpha/ca.crt \
  --tls_cert ./examples/dgraph_tls/alpha/client.dgraphuser.crt \
@@ -108,10 +137,17 @@ dgraph increment \
 
 ### Testing Dgraph Zero (mTLS with client auth)
 
+The Dgraph Zero service will be configured with either `REQUIREANY` or `REQUIREANDVERIFY` for the TLS client authentication method.
+
+Use port forwarding for Dgraph Zero HTTPS to make it available on localhost using another terminal tab:
+
 ```bash
-# Port Forward Zero HTTPS to localhost (use other terminal tab)
-kubectl port-forward my-release-dgraph-zero-0 6080:6080 &
-## Test with Curl (REQUIREANDVERIFY)
+kubectl port-forward my-release-dgraph-zero-0 6080:6080
+```
+
+Now test against `localhost` using `curl`:
+
+```bash
 curl --silent \
   --cacert ./examples/dgraph_tls/zero/ca.crt \
   --cert ./examples/dgraph_tls/zero/client.dgraphuser.crt \
