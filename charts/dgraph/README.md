@@ -274,15 +274,23 @@ helm install $RELEASE \
 
 #### Step 3: Testing mutual TLS with Dgraph Alpha
 
-Now we can test GRPC with `dgraph increment`, and HTTPS with `curl`:
+Use port forwarding with Dgraph Alpha GRPC to make it available on localhost in another terminal tab:
 
 ```bash
 export RELEASE="my-release"
+kubectl port-forward $RELEASE-dgraph-alpha-0 9080:9080
+```
 
-# Port Forward Alpha GRPC to localhost (use other terminal tab)
-kubectl port-forward $RELEASE-dgraph-alpha-0 9080:9080 &
-# Port Forward Alpha HTTPS to localhost (use other terminal tab)
-kubectl port-forward $RELEASE-dgraph-alpha-0 8080:8080 &
+Use port forwarding with Dgraph Alpha HTTPS to make it available on localhost in another terminal tab:
+
+```bash
+export RELEASE="my-release"
+kubectl port-forward $RELEASE-dgraph-alpha-0 8080:8080
+```
+
+Now we can test GRPC with `dgraph increment`, and HTTPS with `curl`:
+
+```bash
 
 # Test GRPC using Mutual TLS
 dgraph increment \
@@ -331,7 +339,7 @@ The certificates created support and Alpha and Zero internal headless Service DN
 ```bash
 export RELEASE="my-release"
 
-# Download Example Dgraph Alpha config
+# Download Example Dgraph Alpha + Zero config for using mTLS on internal ports
 curl --silent --remote-name --location \
  https://raw.githubusercontent.com/dgraph-io/charts/dgraph-$VERS/charts/dgraph/example_values/zero-tls-config.yaml
 
@@ -346,12 +354,17 @@ helm install $RELEASE \
 
 Now we can test Dgraph Zero HTTPS with `curl` below.  For testing Alpha, see [Step 3: Testing mutual TLS with Dgraph Alpha](#step-3-testing-mutual-tls-with-dgraph-alpha).
 
+
+First, use port forwarding to forward Dgraph Zero HTTPS port to localhost in another terminal tab:
+
 ```bash
 export RELEASE="my-release"
-
-# Port Forward Zero HTTPS to localhost (use other terminal tab)
 kubectl port-forward $RELEASE-dgraph-zero-0 6080:6080 &
+```
 
+Now we can test Dgraph Zero HTTPS:
+
+```bash
 # Test HTTPS using Mutual TLS
 curl --silent \
   --cacert ~/dgraph_tls/zero/ca.crt \
