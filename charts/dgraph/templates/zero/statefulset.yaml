@@ -1,3 +1,15 @@
+{{- /* Generate domain name for first zero in cluster */}}
+{{- define "peer_zero" -}}
+  {{- $zeroFullName := include "dgraph.zero.fullname" . -}}
+
+  {{- /* Append domain suffix if domain is used */}}
+  {{- $domainSuffix := "" -}}
+  {{- if .Values.global.domain -}}
+  {{- $domainSuffix = printf ".%s" .Values.global.domain -}}
+  {{- end -}}
+
+  {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc%s:5080" $zeroFullName 0 $zeroFullName $domainSuffix -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -117,7 +129,7 @@ spec:
               if [[ $ordinal -eq 0 ]]; then
                 exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --idx $idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
               else
-                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --peer {{ template "dgraph.zero.fullname" . }}-0.{{ template "dgraph.zero.fullname" . }}-headless.${POD_NAMESPACE}.svc:5080 --idx $idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
+                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --peer {{ template "peer_zero" . }} --idx $idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
               fi
         resources:
 {{ toYaml .Values.zero.resources | indent 10 }}
@@ -168,6 +180,10 @@ spec:
         - name: config-volume
           mountPath: /dgraph/config
         {{- end }}
+        {{- if .Values.zero.tls.enabled }}
+        - name: tls-volume
+          mountPath: /dgraph/tls
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.zero.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
@@ -177,6 +193,11 @@ spec:
       - name: config-volume
         configMap:
           name: {{ template "dgraph.zero.fullname" . }}-config
+      {{- end }}
+      {{- if .Values.zero.tls.enabled }}
+      - name: tls-volume
+        secret:
+          secretName: {{ template "dgraph.zero.fullname" . }}-tls-secret
       {{- end }}
 {{- if .Values.zero.persistence.enabled }}
   volumeClaimTemplates:

@@ -1,0 +1,30 @@
+## NOTE: TLS Encryption for Zero is only available in v20.11.0+
+global:
+  domain: cluster.local
+
+alpha:
+  tls:
+    enabled: true
+  configFile:
+    config.yaml: |
+      tls_cacert: /dgraph/tls/ca.crt
+      tls_cert: /dgraph/tls/client.internaluser.crt
+      tls_key: /dgraph/tls/client.internaluser.key
+      tls_client_auth: VERIFYIFGIVEN
+      tls_internal_port_enabled: true
+      tls_node_cert: /dgraph/tls/node.crt
+      tls_node_key: /dgraph/tls/node.key
+      tls_use_system_ca: true
+zero:
+  tls:
+    enabled: true
+  configFile:
+    config.yaml: |
+      tls_cacert: /dgraph/tls/ca.crt
+      tls_cert: /dgraph/tls/client.internaluser.crt
+      tls_key: /dgraph/tls/client.internaluser.key
+      tls_client_auth: VERIFYIFGIVEN
+      tls_internal_port_enabled: true
+      tls_node_cert: /dgraph/tls/node.crt
+      tls_node_key: /dgraph/tls/node.key
+      tls_use_system_ca: true
