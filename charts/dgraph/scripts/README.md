@@ -24,7 +24,7 @@ You can verify Dgraph Alpha certificates and keys with:
 ## verify certificates and keys
 dgraph cert ls --dir ./dgraph_tls/alpha
 ## verify list of addresses supported
-dgraph cert ls --dir ./dgraph_tls/alpha | awk -F: '/Hosts/{gsub(/\s+/, "", $2); print $2}' | tr , '\n'
+dgraph cert ls --dir ./dgraph_tls/alpha | awk -F: '/Hosts/{gsub(/\[ ]+/, "", $2); print $2}' | tr , '\n'
 ```
 
 You can verify Dgraph Zero certificates and keys with:
@@ -33,5 +33,5 @@ You can verify Dgraph Zero certificates and keys with:
 ## verify certificates and keys
 dgraph cert ls --dir ./dgraph_tls/zero
 ## verify list of addresses supported
-dgraph cert ls --dir ./dgraph_tls/zero | awk -F: '/Hosts/{gsub(/\s+/, "", $2); print $2}' | tr , '\n'
+dgraph cert ls --dir ./dgraph_tls/zero | awk -F: '/Hosts/{gsub(/\[ ]+/, "", $2); print $2}' | tr , '\n'
 ```
