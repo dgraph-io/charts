@@ -301,7 +301,7 @@ curl --silent \
 
 ## Securing internal communication with mutual TLS
 
-Both Alpha and Zero can now secure internal communication with Mutual TLS starting with Dgraph `v20.11.0`. As an example, see [zero-tls-config.yaml](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/zero-tls-config.yaml) for an example configuration.
+Both Alpha and Zero can now use secure internal communication with Mutual TLS starting with Dgraph `v20.11.0`. As an example, see [zero-tls-config.yaml](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/zero-tls-config.yaml) for an example configuration.
 
 ### Securing internal Communication mutual TLS example
 

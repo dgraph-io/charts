@@ -11,7 +11,7 @@ As an example:
 ```bash
 ./make_tls_secrets.sh \
   --release "my-release" \
-  --namespace "defualt" \
+  --namespace "default" \
   --replicas 3 \
   --extra "ratel.example.com,alpha.example.com" \
   --client "dgraphuser" \
