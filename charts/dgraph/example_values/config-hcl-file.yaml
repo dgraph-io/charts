@@ -13,8 +13,8 @@ alpha:
       "log_backtrace_at" = ":0"
       "logtostderr" = true
       "ludicrous_mode" = false
-      "postings" = "/dgraph/data/p"
-      "wal" = "/dgraph/data/w"
+      "postings" = "/dgraph/p"
+      "wal" = "/dgraph/w"
 zero:
   configFile:
     config.hcl: |
@@ -26,4 +26,4 @@ zero:
       "rebalance_interval" = "8m0s"
       "telemetry" = true
       "trace" = 0.01
-      "wal" = "/dgraph/data/zw"
+      "wal" = "/dgraph/zw"

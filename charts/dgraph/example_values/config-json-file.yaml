@@ -20,12 +20,12 @@ alpha:
         "normalize_node_limit": 10000,
         "pending_proposals": 256,
         "port_offset": 0,
-        "postings": "/dgraph/data/p",
+        "postings": "/dgraph/p",
         "query_edge_limit": 1000000,
         "snapshot_after": 10000,
         "telemetry": true,
         "trace": 0.01,
-        "wal": "/dgraph/data/w"
+        "wal": "/dgraph/w"
       }
 zero:
   configFile:
@@ -39,5 +39,5 @@ zero:
         "rebalance_interval": "8m0s",
         "telemetry": true,
         "trace": 0.01,
-        "wal": "/dgraph/data/zw"
+        "wal": "/dgraph/zw"
       }
