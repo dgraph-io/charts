@@ -17,7 +17,7 @@ dgraph version | awk -F: '/Dgraph version/{print $2}'
 
 ### Generate Certificates and Keys
 
-First you need to generate certificates and keys for Dgraph Alpha service and Dgraph Zero service.  There's a script that can help automate creating certificates and keys, as well as a helm value `secrets.yaml` that can be use to the helm chart.  See [README.md](../../charts/dgraph/scripts/README.md).
+First you need to generate certificates and keys for Dgraph Alpha service and Dgraph Zero service.  There's a script that can help automate creating certificates and keys, as well as a helm value `secrets.yaml` that can be use for the helm chart.  See [README.md](../../charts/dgraph/scripts/README.md).
 
 You can run this locally with:
 
@@ -40,7 +40,11 @@ dgraph cert ls --dir ./examples/dgraph_tls/zero
 
 With Dgraph TLS support, you can choose the type of authentication, such as whether MutualTLS is optional or explicitly required.  For more information see [Client Authentication Options](https://dgraph.io/docs/deploy/tls-configuration/#client-authentication-options).
 
-You can set this value using the environment variable `TLS_CLIENT_AUTH` for use with helmfile.  If will set the configuration, and if the environment variable is not specified, it will default to `VERIFYIFGIVEN`.
+You can set this value using the environment variable `TLS_CLIENT_AUTH` for use with helmfile.  If this enviroment variable is not set, the default configuration will be `VERIFYIFGIVEN`. As an example:
+
+```bash
+export TLS_CLIENT_AUTH=REQUIREANDVERIFY
+```
 
 ### Install dgraph with TLS
 
@@ -65,14 +69,14 @@ Here are some examples that can be use to test TLS and MutualTLS with client aut
 ```bash
 # Port Forward Alpha HTTPS to localhost (use other terminal tab)
 kubectl port-forward my-release-dgraph-alpha-0 8080:8080 &
-## Test with Curl (VERIFYGIVEN)
+## Test with Curl (VERIFYIFGIVEN)
 curl --silent \
   --cacert ./examples/dgraph_tls/alpha/ca.crt \
   https://localhost:8080/state | jq
 
   # Port Forward Alpha GRPC to localhost (use other terminal tab)
 kubectl port-forward my-release-dgraph-alpha-0 9080:9080 &
-## Test GRPC with Dgraph Increment (VERIFYGIVEN)
+## Test GRPC with Dgraph Increment (VERIFYIFGIVEN)
 dgraph increment \
  --tls_cacert ./examples/dgraph_tls/alpha/ca.crt \
  --tls_server_name localhost \

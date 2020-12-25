@@ -12,6 +12,6 @@ releases:
     namespace: {{ env "NAMESPACE" | default "default" }}
     chart: {{ env "PWD" }}/../../charts/dgraph
     values:
-      ## set tls_client_auth with env var TLS_CLIENT_AUTH (defaults to VERIFYGIVEN)
+      ## set tls_client_auth with env var TLS_CLIENT_AUTH (defaults to VERIFYIFGIVEN)
       - ./examples/{{ .Environment.Name }}.yaml.gotmpl
       - ./examples/{{ env "TLS_DIR" | default "dgraph_tls" }}//secrets.yaml
