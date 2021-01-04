@@ -70,7 +70,7 @@ Return empty string if minio keys are not defined
 {{- $minioEnabled := "" -}}
 {{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
 {{- if $backupsEnabled -}}
-  {{- if .Values.backups.keys  -}}
+  {{- if .Values.backups.keys -}}
     {{- if .Values.backups.keys.minio -}}
       {{- if and .Values.backups.keys.minio.access .Values.backups.keys.minio.secret -}}
         {{- $minioEnabled = true -}}
@@ -88,7 +88,7 @@ Return empty string if s3 keys are not defined
 {{- $s3Enabled := "" -}}
 {{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
 {{- if $backupsEnabled -}}
-  {{- if .Values.backups.keys  -}}
+  {{- if .Values.backups.keys -}}
     {{- if .Values.backups.keys.s3 -}}
       {{- if and .Values.backups.keys.s3.access .Values.backups.keys.s3.secret -}}
         {{- $s3Enabled = true -}}
