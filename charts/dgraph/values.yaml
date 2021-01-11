@@ -545,7 +545,7 @@ backups:
     debug: false
     ## full backup schedule
     ## 12AM server time
-    schedule: "0 * * * *"
+    schedule: "0 0 * * *"
     ## restart policy
     restartPolicy: Never
   incremental:
