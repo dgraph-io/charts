@@ -3,6 +3,29 @@ entries:
   dgraph:
   - apiVersion: v1
     appVersion: v20.11.0
+    created: "2021-01-14T12:32:38.491304-08:00"
+    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    digest: 086e97fc488353aa91cdf977fd407613acc88522e072ad5872581d47ffd73739
+    home: https://dgraph.io/
+    icon: https://dgraph.io/assets/images/logo.png
+    keywords:
+    - dgraph
+    - database
+    - Graph
+    - GraphQL
+    - nosql
+    maintainers:
+    - email: contact@dgraph.io
+      name: dgraph
+    name: dgraph
+    sources:
+    - https://github.com/dgraph-io/charts/
+    - https://github.com/dgraph-io/dgraph
+    urls:
+    - https://github.com/dgraph-io/charts/releases/download/dgraph-0.0.14/dgraph-0.0.14.tgz
+    version: 0.0.14
+  - apiVersion: v1
+    appVersion: v20.11.0
     created: "2020-12-24T18:18:46.292839568-08:00"
     description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
     digest: c311760d426b85fcb25cb46222a9623ef97b69f9e428e19886c97cd7779ea07c
