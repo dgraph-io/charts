@@ -14,7 +14,7 @@ to verify that the chart is well-formed:
 
 ```bash
 helm lint charts/dgraph
-helm ling charts/dgraph-lambda
+helm lint charts/dgraph-lambda
 ```
 
 ### Create the Helm chart package
