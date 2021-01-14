@@ -187,9 +187,13 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.zero.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
+      {{- if .Values.zero.persistence.enabled }}
         persistentVolumeClaim:
           claimName: datadir
-     {{- if .Values.zero.configFile }}
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
+      {{- if .Values.zero.configFile }}
       - name: config-volume
         configMap:
           name: {{ template "dgraph.zero.fullname" . }}-config
@@ -223,7 +227,4 @@ spec:
         storageClassName: {{ .Values.zero.persistence.storageClass | quote }}
       {{- end -}}
       {{- end -}}
-{{- else }}
-        - name: datadir
-          emptyDir: {}
 {{- end }}

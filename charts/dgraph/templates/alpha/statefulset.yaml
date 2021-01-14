@@ -259,8 +259,12 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
       - name: datadir
+      {{- if .Values.alpha.persistence.enabled }}
         persistentVolumeClaim:
           claimName: datadir
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
       {{- if and $backupsEnabled (or $hasS3Keys $hasMinioKeys) }}
       - name: backup-secret-volume
         secret:
@@ -318,7 +322,4 @@ spec:
         storageClassName: {{ .Values.alpha.persistence.storageClass | quote }}
       {{- end -}}
       {{- end -}}
-{{- else }}
-        - name: datadir
-          emptyDir: {}
 {{- end }}
