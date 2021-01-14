@@ -34,6 +34,9 @@ spec:
           labels:
             cronjob: {{ template "dgraph.backups.fullname" . }}-full
         spec:
+          {{- if .Values.backups.schedulerName }}
+          schedulerName: {{ .Values.backups.schedulerName }}
+          {{- end }}
           containers:
           - name: {{ template "dgraph.backups.fullname" . }}-full
             image: {{ template "dgraph.backups.image" . }}

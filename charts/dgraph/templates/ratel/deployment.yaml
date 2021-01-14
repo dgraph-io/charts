@@ -25,6 +25,9 @@ spec:
         component: {{ .Values.ratel.name }}
         release: {{ .Release.Name }}
     spec:
+      {{- if .Values.ratel.schedulerName }}
+      schedulerName: {{ .Values.ratel.schedulerName }}
+      {{- end }}
       {{- if .Values.ratel.securityContext.enabled }}
       securityContext:
         fsGroup: {{ .Values.ratel.securityContext.fsGroup }}
