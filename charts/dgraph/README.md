@@ -67,6 +67,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
 | `zero.name`                              | Zero component name                                                   | `zero`                                              |
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
+| `zero.schedulerName`                     | Configure an explicit scheduler                                       | `nil`                                               |
 | `zero.monitorLabel`                      | Monitor label for zero, used by prometheus.                           | `zero-dgraph-io`                                    |
 | `zero.rollingUpdatePartition`            | Partition update strategy                                             | `nil`                                               |
 | `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `OrderedReady`                                      |
@@ -104,6 +105,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.name`                             | Alpha component name                                                  | `alpha`                                             |
 | `alpha.monitorLabel`                     | Monitor label for alpha, used by prometheus.                          | `alpha-dgraph-io`                                   |
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
+| `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `alpha.rollingUpdatePartition`           | Partition update strategy                                             | `nil`                                               |
 | `alpha.podManagementPolicy`              | Pod management policy for alpha nodes                                 | `OrderedReady`                                      |
 | `alpha.replicaCount`                     | Number of alpha nodes                                                 | `3`                                                 |
@@ -154,6 +156,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `true`                                              |
+| `ratel.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
 | `ratel.extraEnvs`                        | Extra env vars                                                        | `[]`                                                |
 | `ratel.service.type`                     | Ratel service type                                                    | `ClusterIP`                                         |
@@ -174,6 +177,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
 | `backups.name`                           | Backups component name                                                | `backups`                                           |
+| `backups.schedulerName`                  | Configure an explicit scheduler for Backups Kubernetes CronJobs       | `nil`                                               |
 | `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
 | `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |
 | `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |

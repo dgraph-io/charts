@@ -421,14 +421,13 @@ alpha:
 
 ratel:
   name: ratel
+  ## Enable Ratel service
+  enabled: true
 
   ## Scheduler name
   ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
   ##
   # schedulerName: stork
-
-  ## Enable Ratel service
-  enabled: true
 
   ## Number of dgraph nodes
   ##
@@ -517,13 +516,11 @@ ratel:
 ## ref: https://dgraph.io/docs/enterprise-features/binary-backups/
 ##
 backups:
-
+  name: backups
   ## Scheduler name
   ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
   ##
   # schedulerName: stork
-
-  name: backups
   admin:
     ## backup user and password that is a member of 'guardians'group used to
     ## login if ACLs are enabled.  This fetches an access token used to trigger backups
