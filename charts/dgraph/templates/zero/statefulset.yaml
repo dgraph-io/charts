@@ -10,6 +10,14 @@
 
   {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc%s:5080" $zeroFullName 0 $zeroFullName $domainSuffix -}}
 {{- end -}}
+{{- /* Superflag (v21.03.0) support and legacy flags */}}
+{{- define "raft_index_flag" -}}
+  {{- if (eq .Values.image.tag "bugbusters") -}}
+    {{- printf "--raft idx=" -}}
+  {{- else -}}
+    {{- printf "--idx " -}}
+  {{- end -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -130,9 +138,9 @@ spec:
               ordinal=${BASH_REMATCH[1]}
               idx=$(($ordinal + 1))
               if [[ $ordinal -eq 0 ]]; then
-                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --idx $idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
+                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
               else
-                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --peer {{ template "peer_zero" . }} --idx $idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
+                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --peer {{ template "peer_zero" . }} {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
               fi
         resources:
 {{ toYaml .Values.zero.resources | indent 10 }}
