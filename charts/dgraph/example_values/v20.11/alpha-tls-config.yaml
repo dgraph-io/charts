@@ -1,0 +1,21 @@
+## alpha-tls-config.yaml
+## Specify TLS configuration options for `dgraph alpha`
+## * https://dgraph.io/docs/deploy/tls-configuration/#tls-options
+alpha:
+  tls:
+    enabled: true
+  configFile:
+    config.yaml: |
+      tls_client_auth: VERIFYIFGIVEN
+      tls_use_system_ca: true
+
+      ## TLS configuration (before v20.11.0)
+      tls_dir: /dgraph/tls
+
+      ## TLS configuration (after v20.11.0)
+      tls_cacert: /dgraph/tls/ca.crt
+      tls_node_cert: /dgraph/tls/node.crt
+      tls_node_key: /dgraph/tls/node.key
+
+      ## lru_mb deprecated after v20.11.0 and is no longer needed
+      lru_mb: 2048

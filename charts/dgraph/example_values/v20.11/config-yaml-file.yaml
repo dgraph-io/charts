@@ -1,0 +1,38 @@
+## some default configurations consistent with dgraph v20.11.x
+alpha:
+  configFile:
+    config.yaml: |
+      abort_older_than: 5m
+      alsologtostderr: true
+      badger:
+        compression_level: snappy
+      bindall: true
+      enable_sentry: true
+      export: export
+      graphql_introspection: true
+      log_backtrace_at: :0
+      logtostderr: true
+      ludicrous_mode: false
+      max_retries: -1
+      mutations: allow
+      normalize_node_limit: 10000
+      pending_proposals: 256
+      port_offset: 0
+      postings: /dgraph/p
+      query_edge_limit: 1000000
+      snapshot_after: 10000
+      telemetry: true
+      trace: 0.01
+      wal: /dgraph/w
+zero:
+  configFile:
+    config.yaml: |
+      alsologtostderr: true
+      bindall: true
+      enable_sentry: true
+      log_backtrace_at: :0
+      logtostderr: true
+      rebalance_interval: 8m0s
+      telemetry: true
+      trace: 0.01
+      wal: /dgraph/zw
