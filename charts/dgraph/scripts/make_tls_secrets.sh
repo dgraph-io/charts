@@ -156,8 +156,12 @@ get_node_list() {
 
   ## Build List
   for (( IDX=0; IDX<REPLICAS; IDX++ )); do
+    ## Add service FQDN for each dgraph pod
     LIST+=("$RELEASE-dgraph-$TYPE-$IDX.$RELEASE-dgraph-$TYPE-headless.$NAMESPACE.svc.$LOCAL_DOMAIN")
   done
+
+  ## Add service FQDN for service
+  LIST+=("$RELEASE-dgraph-$TYPE-headless.$NAMESPACE.svc.$LOCAL_DOMAIN")
 
   ## Output Comma Separated List
   local IFS=,; echo "${LIST[*]}"
