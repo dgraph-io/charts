@@ -37,13 +37,13 @@ export DGRAPH_REL=my-release
 
 #### Deploy Dgraph Alpha
 
-Dgraph Alpha will need to be configured with the `--graphql_lambda_url` argument (see: [lambda server](https://dgraph.io/docs/graphql/lambda/server/)) to support `dgraph-lambda`.  You can use environment variables to configure this:
+Dgraph Alpha will need to be configured with the `--graphql lambda-url=<url>` argument (see: [lambda server](https://dgraph.io/docs/graphql/lambda/server/)) to support `dgraph-lambda`.  You can use environment variables to configure this:
 
 ```bash
 helm install $DGRAPH_REL dgraph/dgraph \
   --namespace $NS \
-  --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL \
-  --set alpha.extraEnvs[0].value=http://$LAMBDA_REL-dgraph-lambda.$NS.svc:80/graphql-worker
+  --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_GRAPHQL \
+  --set alpha.extraEnvs[0].value=lambda-url=http://$LAMBDA_REL-dgraph-lambda.$NS.svc:80/graphql-worker
 ```
 
 The `DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL` environment variable will point to Dgraph Lambda service that will be deployed in the next step.  The format Dgraph Lambda domain name is formatted as the following:
@@ -149,7 +149,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `replicaCount`                           | number of Kubernetes replicas                                         | `1`                                                 |
 | `image.repository`                       | Container repository name                                             | `dgraph/dgraph-lambda`                              |
 | `image.pullPolicy`                       | Container image pull policy                                           | `IfNotPresent`                                      |
-| `image.tag`                              | Container image tag                                                   | `v20.11.0`                                          |
+| `image.tag`                              | Container image tag                                                   | `v1.2.4`                                          |
 | `imagePullSecrets`                       | Image pull secrets auth tokens used to access a private registry      | `[]`                                                |
 | `nameOverride`                           | Name override of the default chart name                               | `""`                                                |
 | `fullnameOverride`                       | Full Name override of the release name + chart name                   | `""`                                                |
