@@ -15,17 +15,27 @@ releases:
     chart: {{ env "PWD" }}/../../charts/dgraph
     values:
       - {{ env "PWD" }}/../../charts/dgraph/example_values/{{ .Environment.Name }}-config.yaml
+    ## Access-Control-Lists and Encryption-at-Rest require a secret
     {{- if or (eq .Environment.Name "alpha-acl") (eq .Environment.Name "alpha-enc") }}
       - {{ env "PWD" }}/../../charts/dgraph/example_values/{{ .Environment.Name }}-secret.yaml
     {{- end }}
+    ## TLS Tests will use generated secrets
     {{- if or (eq .Environment.Name "alpha-tls") (eq .Environment.Name "zero-tls") }}
-      - {{ env "PWD" }}/dgraph_tls/secrets.yaml
+      - {{ env "PWD" }}/dgraph_tls/dgraph-test-{{ .Environment.Name }}/secrets.yaml
     {{- end }}
       - alpha:
           persistence:
             enabled: {{ env "DGRAPH_PERSISTENCE" | default "false" }}
+          livenessProbe:
+            enabled: {{ env "DGRAPH_HEALTHCHECK" | default "false" }}
+          readinessProbe:
+            enabled: {{ env "DGRAPH_HEALTHCHECK" | default "false" }}
         zero:
           persistence:
             enabled: {{ env "DGRAPH_PERSISTENCE" | default "false" }}
+          livenessProbe:
+            enabled: {{ env "DGRAPH_HEALTHCHECK" | default "false" }}
+          readinessProbe:
+            enabled: {{ env "DGRAPH_HEALTHCHECK" | default "false" }}
         ratel:
           enabled: false
