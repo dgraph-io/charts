@@ -1,0 +1,23 @@
+## Mutual TLS Example
+
+## Environments enabled with helmfile --environment <environment>
+environments:
+  alpha-acl:
+  alpha-enc:
+  alpha-tls:
+  default-json:
+  default-yaml:
+  zero-tls:
+
+releases:
+  - name: test
+    namespace: dgraph-test-{{ .Environment.Name }}
+    chart: {{ env "PWD" }}/../../charts/dgraph
+    values:
+      - {{ env "PWD" }}/../../charts/dgraph/example_values/{{ .Environment.Name }}-config.yaml
+    {{- if or (eq .Environment.Name "alpha-acl") (eq .Environment.Name "alpha-enc") }}
+      - {{ env "PWD" }}/../../charts/dgraph/example_values/{{ .Environment.Name }}-secret.yaml
+    {{- end }}
+    {{- if or (eq .Environment.Name "alpha-tls") (eq .Environment.Name "zero-tls") }}
+      - {{ env "PWD" }}/dgraph_tls/secret.yaml
+    {{- end }}

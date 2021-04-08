@@ -23,3 +23,14 @@ docker exec -it dgraph-certs dgraph cert ls --dir /dgraph_tls/alpha
 ## Verify Dgraph Zero Keys and Certificates
 docker exec -it dgraph-certs dgraph cert ls --dir /dgraph_tls/zero
 ```
+
+## Run Tests
+
+```bash
+TESTS="alpha-tls alpha-enc alpha-tls default-json default-yaml zero-tls"
+
+for TEST in $TESTS; do
+  helmfile --environment $TEST apply
+done
+```
+
