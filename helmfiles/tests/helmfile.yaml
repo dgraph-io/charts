@@ -21,3 +21,11 @@ releases:
     {{- if or (eq .Environment.Name "alpha-tls") (eq .Environment.Name "zero-tls") }}
       - {{ env "PWD" }}/dgraph_tls/secret.yaml
     {{- end }}
+      - alpha:
+          persistence:
+            enabled: {{ env "DGRAPH_ALPHA_PERSISTENCE" | default "false" }}
+        zero:
+          persistence:
+            enabled: {{ env "DGRAPH_ZERO_PERSISTENCE" | default "false" }}
+        ratel:
+          enabled: false

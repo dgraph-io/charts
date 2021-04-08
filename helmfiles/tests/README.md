@@ -1,4 +1,6 @@
+# Tests
 
+These tests Dgraph delployments with a variety helm config values.  
 
 ## Create Secrets Using Docker Container
 
@@ -26,6 +28,12 @@ docker exec -it dgraph-certs dgraph cert ls --dir /dgraph_tls/zero
 
 ## Run Tests
 
+This will deploy a dgraph cluster using different types of dgraph configuration.  Use the `--environment $TEST` flag to select the desired test.  
+
+The focus on these tests is to deploy Dgraph on Kubernetes, and verify that dgraph is running successful.
+
+### Run Tests without persistence
+
 ```bash
 TESTS="alpha-tls alpha-enc alpha-tls default-json default-yaml zero-tls"
 
@@ -34,3 +42,26 @@ for TEST in $TESTS; do
 done
 ```
 
+### Run Tests with persistence
+
+```bash
+export DGRAPH_ALPHA_PERSISTENCE=true
+export DGRAPH_ZERO_PERSISTENCE=true
+TESTS="alpha-tls alpha-enc alpha-tls default-json default-yaml zero-tls"
+
+for TEST in $TESTS; do
+  helmfile --environment $TEST apply
+done
+```
+
+## Clean up PVCs
+
+If you enabled peristence, you can delete the PVC with:
+
+```bash
+TESTS="alpha-tls alpha-enc alpha-tls default-json default-yaml zero-tls"
+
+for TEST in $TESTS; do
+  kubectl delete pvc --namespace dgraph-test-${TEST} --selector release=test delete
+done
+```

@@ -421,8 +421,8 @@ alpha:
 
 ratel:
   name: ratel
-  ## Enable Ratel service
-  enabled: true
+  ## Disable Ratel service
+  enabled: false
 
   ## Scheduler name
   ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
