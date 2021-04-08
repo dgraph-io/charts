@@ -1,6 +1,6 @@
 ## alpha-enc-config.yaml
 ## Specify Encryption at Rest configuration options for `dgraph alpha`
-## * https://dgraph.io/docs/enterprise-features/encryption-at-rest/
+## * https://dgraph.io/docs/v20.11/enterprise-features/encryption-at-rest/
 alpha:
   encryption:
     enabled: true

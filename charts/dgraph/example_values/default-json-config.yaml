@@ -12,7 +12,7 @@ alpha:
         },
         "alsologtostderr": true,
         "badger": {
-          "compression_level": "snappy"
+          "compression": "snappy"
         },
         "bindall": true,
         "telemetry": {

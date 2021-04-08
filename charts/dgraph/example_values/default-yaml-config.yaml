@@ -10,7 +10,7 @@ alpha:
         query_edge: 1000000
       alsologtostderr: true
       badger:
-        compression_level: snappy
+        compression: snappy
       bindall: true
       telemetry:
         sentry: true

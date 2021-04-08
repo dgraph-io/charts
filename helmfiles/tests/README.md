@@ -35,7 +35,8 @@ The focus on these tests is to deploy Dgraph on Kubernetes, and verify that dgra
 ### Run Tests without persistence
 
 ```bash
-TESTS="alpha-tls alpha-enc alpha-tls default-json default-yaml zero-tls"
+export DGRAPH_PERSISTENCE="false" # default
+TESTS="alpha-acl alpha-enc alpha-tls default-json default-yaml alpha-tls zero-tls"
 
 for TEST in $TESTS; do
   helmfile --environment $TEST apply
@@ -45,24 +46,33 @@ done
 ### Run Tests with persistence
 
 ```bash
-export DGRAPH_ALPHA_PERSISTENCE=true
-export DGRAPH_ZERO_PERSISTENCE=true
-TESTS="alpha-tls alpha-enc alpha-tls default-json default-yaml zero-tls"
+export DGRAPH_PERSISTENCE="true"
+TESTS="alpha-tls alpha-acl alpha-enc alpha-tls default-json default-yaml zero-tls"
 
 for TEST in $TESTS; do
   helmfile --environment $TEST apply
 done
 ```
 
-## Clean up PVCs
+## Cleanup Kubernetes Resources
 
-If you enabled peristence, you can delete the PVC with:
+You can delete all of the pods including any persistence volumes with:
 
 ```bash
-TESTS="alpha-tls alpha-enc alpha-tls default-json default-yaml zero-tls"
+TESTS="alpha-acl alpha-enc alpha-tls default-json default-yaml alpha-tls zero-tls"
 
+# Delete k8s resources except pvc
 for TEST in $TESTS; do
-  helm uninstall test --namespace dgraph-test-${TEST}
-  kubectl delete pvc --namespace dgraph-test-${TEST} --selector release=test delete
+  helm uninstall test --namespace dgraph-test-${TEST} 2> /dev/null
+done
+
+# Delete persistence if it exists
+# NOTE: PVC resources will not get deleted if they are in use, so pods must be
+# deleted first
+for TEST in $TESTS; do
+  if kubectl get pvc --namespace dgraph-test-${TEST} \
+       --selector release=test 2> /dev/null | grep -q "test"; then
+    kubectl delete pvc --namespace dgraph-test-${TEST} --selector release=test
+  fi
 done
 ```

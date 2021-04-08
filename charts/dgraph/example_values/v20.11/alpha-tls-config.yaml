@@ -1,6 +1,10 @@
 ## alpha-tls-config.yaml
 ## Specify TLS configuration options for `dgraph alpha`
-## * https://dgraph.io/docs/deploy/tls-configuration/#tls-options
+## * https://dgraph.io/docs/v20.11/deploy/tls-configuration/#tls-options
+##
+## NOTE: Client Certificates used for Mutual TLS with Dgraph Alpha do not need to
+## be configured in this file.  These client certificates are needed by clients to
+## access Dgraph Alpha when tls_client_auth is set to REQUIREANDVERIFY
 alpha:
   tls:
     enabled: true

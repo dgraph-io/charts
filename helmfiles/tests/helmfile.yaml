@@ -23,9 +23,9 @@ releases:
     {{- end }}
       - alpha:
           persistence:
-            enabled: {{ env "DGRAPH_ALPHA_PERSISTENCE" | default "false" }}
+            enabled: {{ env "DGRAPH_PERSISTENCE" | default "false" }}
         zero:
           persistence:
-            enabled: {{ env "DGRAPH_ZERO_PERSISTENCE" | default "false" }}
+            enabled: {{ env "DGRAPH_PERSISTENCE" | default "false" }}
         ratel:
           enabled: false

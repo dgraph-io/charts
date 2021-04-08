@@ -5,7 +5,6 @@ alpha:
   encryption:
     enabled: true
   configFile:
-    ## NOTE: lru_mb deprecated after v20.11.0 and is no longer needed
     config.yaml: |
       encryption:
         key_file: /dgraph/enc/enc_key_file
