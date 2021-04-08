@@ -19,7 +19,7 @@ releases:
       - {{ env "PWD" }}/../../charts/dgraph/example_values/{{ .Environment.Name }}-secret.yaml
     {{- end }}
     {{- if or (eq .Environment.Name "alpha-tls") (eq .Environment.Name "zero-tls") }}
-      - {{ env "PWD" }}/dgraph_tls/secret.yaml
+      - {{ env "PWD" }}/dgraph_tls/secrets.yaml
     {{- end }}
       - alpha:
           persistence:
