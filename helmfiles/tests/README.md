@@ -102,7 +102,7 @@ curl --silent \
   --key ./dgraph_tls/$NS/zero/client.dgraphuser.key \
   https://localhost:6080/state | jq
 
-curl -i --silent \
+curl --silent \
   --cacert ./dgraph_tls/$NS/alpha/ca.crt \
   --cert ./dgraph_tls/$NS/alpha/client.dgraphuser.crt \
   --key ./dgraph_tls/$NS/alpha/client.dgraphuser.key \
