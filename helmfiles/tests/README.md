@@ -62,6 +62,7 @@ If you enabled peristence, you can delete the PVC with:
 TESTS="alpha-tls alpha-enc alpha-tls default-json default-yaml zero-tls"
 
 for TEST in $TESTS; do
+  helm uninstall test --namespace dgraph-test-${TEST}
   kubectl delete pvc --namespace dgraph-test-${TEST} --selector release=test delete
 done
 ```
