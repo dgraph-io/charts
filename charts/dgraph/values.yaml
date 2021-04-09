@@ -254,9 +254,9 @@ alpha:
 
   ## Configuration file for dgraph alpha used as an alternative to command-line options
   ## Ref: https://dgraph.io/docs/deploy/#config
-  configFile:
-    config.yaml: |
-      lru_mb: 2048
+  configFile: {}
+    # config.yaml: |
+    #   lru_mb: 2048
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
