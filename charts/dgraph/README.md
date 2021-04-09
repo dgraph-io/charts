@@ -115,7 +115,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.nodeAffinity`                     | Alpha node affinity policy                                            | `{}`                                                |
 | `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
 | `alpha.extraFlags`                       | Alpha extra flags for command                                         | `""`                                                |
-| `alpha.configFile`                       | Alpha config file                                                     | `{ config.yaml: 'lru_mb: 2048' }`                   |
+| `alpha.configFile`                       | Alpha config file                                                     | `{}`                                                |
 | `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
 | `alpha.service.annotations`              | Alpha service annotations                                             | `{}`                                                |
 | `alpha.service.publishNotReadyAddresses` | publish address if pods not in ready state                            | `true`                                              |
@@ -156,6 +156,10 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `false`                                             |
+| `ratel.image.registry`                   | Container registry name                                               | `docker.io`                                         |
+| `ratel.image.repository`                 | Container image name                                                  | `dgraph/dgraph`                                     |
+| `ratel.image.tag`                        | Container image tag                                                   | `v20.11.3`                                          |
+| `ratel.image.pullPolicy`                 | Container pull policy                                                 | `IfNotPresent`                                      |
 | `ratel.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
 | `ratel.extraEnvs`                        | Extra env vars                                                        | `[]`                                                |
@@ -224,10 +228,9 @@ There are some example chart values for ingress resource configuration in [examp
 
 ## Zero and Alpha configuration
 
-Should you need additional configuration options you can add these either through environment variables or a configuration file, e.g. `config.toml`. Instructions about this configuration can be found in `values.yaml`.
+Should you need additional configuration options you can add these either through environment variables or a configuration file, e.g. `config.yaml`. Instructions about this configuration can be found in `values.yaml`.
 
-There are some example values files demonstrating how to add configuration with HCL, JSON, Java Properties, TOML, and YAML file formats in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
-
+There are some example values files demonstrating how to add configuration with JSON and YAML file formats in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
 ## Alpha TLS options
 
 The Dgraph Alpha service can be configured to use Mutual TLS.  Instructions about this configuration can be found in `values.yaml`.  
@@ -382,8 +385,8 @@ curl --silent \
 You can generate a secret for the key file using `base64` tool:
 
 ```bash
-printf '123456789012345' | base64
-# MTIzNDU2Nzg5MDEyMzQ1
+printf '12345678901234567890123456789012' | base64
+# MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
 ```
 
 Then create a Helm chart value config file with the secret:
@@ -393,7 +396,7 @@ Then create a Helm chart value config file with the secret:
 alpha:
   encryption:
     file:
-      enc_key_file: MTIzNDU2Nzg5MDEyMzQ1
+      enc_key_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
 ```
 
 Create a corresponding configuration enables and configures Dgraph Alpha to use this file:
@@ -403,10 +406,11 @@ Create a corresponding configuration enables and configures Dgraph Alpha to use 
 alpha:
   encryption:
     enabled: true
-  configFile:
-    config.toml: |
-      encryption_key_file = '/dgraph/enc/enc_key_file'
-      lru_mb = 2048
+  config.yaml: |
+    encryption:
+      key_file: /dgraph/enc/enc_key_file
+    security:
+      whitelist: 10.0.0.0/8,172.0.0.0/8,192.168.0.0/16
 ```
 
 Then deploy Dgraph using the secret and config files:
@@ -445,10 +449,11 @@ Create a corresponding configuration enables and configures Dgraph Alpha to use 
 alpha:
   acl:
     enabled: true
-  configFile:
-    config.toml: |
-      acl_secret_file = '/dgraph/acl/hmac_secret_file'
-      lru_mb = 2048
+  config.yaml: |
+    acl:
+      secret_file: /dgraph/acl/hmac_secret_file
+    security:
+      whitelist: 10.0.0.0/8,172.0.0.0/8,192.168.0.0/16
 ```
 
 Then deploy Dgraph using the secret and config files:
