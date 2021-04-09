@@ -64,6 +64,17 @@ Return the backups image name
 {{- end -}}
 
 {{/*
+Return the ratel image name
+*/}}
+{{- define "dgraph.ratel.image" -}}
+{{- $registryName := .Values.ratel.image.registry -}}
+{{- $repositoryName := .Values.ratel.image.repository -}}
+{{- $tag := .Values.ratel.image.tag | toString -}}
+{{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
+{{- end -}}
+
+
+{{/*
 Return empty string if minio keys are not defined
 */}}
 {{- define "dgraph.backups.keys.minio.enabled" -}}
