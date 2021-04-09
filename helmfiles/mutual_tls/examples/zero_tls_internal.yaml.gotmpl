@@ -5,10 +5,10 @@ alpha:
   configFile:
     config.yaml: |
       tls:
-        cacert: /dgraph/tls/ca.crt
+        ca_cert: /dgraph/tls/ca.crt
         client_cert: /dgraph/tls/client.dgraphuser.crt
         client_key: /dgraph/tls/client.dgraphuser.key
-        client_auth: {{ env "TLS_CLIENT_AUTH" | default "VERIFYIFGIVEN" }}
+        client_auth_type: {{ env "TLS_CLIENT_AUTH" | default "VERIFYIFGIVEN" }}
         internal_port: true
         server_cert: /dgraph/tls/node.crt
         server_key: /dgraph/tls/node.key
@@ -23,7 +23,7 @@ zero:
         ca_cert: /dgraph/tls/ca.crt
         client_cert: /dgraph/tls/client.internaluser.crt
         client_key: /dgraph/tls/client.internaluser.key
-        client_auth: {{ env "TLS_CLIENT_AUTH" | default "VERIFYIFGIVEN" }}
+        client_auth_type: {{ env "TLS_CLIENT_AUTH" | default "VERIFYIFGIVEN" }}
         internal_port: true
         server_cert: /dgraph/tls/node.crt
         server_key: /dgraph/tls/node.key

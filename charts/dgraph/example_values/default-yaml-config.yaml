@@ -1,4 +1,3 @@
-## some default configurations consistent with dgraph v20.11.x
 alpha:
   configFile:
     config.yaml: |

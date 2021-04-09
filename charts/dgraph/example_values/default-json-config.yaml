@@ -1,7 +1,7 @@
 ## some default configurations consistent with dgraph v20.11.x
 alpha:
   configFile:
-    ## NOTE: large numbers are quoted, e.g. `1000000`, otherwise it gets converted to 1e+06.
+    ## NOTE: large numbers are quoted, e.g. `1000000`, otherwise it gets converted, e.g. 1000000 becomes 1e+06.
     ##  ref. https://discuss.dgraph.io/t/dgraph-v21-03-superflag-json-config-crashes-alpha/13605
     config.json: |
       {
