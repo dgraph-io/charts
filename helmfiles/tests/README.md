@@ -74,13 +74,8 @@ for TEST in $TESTS; do helmfile --environment $TEST apply; done
 ```bash
 # set this for all tabs
 NS="dgraph-test-alpha-tls"
-# run in separate tabs for port forward commands
+# run the port forward command in a separate tab
 kubectl port-forward --namespace $NS test-dgraph-alpha-0 8080:8080
-kubectl port-forward --namespace $NS test-dgraph-zero-0 6080:6080
-
-curl --silent \
-  --cacert ./dgraph_tls/$NS/zero/ca.crt \
-  https://localhost:6080/state | jq
 
 curl --silent \
   --cacert ./dgraph_tls/$NS/alpha/ca.crt \
@@ -92,7 +87,7 @@ curl --silent \
 ```bash
 # set this for all tabs
 NS="dgraph-test-zero-tls"
-# run in separate tabs for port forward commands
+# run port forward commands in separate tabs
 kubectl port-forward --namespace $NS test-dgraph-alpha-0 8080:8080
 kubectl port-forward --namespace $NS test-dgraph-zero-0 6080:6080
 
