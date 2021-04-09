@@ -1,5 +1,5 @@
 ## backup-volume-config.yaml
-## * https://dgraph.io/docs/master/enterprise-features/binary-backups/
+## * https://dgraph.io/docs/v20.11/enterprise-features/binary-backups/
 ##
 ## Demonstrates binary backups with custom PVC + PV
 ## Note that the PV and PVC must have been previously created before installing

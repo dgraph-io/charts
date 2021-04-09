@@ -1,5 +1,5 @@
 ## backup-s3-config.yaml
-## * https://dgraph.io/docs/master/enterprise-features/binary-backups/
+## * https://dgraph.io/docs/enterprise-features/binary-backups/
 ##
 ## Demonstrates
 ## * Binary Backups to S3
@@ -19,12 +19,18 @@ backups:
 alpha:
   acl:
     enabled: true
+  tls:
+    enabled: true
   configFile:
-    ## NOTE: lru_mb deprecated after v20.11.0 and is no longer needed
     config.yaml: |
+      acl:
+        secret_file: /dgraph/acl/hmac_secret_file
       security:
         whitelist: 10.0.0.0/8,172.0.0.0/8,192.168.0.0/16
         token: 1234567890AbCdE
       tls:
-        client_auth: REQUIREANDVERIFY
+        client_auth_type: REQUIREANDVERIFY
         use_system_ca: true
+        ca_cert: /dgraph/tls/ca.crt
+        server_cert: /dgraph/tls/node.crt
+        server_key: /dgraph/tls/node.key
