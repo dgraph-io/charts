@@ -37,7 +37,7 @@ export DGRAPH_REL=my-release
 
 #### Deploy Dgraph Alpha
 
-Dgraph Alpha will need to be configured with the `--graphql lambda-url=<url>` argument (see: [lambda server](https://dgraph.io/docs/graphql/lambda/server/)) to support `dgraph-lambda`.  You can use environment variables to configure this:
+Dgraph Alpha needs to be configured with the `--graphql lambda-url=<url>` argument (see: [lambda server](https://dgraph.io/docs/graphql/lambda/server/)) to support `dgraph-lambda`.  You can use environment variables to configure this:
 
 ```bash
 helm install $DGRAPH_REL dgraph/dgraph \
