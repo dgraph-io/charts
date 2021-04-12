@@ -42,7 +42,7 @@ done
 
 This will deploy a Dgraph cluster using different types of Dgraph configuration.  Use the `--environment $TEST` flag to select the desired test.  
 
-The focus on these tests is to deploy Dgraph on Kubernetes, and verify that dgraph is running successful.
+The focus on these tests is to deploy Dgraph on Kubernetes, and verify that Dgraph is running successfully.
 
 ### Run Tests without persistence
 
