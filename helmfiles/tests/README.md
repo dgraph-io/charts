@@ -1,6 +1,6 @@
 # Tests
 
-These tests Dgraph delployments with a variety helm config values.  
+These tests validate Dgraph deployments with a variety of helm config values.  
 
 ## Create Secrets Using Docker Container
 
