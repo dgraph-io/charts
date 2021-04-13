@@ -2,6 +2,29 @@ apiVersion: v1
 entries:
   dgraph:
   - apiVersion: v1
+    appVersion: v21.03.0
+    created: "2021-04-13T16:00:10.743162-07:00"
+    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    digest: beb80c95207427e1495c5fd271968559fb4caa96c6cfe6d77ec38d79e7b42814
+    home: https://dgraph.io/
+    icon: https://dgraph.io/assets/images/logo.png
+    keywords:
+    - dgraph
+    - database
+    - Graph
+    - GraphQL
+    - nosql
+    maintainers:
+    - email: contact@dgraph.io
+      name: dgraph
+    name: dgraph
+    sources:
+    - https://github.com/dgraph-io/charts/
+    - https://github.com/dgraph-io/dgraph
+    urls:
+    - https://github.com/dgraph-io/charts/releases/download/dgraph-0.0.17/dgraph-0.0.17.tgz
+    version: 0.0.17
+  - apiVersion: v1
     appVersion: v20.11.3
     created: "2021-04-05T15:00:47.725203-07:00"
     description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
@@ -301,6 +324,31 @@ entries:
     - https://github.com/dgraph-io/charts/releases/download/dgraph-0.0.4/dgraph-0.0.4.tgz
     version: 0.0.4
   dgraph-lambda:
+  - apiVersion: v2
+    appVersion: v1.2.4
+    created: "2021-04-13T16:00:10.943814-07:00"
+    description: Serverless platform for running JavaScript on Slash GraphQL (or Dgraph).
+    digest: 6a2bca861f120c31c2cb0791ae895c071d571aed671620e25d9f928080a34bfa
+    icon: https://dgraph.io/assets/images/logo.png
+    keywords:
+    - dgraph
+    - database
+    - Graph
+    - GraphQL
+    - nosql
+    - serverless
+    - lambda
+    - JavaScript
+    maintainers:
+    - email: contact@dgraph.io
+      name: dgraph
+    name: dgraph-lambda
+    sources:
+    - https://github.com/dgraph-io/dgraph-lambda
+    type: application
+    urls:
+    - https://github.com/dgraph-io/charts/releases/download/dgraph-lambda-0.0.2/dgraph-lambda-0.0.2.tgz
+    version: 0.0.2
   - apiVersion: v2
     appVersion: v1.2.1
     created: "2020-12-23T10:57:42.848681126-08:00"
