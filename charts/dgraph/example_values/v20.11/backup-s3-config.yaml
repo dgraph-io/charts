@@ -1,0 +1,42 @@
+## backup-s3-config.yaml
+## * https://dgraph.io/docs/v20.11/enterprise-features/binary-backups/
+##
+## Demonstrates
+## * Binary Backups to S3
+## * Mutual TLS (see https://dgraph.io/docs/v20.11/deploy/tls-configuration/)
+## * Auth Token (see https://dgraph.io/docs/v20.11/deploy/dgraph-administration/#securing-alter-operations)
+backups:
+  full:
+    enabled: true
+    schedule: "0 * * * *"
+  incremental:
+    enabled: true
+    schedule: "0 1-23 * * *"
+  admin:
+    tls_client: backupuser
+  ## Requires AWS S3 Bucket to be provisioned
+  destination: s3://s3.<region>.amazonaws.com/<bucket>
+alpha:
+  acl:
+    enabled: true
+  tls:
+    enabled: true
+  configFile:
+    ## NOTE: lru_mb deprecated after v20.11.0 and is no longer needed
+    config.hcl: |
+      acl_secret_file = '/dgraph/acl/hmac_secret_file'
+      whitelist          = "10.0.0.0/8,172.0.0.0/8,192.168.0.0/16"
+      auth_token         = "1234567890AbCdE"
+      tls_client_auth    = "REQUIREANDVERIFY"
+      tls_use_system_ca" = true
+
+      ## TLS configuration (before v20.11.0)
+      tls_dir            = "/dgraph/tls"
+
+      ## TLS configuration (after v20.11.0)
+      tls_cacert         = "/dgraph/tls/ca.crt"
+      tls_node_cert      = "/dgraph/tls/node.crt"
+      tls_node_key       = "/dgraph/tls/node.key"
+
+      ## lru_mb deprecated after v20.11.0 and is no longer needed
+      lru_mb             = 2048

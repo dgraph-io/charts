@@ -36,8 +36,8 @@ spec:
 {{- include "dgraph.imagePullSecrets" . | indent 6 }}
       containers:
       - name: "{{ template "dgraph.ratel.fullname" . }}"
-        image: "{{ template "dgraph.image" . }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        image: "{{ template "dgraph.ratel.image" . }}"
+        imagePullPolicy: {{ .Values.ratel.image.pullPolicy | quote }}
         {{- if .Values.ratel.extraEnvs }}
         env:
         {{- with .Values.ratel.extraEnvs }}

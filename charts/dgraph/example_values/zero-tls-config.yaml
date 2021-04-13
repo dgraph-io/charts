@@ -1,4 +1,7 @@
-## NOTE: TLS Encryption for Zero is only available in v20.11.0+
+## Specify TLS configuration options for `dgraph alpha` and `dgraph zero`
+## * https://dgraph.io/docs/deploy/tls-configuration/#using-tls-with-internal-and-external-ports-encrypted
+## NOTE: Client Certificates used for Mutual TLS must be configured, as these are
+## need by Dgraph nodes to authenticate to each other.
 global:
   domain: cluster.local
 
@@ -7,24 +10,26 @@ alpha:
     enabled: true
   configFile:
     config.yaml: |
-      tls_cacert: /dgraph/tls/ca.crt
-      tls_cert: /dgraph/tls/client.internaluser.crt
-      tls_key: /dgraph/tls/client.internaluser.key
-      tls_client_auth: VERIFYIFGIVEN
-      tls_internal_port_enabled: true
-      tls_node_cert: /dgraph/tls/node.crt
-      tls_node_key: /dgraph/tls/node.key
-      tls_use_system_ca: true
+      tls:
+        ca_cert: /dgraph/tls/ca.crt
+        client_cert: /dgraph/tls/client.dgraphuser.crt
+        client_key: /dgraph/tls/client.dgraphuser.key
+        client_auth_type: REQUIREANDVERIFY
+        internal_port: true
+        server_cert: /dgraph/tls/node.crt
+        server_key: /dgraph/tls/node.key
+        use_system_ca: true
 zero:
   tls:
     enabled: true
   configFile:
     config.yaml: |
-      tls_cacert: /dgraph/tls/ca.crt
-      tls_cert: /dgraph/tls/client.internaluser.crt
-      tls_key: /dgraph/tls/client.internaluser.key
-      tls_client_auth: VERIFYIFGIVEN
-      tls_internal_port_enabled: true
-      tls_node_cert: /dgraph/tls/node.crt
-      tls_node_key: /dgraph/tls/node.key
-      tls_use_system_ca: true
+      tls:
+        ca_cert: /dgraph/tls/ca.crt
+        client_cert: /dgraph/tls/client.dgraphuser.crt
+        client_key: /dgraph/tls/client.dgraphuser.key
+        client_auth_type: REQUIREANDVERIFY
+        internal_port: true
+        server_cert: /dgraph/tls/node.crt
+        server_key: /dgraph/tls/node.key
+        use_system_ca: true

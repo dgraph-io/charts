@@ -7,10 +7,12 @@ releases:
     values:
       - alpha:
           extraEnvs:
-            - name: DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL
-              ## http://<helm-chart-release-name>-dgraph-lambda.<namespace>.svc/graphql-worker
-              value: http://lambda-dgraph-lambda.default.svc/graphql-worker
-
+            ## NOTE: The url is formatted as:
+            ##  - http://<helm-chart-release-name>-dgraph-lambda.<namespace>.svc/graphql-worker
+            ## NOTE: Configuration env vars have changed in v21.03.
+            ## Use appropriate value for the dgraph version used.
+            - name: DGRAPH_ALPHA_GRAPHQL
+              value: lambda-url=http://lambda-dgraph-lambda.default.svc/graphql-worker
   - name: lambda
     namespace: default
     chart: {{ env "PWD" }}/../../charts/dgraph-lambda

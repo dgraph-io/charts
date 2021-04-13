@@ -1,0 +1,45 @@
+alpha:
+  configFile:
+    config.yaml: |
+      limit:
+        query_timeout: 5m
+        max_retries: -1
+        mutations: allow
+        normalize_node: 10000
+        query_edge: 1000000
+      alsologtostderr: true
+      badger:
+        compression: snappy
+      bindall: true
+      telemetry:
+        sentry: true
+        reports: true
+      export: export
+      graphql:
+        introspection: true
+      log_backtrace_at: ":0"
+      logtostderr: true
+      ludicrous:
+        enabled: false
+      raft:
+        pending_proposals: 256
+        snapshot_after_entries: 10000
+      port_offset: 0
+      postings: "/dgraph/p"
+      trace:
+        ratio: 0.01
+      wal: "/dgraph/w"
+zero:
+  configFile:
+    config.yaml: |
+      alsologtostderr: true
+      bindall: true
+      telemetry:
+        sentry: true
+        reports: true
+      log_backtrace_at: ":0"
+      logtostderr: true
+      rebalance_interval: 8m0s
+      trace:
+        ratio: 0.01
+      wal: "/dgraph/zw"
