@@ -1,0 +1,4 @@
+.cr-release-packages
+charts
+helmfiles
+.DS_Store
