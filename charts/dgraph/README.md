@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v21.03.0`                                          |
+| `image.tag`                              | Container image tag                                                   | `v21.03.1`                                          |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
@@ -157,8 +157,8 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `false`                                             |
 | `ratel.image.registry`                   | Container registry name                                               | `docker.io`                                         |
-| `ratel.image.repository`                 | Container image name                                                  | `dgraph/dgraph`                                     |
-| `ratel.image.tag`                        | Container image tag                                                   | `v20.11.3`                                          |
+| `ratel.image.repository`                 | Container image name                                                  | `dgraph/ratel`                                      |
+| `ratel.image.tag`                        | Container image tag                                                   | `v21.03.0`                                          |
 | `ratel.image.pullPolicy`                 | Container pull policy                                                 | `IfNotPresent`                                      |
 | `ratel.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
