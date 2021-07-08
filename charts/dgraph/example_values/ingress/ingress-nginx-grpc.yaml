@@ -15,7 +15,7 @@ global:
     annotations:
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
     # All hostnames must be listed for grpc + https ingress shared cert secret
