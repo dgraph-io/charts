@@ -1,6 +1,5 @@
 {{- if and (eq .Values.ratel.ingress.enabled true) (eq .Values.global.ingress.enabled false) (eq .Values.ratel.enabled true) -}}
-
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "dgraph.ratel.fullname" . }}-ingress
@@ -29,16 +28,19 @@ spec:
     - host: {{ .Values.ratel.ingress.hostname }}
       http:
         paths:
-          {{- if index $.Values.ratel.ingress "annotations" }}
-          {{- if eq (index $.Values.ratel.ingress.annotations "kubernetes.io/ingress.class" | default "") "gce" "alb" "nsx" }}
-          - path: /*
-          {{- else }}{{/* Has annotations but ingress class is not "gce" nor "alb" */}}
-          - path: /
-          {{- end }}
-          {{- else}}{{/* Has no annotations */}}
-          - path: /
-          {{- end }}
-            backend:
-              serviceName: {{ template "dgraph.ratel.fullname" . }}
-              servicePort: 80
+          - backend:
+              service:
+                name:  {{ template "dgraph.ratel.fullname" . }}
+                port: 
+                 number: 80
+            pathType: ImplementationSpecific
+            {{- if index $.Values.ratel.ingress "annotations" }}
+            {{- if eq (index $.Values.ratel.ingress.annotations "kubernetes.io/ingress.class" | default "") "gce" "alb" "nsx" }}
+            path: /*
+            {{- else }}{{/* Has annotations but ingress class is not "gce" nor "alb" */}}
+            path: /
+            {{- end }}
+            {{- else}}{{/* Has no annotations */}}
+            path: /
+            {{- end }}
 {{- end }}

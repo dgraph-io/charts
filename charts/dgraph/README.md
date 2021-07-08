@@ -122,10 +122,14 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.service.loadBalancerIP`           | specify static IP address for LoadBalancer type                       | `""`                                                |
 | `alpha.service.externalTrafficPolicy`    | route external traffic to node-local or cluster-wide endpoints        | `""`                                                |
 | `alpha.service.loadBalancerSourceRanges` | restrict CIDR IP addresses for a LoadBalancer type                    | `[]`                                                |
-| `alpha.ingress.enabled`                  | Alpha Ingress resource enabled                                        | `false`                                             |
-| `alpha.ingress.hostname`                 | Alpha Ingress virtual hostname                                        | `nil`                                               |
-| `alpha.ingress.annotations`              | Alpha Ingress annotations                                             | `nil`                                               |
-| `alpha.ingress.tls`                      | Alpha Ingress TLS settings                                            | `nil`                                               |
+| `alpha.ingress.enabled`                  | Alpha ingress resource enabled                                        | `false`                                             |
+| `alpha.ingress.hostname`                 | Alpha ingress virtual hostname                                        | `nil`                                               |
+| `alpha.ingress.annotations`              | Alpha ingress annotations                                             | `nil`                                               |
+| `alpha.ingress.tls`                      | Alpha ingress TLS settings                                            | `nil`                                               |
+| `alpha.ingress_grpc.enabled`             | Alpha ingress-grpc resource enabled                                   | `false`                                             |
+| `alpha.ingress_grpc.hostname`            | Alpha ingress-grpc virtual hostname                                   | `nil`                                               |
+| `alpha.ingress_grpc.annotations`         | Alpha ingress-gcpc annotations                                        | `nil`                                               |
+| `alpha.ingress_grpc.tls`                 | Alpha ingress-grpc TLS settings                                       | `nil`                                               |
 | `alpha.securityContext.enabled`          | Security context for Alpha nodes enabled                              | `false`                                             |
 | `alpha.securityContext.fsGroup`          | Group id of the Alpha container                                       | `1001`                                              |
 | `alpha.securityContext.runAsUser`        | User ID for the Alpha container                                       | `1001`                                              |
@@ -218,14 +222,25 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |
 | `global.ingress.ratel_hostname`          | global ingress virtual host name for Ratel service                    | `""`                                                |
 | `global.ingress.alpha_hostname`          | global ingress virtual host name for Alpha service                    | `""`                                                |
-
-
+| `global.ingress_grpc.enabled`             | Enable global ingress-grpc resource (overrides Alpha ingress-grpc)   | `false`                                             |
+| `global.ingress_grpc.annotations`         | global ingress-grpc annotations                                      | `{}`                                                |
+| `global.ingress_grpc.tls`                 | global ingress-grpc tls settings                                     | `{}`                                                |
+| `global.ingress_grpc.alpha_grpc_hostname` | global ingress-grpc virtual host name for Alpha GRPC service         | `""`                                                |
 ## Ingress resource
 
-You can define ingress resources through `alpha.ingress` for the Alpha HTTP service and `ratel.ingress` for the ratel UI service, or you can use a combined single ingress with `global.ingress` for both Alpha HTTP and ratel UI services.
+You can define ingress resources through `alpha.ingress` for the Alpha HTTP(S) service and `ratel.ingress` for the ratel UI service, or you can use a combined single ingress with `global.ingress` for both Alpha HTTP(S) and ratel UI services.
 
-There are some example chart values for ingress resource configuration in [example_values](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values).
+There are some example chart values for ingress resource configuration in [example_values/ingress](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/ingress).
+### Ingress resource with GRPC
 
+The Dgraph Alpha GRPC can be exposed though an ingress configured with either `alpha.ingress_grpc` or `global.ingress_grpc` values.  For this solution to work, a few requirements must be met:
+
+* if an external load balancer is used by the ingress controller, the load balancer should be Layer 4 TCP as the ingress-controller will handle both HTTPS and GRPC traffic.
+* The ingress resource must instruct the ingress controller to use GRPC, such as `nginx.ingress.kubernetes.io/backend-protocol: GRPC` with [ingress-nginx](https://kubernetes.github.io/ingress-nginx/).
+* The ingress controller can support both HTTPS and GRPC traffic, but must do TLS terminationation, so a secret with the appropriate certificates must be configured; this can be automated with the [cert-manager](https://cert-manager.io/) addon.
+* As the Dgraph Alpha service will be accessed through a FQDN name, it is recommended that DNS record updates are automated; this can be automated with the [external-dns](https://github.com/kubernetes-sigs/external-dns/) addon.
+
+There is an example chart values for ingress resource configuration in [example_values/ingress](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/ingress).
 ## Zero and Alpha configuration
 
 Should you need additional configuration options you can add these either through environment variables or a configuration file, e.g. `config.yaml`. Instructions about this configuration can be found in `values.yaml`.

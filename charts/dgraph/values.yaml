@@ -293,6 +293,14 @@ alpha:
     # annotations: {}
     # tls: {}
 
+  ## alpha GRPC ingress resource configuration
+  ## This requires an ingress controller to be installed into your k8s cluster
+  ingress_grpc:
+    enabled: false
+    # hostname: ""
+    # annotations: {}
+    # tls: {}    
+
   ## dgraph Pod Security Context
   securityContext:
     enabled: false
@@ -619,3 +627,8 @@ global:
     tls: {}
     ratel_hostname: ""
     alpha_hostname: ""
+  ingress_grpc:
+    enabled: false
+    annotations: {}
+    tls: {}
+    alpha_grpc_hostname: ""  
