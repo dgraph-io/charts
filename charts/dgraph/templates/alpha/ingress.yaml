@@ -31,7 +31,7 @@ spec:
           - backend:
               service:
                 name:  {{ template "dgraph.alpha.fullname" . }}
-                port: 
+                port:
                   number: 8080
             pathType: ImplementationSpecific
             {{- if index $.Values.alpha.ingress "annotations" }}
@@ -78,7 +78,7 @@ spec:
           - backend:
               service:
                 name:  {{ template "dgraph.alpha.fullname" . }}
-                port: 
+                port:
                   number: 9080
             pathType: ImplementationSpecific
             {{- if index $.Values.alpha.ingress_grpc "annotations" }}

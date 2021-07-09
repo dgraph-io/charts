@@ -31,7 +31,7 @@ spec:
           - backend:
               service:
                 name:  {{ template "dgraph.alpha.fullname" . }}
-                port: 
+                port:
                   number: 8080
             pathType: ImplementationSpecific
             {{- if index $.Values.global.ingress "annotations" }}
@@ -50,7 +50,7 @@ spec:
           - backend:
               service:
                 name:  {{ template "dgraph.ratel.fullname" . }}
-                port: 
+                port:
                   number: 80
             pathType: ImplementationSpecific
             {{- if index $.Values.global.ingress "annotations" }}
@@ -98,7 +98,7 @@ spec:
           - backend:
               service:
                 name:  {{ template "dgraph.alpha.fullname" . }}
-                port: 
+                port:
                   number: 9080
             pathType: ImplementationSpecific
             {{- if index $.Values.global.ingress_grpc.annotations "annotations" }}

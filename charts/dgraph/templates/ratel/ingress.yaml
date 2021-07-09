@@ -31,7 +31,7 @@ spec:
           - backend:
               service:
                 name:  {{ template "dgraph.ratel.fullname" . }}
-                port: 
+                port:
                  number: 80
             pathType: ImplementationSpecific
             {{- if index $.Values.ratel.ingress "annotations" }}
