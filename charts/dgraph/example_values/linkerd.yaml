@@ -1,0 +1,10 @@
+alpha:
+  extraAnnotations:
+    config.linkerd.io/skip-inbound-ports: 7080
+    config.linkerd.io/skip-outbound-ports: 7080
+    linkerd.io/inject: enabled
+zero:
+  extraAnnotations:
+    config.linkerd.io/skip-inbound-ports: 5080
+    config.linkerd.io/skip-outbound-ports: 5080
+    linkerd.io/inject: enabled

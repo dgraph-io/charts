@@ -57,11 +57,16 @@ spec:
   template:
     metadata:
       name: {{ template "dgraph.alpha.fullname" . }}
-      {{- if .Values.alpha.metrics.enabled }}
+      {{- if or .Values.alpha.metrics.enabled .Values.alpha.extraAnnotations }}
       annotations:
+        {{- if .Values.alpha.metrics.enabled }}
         prometheus.io/path: /debug/prometheus_metrics
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
+        {{- end }}
+        {{- with .Values.alpha.extraAnnotations }}
+{{- toYaml . | trimSuffix "\n" | nindent 8 }}
+        {{- end }}
       {{- end }}
       labels:
         app: {{ template "dgraph.name" . }}
