@@ -66,6 +66,8 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
 | `zero.name`                              | Zero component name                                                   | `zero`                                              |
+| `zero.metrics.enabled`                   | Add annotations for Prometheus metric scraping                        | `true`                                              |
+| `zero.extraAnnotations`                  | Specify annotations for template metadata                             | `{}`                                                |
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
 | `zero.schedulerName`                     | Configure an explicit scheduler                                       | `nil`                                               |
 | `zero.monitorLabel`                      | Monitor label for zero, used by prometheus.                           | `zero-dgraph-io`                                    |
@@ -103,6 +105,8 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.customLivenessProbe`               | Zero custom liveness probes (if `zero.livenessProbe` not enabled)     | `{}`                                                |
 | `zero.customReadinessProbe`              | Zero custom readiness probes  (if `zero.readinessProbe` not enabled)  | `{}`                                                |
 | `alpha.name`                             | Alpha component name                                                  | `alpha`                                             |
+| `alpha.metrics.enabled`                  | Add annotations for Prometheus metric scraping                        | `true`                                              |
+| `alpha.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
 | `alpha.monitorLabel`                     | Monitor label for alpha, used by prometheus.                          | `alpha-dgraph-io`                                   |
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
 | `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
@@ -156,6 +160,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `false`                                             |
+| `ratel.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
 | `ratel.image.registry`                   | Container registry name                                               | `docker.io`                                         |
 | `ratel.image.repository`                 | Container image name                                                  | `dgraph/ratel`                                      |
 | `ratel.image.tag`                        | Container image tag                                                   | `v21.03.0`                                          |
