@@ -32,6 +32,10 @@ zero:
   name: zero
   metrics:
     enabled: true
+
+  ## StatefulSet spec.template.metadata.annotations
+  extraAnnotations: {}
+
   monitorLabel: zero-dgraph-io
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
@@ -201,6 +205,10 @@ alpha:
   name: alpha
   metrics:
     enabled: true
+
+  ## StatefulSet spec.template.metadata.annotations
+  extraAnnotations: {}
+
   monitorLabel: alpha-dgraph-io
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
@@ -421,6 +429,9 @@ ratel:
   name: ratel
   ## Disable Ratel service
   enabled: false
+
+  ## Deployment spec.template.metadata.annotations
+  extraAnnotations: {}
 
   ## NOTE: Ratel is no longer included in dgraph image since dgraph/dgraph:v21.03.0
   ##  The image dgraph/dgraph:v21.11.3 is last known version that has Ratel.

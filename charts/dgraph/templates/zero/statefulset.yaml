@@ -50,11 +50,16 @@ spec:
   template:
     metadata:
       name: {{ template "dgraph.zero.fullname" . }}
-      {{- if .Values.zero.metrics.enabled }}
+      {{- if or .Values.zero.metrics.enabled .Values.zero.extraAnnotations }}
       annotations:
+        {{- if .Values.zero.metrics.enabled }}
         prometheus.io/path: /debug/prometheus_metrics
         prometheus.io/port: "6080"
         prometheus.io/scrape: "true"
+        {{- end }}
+        {{- with .Values.zero.extraAnnotations }}
+{{- toYaml . | trimSuffix "\n" | nindent 8 }}
+        {{- end }}
       {{- end }}
       labels:
         app: {{ template "dgraph.name" . }}
