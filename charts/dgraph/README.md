@@ -237,7 +237,7 @@ The Dgraph Alpha GRPC can be exposed though an ingress configured with either `a
 
 * if an external load balancer is used by the ingress controller, the load balancer should be Layer 4 TCP as the ingress-controller will handle both HTTPS and GRPC traffic.
 * The ingress resource must instruct the ingress controller to use GRPC, such as `nginx.ingress.kubernetes.io/backend-protocol: GRPC` with [ingress-nginx](https://kubernetes.github.io/ingress-nginx/).
-* The ingress controller can support both HTTPS and GRPC traffic, but must do TLS terminationation, so a secret with the appropriate certificates must be configured; this can be automated with the [cert-manager](https://cert-manager.io/) addon.
+* The ingress controller can support both HTTPS and GRPC traffic, but must do TLS termination, so a secret with the appropriate certificates must be configured; this can be automated with the [cert-manager](https://cert-manager.io/) addon.
 * As the Dgraph Alpha service will be accessed through a FQDN name, it is recommended that DNS record updates are automated; this can be automated with the [external-dns](https://github.com/kubernetes-sigs/external-dns/) addon.
 
 There is an example chart values for ingress resource configuration in [example_values/ingress](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/ingress).
