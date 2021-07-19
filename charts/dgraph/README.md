@@ -233,7 +233,7 @@ You can define ingress resources through `alpha.ingress` for the Alpha HTTP(S) s
 There are some example chart values for ingress resource configuration in [example_values/ingress](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/ingress).
 ### Ingress resource with GRPC
 
-The Dgraph Alpha GRPC can be exposed though an ingress configured with either `alpha.ingress_grpc` or `global.ingress_grpc` values.  For this solution to work, a few requirements must be met:
+The Dgraph Alpha GRPC can be exposed through an ingress configured with either `alpha.ingress_grpc` or `global.ingress_grpc` values.  For this solution to work, a few requirements must be met:
 
 * if an external load balancer is used by the ingress controller, the load balancer should be Layer 4 TCP as the ingress-controller will handle both HTTPS and GRPC traffic.
 * The ingress resource must instruct the ingress controller to use GRPC, such as `nginx.ingress.kubernetes.io/backend-protocol: GRPC` with [ingress-nginx](https://kubernetes.github.io/ingress-nginx/).
