@@ -2,9 +2,34 @@ apiVersion: v1
 entries:
   dgraph:
   - apiVersion: v1
+    appVersion: v21.03.1
+    created: "2021-07-28T13:21:14.223765436-07:00"
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
+    digest: 2cc5a64b65cf207e41009a9c1e71e37e5b9f6fd1a454ee5d89d2cd34b1b67fd1
+    home: https://dgraph.io/
+    icon: https://dgraph.io/assets/images/logo.png
+    keywords:
+    - dgraph
+    - database
+    - Graph
+    - GraphQL
+    - nosql
+    maintainers:
+    - email: contact@dgraph.io
+      name: dgraph
+    name: dgraph
+    sources:
+    - https://github.com/dgraph-io/charts/
+    - https://github.com/dgraph-io/dgraph
+    urls:
+    - https://github.com/dgraph-io/charts/releases/download/dgraph-0.0.18/dgraph-0.0.18.tgz
+    version: 0.0.18
+  - apiVersion: v1
     appVersion: v21.03.0
     created: "2021-04-13T16:00:10.743162-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: beb80c95207427e1495c5fd271968559fb4caa96c6cfe6d77ec38d79e7b42814
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -27,7 +52,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.11.3
     created: "2021-04-05T15:00:47.725203-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 7c0f8cc3ebdf651d689f51c76a167b84cac69930b9023b9c9241b0b7e9bc8ba7
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -50,7 +76,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.11.1
     created: "2021-01-28T14:52:25.781319-08:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 5ebc8d0fe3bfc9a3713c7fa23e4f7295cd69bf3a07254bc2181e0142649c843e
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -73,7 +100,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.11.0
     created: "2021-01-14T12:32:38.491304-08:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 086e97fc488353aa91cdf977fd407613acc88522e072ad5872581d47ffd73739
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -96,7 +124,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.11.0
     created: "2020-12-24T18:18:46.292839568-08:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: c311760d426b85fcb25cb46222a9623ef97b69f9e428e19886c97cd7779ea07c
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -119,7 +148,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.07.2
     created: "2020-11-04T15:14:12.605645139-08:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: b077146171fdbd5a51cf126907395612f5f6edf3dfe1ed5f09b1bccd08b11a8a
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -142,7 +172,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.07.1
     created: "2020-09-30T21:43:30.147699423-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 1b5fdea1130b9f1b97972d7d1bba859f693e2e0bf9eb06ed716535798da58c4b
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -165,7 +196,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.03.4
     created: "2020-09-02T16:26:06.731213938-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 7b7407c0b298f82dbae53b72c3a64507866046cb4ce4f3f5672d4bddcd34fc9b
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -188,7 +220,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.03.4
     created: "2020-07-28T18:34:24.976334939-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 6848eea30834465bb3ef0d846f1b82ea806e6879d10eb379e4f4a92cbc375c82
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -211,7 +244,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.03.4
     created: "2020-07-23T19:48:49.63539288-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 561a27a11cb11bd72f89397e00a174cb10d39d4ddd882a4e1c4f81950f23a4ef
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -234,7 +268,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.03.3
     created: "2020-07-17T00:14:50.958378088-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: dc12f61abfbfe6c6591b95b29d3b2853fafa8b9a53430e3127f259fd372d143c
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -257,7 +292,8 @@ entries:
   - apiVersion: v1
     appVersion: v20.03.3
     created: "2020-07-16T21:34:53.813882844-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 20e7af4ff869ba28d5c8780ef762ca95c8df44c79ab7ce8b98a020ff46102a82
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -280,7 +316,8 @@ entries:
   - apiVersion: v1
     appVersion: v1.2.2
     created: "2020-07-16T17:38:05.67241049-07:00"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: 109d16fa48cee98f2da13764dba0952364998c2d839d110d58e3181838dcb2ba
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -303,7 +340,8 @@ entries:
   - apiVersion: v1
     appVersion: v1.2.2
     created: "2020-04-03T12:05:18.63334+05:30"
-    description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
     digest: ad22d48cdc85ae4b2ef7e02698582db82ba35116227a12a6eab1242d17d9db8b
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
@@ -374,4 +412,4 @@ entries:
     urls:
     - https://github.com/dgraph-io/charts/releases/download/dgraph-lambda-0.0.1/dgraph-lambda-0.0.1.tgz
     version: 0.0.1
-generated: "2020-01-10T19:40:29.142372+05:30"
+generated: "2021-07-28T13:21:14.223991532-07:00"
