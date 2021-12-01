@@ -411,11 +411,12 @@ Create a corresponding configuration enables and configures Dgraph Alpha to use 
 alpha:
   encryption:
     enabled: true
-  config.yaml: |
-    encryption:
-      key_file: /dgraph/enc/enc_key_file
-    security:
-      whitelist: 10.0.0.0/8,172.0.0.0/8,192.168.0.0/16
+  configFile:
+    config.yaml: |
+      encryption:
+        key_file: /dgraph/enc/enc_key_file
+      security:
+        whitelist: 10.0.0.0/8,172.0.0.0/8,192.168.0.0/16
 ```
 
 Then deploy Dgraph using the secret and config files:
@@ -454,11 +455,12 @@ Create a corresponding configuration enables and configures Dgraph Alpha to use 
 alpha:
   acl:
     enabled: true
-  config.yaml: |
-    acl:
-      secret_file: /dgraph/acl/hmac_secret_file
-    security:
-      whitelist: 10.0.0.0/8,172.0.0.0/8,192.168.0.0/16
+  configFile:
+    config.yaml: |
+      acl:
+        secret_file: /dgraph/acl/hmac_secret_file
+      security:
+        whitelist: 10.0.0.0/8,172.0.0.0/8,192.168.0.0/16
 ```
 
 Then deploy Dgraph using the secret and config files:
