@@ -10,7 +10,7 @@
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v21.03.0
+  tag: v21.03.1
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -32,6 +32,10 @@ zero:
   name: zero
   metrics:
     enabled: true
+
+  ## StatefulSet spec.template.metadata.annotations
+  extraAnnotations: {}
+
   monitorLabel: zero-dgraph-io
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
@@ -201,6 +205,10 @@ alpha:
   name: alpha
   metrics:
     enabled: true
+
+  ## StatefulSet spec.template.metadata.annotations
+  extraAnnotations: {}
+
   monitorLabel: alpha-dgraph-io
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
@@ -292,6 +300,14 @@ alpha:
     # hostname: ""
     # annotations: {}
     # tls: {}
+
+  ## alpha GRPC ingress resource configuration
+  ## This requires an ingress controller to be installed into your k8s cluster
+  ingress_grpc:
+    enabled: false
+    # hostname: ""
+    # annotations: {}
+    # tls: {}    
 
   ## dgraph Pod Security Context
   securityContext:
@@ -422,12 +438,15 @@ ratel:
   ## Disable Ratel service
   enabled: false
 
+  ## Deployment spec.template.metadata.annotations
+  extraAnnotations: {}
+
   ## NOTE: Ratel is no longer included in dgraph image since dgraph/dgraph:v21.03.0
   ##  The image dgraph/dgraph:v21.11.3 is last known version that has Ratel.
   image:
     registry: docker.io
     repository: dgraph/ratel
-    tag: v21.03.0
+    tag: v21.03.1
 
   ## Scheduler name
   ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
@@ -619,3 +638,8 @@ global:
     tls: {}
     ratel_hostname: ""
     alpha_hostname: ""
+  ingress_grpc:
+    enabled: false
+    annotations: {}
+    tls: {}
+    alpha_grpc_hostname: ""  
