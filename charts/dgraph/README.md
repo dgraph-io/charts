@@ -167,7 +167,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
 | `ratel.image.registry`                   | Container registry name                                               | `docker.io`                                         |
 | `ratel.image.repository`                 | Container image name                                                  | `dgraph/ratel`                                      |
-| `ratel.image.tag`                        | Container image tag                                                   | `v21.03.0`                                          |
+| `ratel.image.tag`                        | Container image tag                                                   | `v21.03.1`                                          |
 | `ratel.image.pullPolicy`                 | Container pull policy                                                 | `IfNotPresent`                                      |
 | `ratel.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
