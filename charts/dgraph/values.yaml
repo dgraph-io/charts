@@ -10,7 +10,7 @@
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v21.03.1
+  tag: v21.12.0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -297,6 +297,7 @@ alpha:
   ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
     enabled: false
+    # ingressClassName: nginx
     # hostname: ""
     # annotations: {}
     # tls: {}
@@ -305,6 +306,7 @@ alpha:
   ## This requires an ingress controller to be installed into your k8s cluster
   ingress_grpc:
     enabled: false
+    # ingressClassName: nginx
     # hostname: ""
     # annotations: {}
     # tls: {}    
@@ -491,6 +493,7 @@ ratel:
   ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
     enabled: false
+    # ingressClassName: nginx
     # hostname: ""
     # annotations: {}
     # tls: {}
@@ -634,12 +637,14 @@ global:
   ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
     enabled: false
+    ingressClassName: nginx
     annotations: {}
     tls: {}
     ratel_hostname: ""
     alpha_hostname: ""
   ingress_grpc:
     enabled: false
+    ingressClassName: nginx
     annotations: {}
     tls: {}
     alpha_grpc_hostname: ""  

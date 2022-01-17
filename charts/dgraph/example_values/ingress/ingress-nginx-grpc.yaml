@@ -14,8 +14,8 @@
 global:
   ingress:
     enabled: true
+    ingressClassName: nginx
     annotations:
-      kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/backend-protocol: HTTP
       cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -30,8 +30,8 @@ global:
     alpha_hostname: alpha.example.com
   ingress_grpc:
     enabled: true
+    ingressClassName: nginx
     annotations:
-      kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/backend-protocol: GRPC
       cert-manager.io/cluster-issuer: letsencrypt-prod

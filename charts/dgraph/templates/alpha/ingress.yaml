@@ -14,6 +14,9 @@ metadata:
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
   {{- end }}
 spec:
+{{- if .Values.alpha.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.alpha.ingress.ingressClassName }}
+{{- end }}
 {{- if .Values.alpha.ingress.tls }}
   tls:
   {{- range .Values.alpha.ingress.tls }}
@@ -61,6 +64,9 @@ metadata:
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
   {{- end }}
 spec:
+{{- if .Values.alpha.ingress_grpc.ingressClassName }}
+  ingressClassName: {{ .Values.alpha.ingress_grpc.ingressClassName }}
+{{- end }}
 {{- if .Values.alpha.ingress_grpc.tls }}
   tls:
   {{- range .Values.alpha.ingress_grpc.tls }}
