@@ -14,7 +14,7 @@ metadata:
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
   {{- end }}
 spec:
-{- if .Values.ratel.ingress.ingressClassName }}
+{{- if .Values.ratel.ingress.ingressClassName }}
   ingressClassName: {{ .Values.ratel.ingress.ingressClassName }}
 {{- end }}
 {{- if .Values.ratel.ingress.tls }}
