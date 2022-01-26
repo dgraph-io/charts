@@ -29,6 +29,9 @@ metadata:
     component: {{ .Values.zero.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{- if .Values.zero.podLabels }}
+{{- .Values.zero.podLabels | toYaml | indent 8}}
+    {{- end }}
 spec:
   serviceName: {{ template "dgraph.zero.fullname" . }}-headless
   replicas: {{ .Values.zero.replicaCount }}

@@ -68,6 +68,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.name`                              | Zero component name                                                   | `zero`                                              |
 | `zero.metrics.enabled`                   | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `zero.extraAnnotations`                  | Specify annotations for template metadata                             | `{}`                                                |
+| `zero.podLabels`                         | Specify additional labels for template metadata                       | `{}`                                                |
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
 | `zero.schedulerName`                     | Configure an explicit scheduler                                       | `nil`                                               |
 | `zero.monitorLabel`                      | Monitor label for zero, used by prometheus.                           | `zero-dgraph-io`                                    |
@@ -107,6 +108,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.name`                             | Alpha component name                                                  | `alpha`                                             |
 | `alpha.metrics.enabled`                  | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `alpha.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
+| `alpha.podLabels`                        | Specify additional labels for template metadata                       | `{}`                                                |
 | `alpha.monitorLabel`                     | Monitor label for alpha, used by prometheus.                          | `alpha-dgraph-io`                                   |
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
 | `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
@@ -165,6 +167,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `false`                                             |
 | `ratel.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
+| `ratel.podLabels`                        | Specify additional labels for template metadata                       | `{}`                                                |
 | `ratel.image.registry`                   | Container registry name                                               | `docker.io`                                         |
 | `ratel.image.repository`                 | Container image name                                                  | `dgraph/ratel`                                      |
 | `ratel.image.tag`                        | Container image tag                                                   | `v21.03.1`                                          |
@@ -190,6 +193,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.customLivenessProbe`              | Ratel custom liveness probes (if `ratel.livenessProbe` not enabled)   | `{}`                                                |
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
 | `backups.name`                           | Backups component name                                                | `backups`                                           |
+| `backups.podLabels`                      | Specify additional labels for template metadata                       | `{}`                                                |
 | `backups.schedulerName`                  | Configure an explicit scheduler for Backups Kubernetes CronJobs       | `nil`                                               |
 | `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
 | `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |

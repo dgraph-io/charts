@@ -36,6 +36,9 @@ zero:
   ## StatefulSet spec.template.metadata.annotations
   extraAnnotations: {}
 
+  ## StatefulSet spec.template.metadata.labels
+  podLabels: {}
+
   monitorLabel: zero-dgraph-io
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
@@ -208,6 +211,9 @@ alpha:
 
   ## StatefulSet spec.template.metadata.annotations
   extraAnnotations: {}
+
+  ## StatefulSet spec.template.metadata.labels
+  podLabels: {}
 
   monitorLabel: alpha-dgraph-io
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
@@ -443,6 +449,9 @@ ratel:
   ## Deployment spec.template.metadata.annotations
   extraAnnotations: {}
 
+  ## Deployment spec.template.metadata.labels
+  podLabels: {}
+
   ## NOTE: Ratel is no longer included in dgraph image since dgraph/dgraph:v21.03.0
   ##       The Ratel image is dgraph/ratel.
   image:
@@ -548,6 +557,8 @@ backups:
   ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
   ##
   # schedulerName: stork
+  ## CronJob spec.jobTemplate.spec.template.metadata.labels
+  podLabels: {}
   admin:
     ## backup user and password that is a member of 'guardians'group used to
     ## login if ACLs are enabled.  This fetches an access token used to trigger backups
