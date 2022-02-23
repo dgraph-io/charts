@@ -88,8 +88,8 @@ If you would like to forgo using `helmfile` and instead just use the vanilla `he
 
 ```bash
 helm install dev ../../charts/dgraph \
-  --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL \
-  --set alpha.extraEnvs[0].value=http://lambda-dgraph-lambda.default.svc/graphql-worker
+  --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_LAMBDA \
+  --set alpha.extraEnvs[0].value=url=http://lambda-dgraph-lambda.default.svc/graphql-worker
 
 helm install lambda ../../charts/dgraph-lambda \
   --values example/script.yaml \

@@ -42,11 +42,11 @@ Dgraph Alpha needs to be configured with the `--graphql lambda-url=<url>` argume
 ```bash
 helm install $DGRAPH_REL dgraph/dgraph \
   --namespace $NS \
-  --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_GRAPHQL \
-  --set alpha.extraEnvs[0].value=lambda-url=http://$LAMBDA_REL-dgraph-lambda.$NS.svc:80/graphql-worker
+  --set alpha.extraEnvs[0].name=DGRAPH_ALPHA_LAMBDA \
+  --set alpha.extraEnvs[0].value=url=http://$LAMBDA_REL-dgraph-lambda.$NS.svc:80/graphql-worker
 ```
 
-The `DGRAPH_ALPHA_GRAPHQL_LAMBDA_URL` environment variable points to Dgraph Lambda service that will be deployed in the next step.  The format Dgraph Lambda domain name is formatted as follows:
+The `DGRAPH_ALPHA_LAMBDA_URL` environment variable points to Dgraph Lambda service that will be deployed in the next step.  The format Dgraph Lambda domain name is formatted as follows:
 
 ```
 http://<helm-chart-release-name>-dgraph-lambda.<namesapce>.svc/graphql-worker
