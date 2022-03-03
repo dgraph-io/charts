@@ -29,9 +29,6 @@ metadata:
     component: {{ .Values.zero.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    {{- if .Values.zero.podLabels }}
-{{- .Values.zero.podLabels | toYaml | indent 8}}
-    {{- end }}
 spec:
   serviceName: {{ template "dgraph.zero.fullname" . }}-headless
   replicas: {{ .Values.zero.replicaCount }}
@@ -69,6 +66,9 @@ spec:
         chart: {{ template "dgraph.chart" . }}
         release: {{ .Release.Name }}
         component: {{ .Values.zero.name }}
+        {{- if .Values.zero.podLabels }}
+{{ .Values.zero.podLabels | toYaml | indent 8}}
+        {{- end }}
     spec:
       {{- if .Values.zero.schedulerName }}
       schedulerName: {{ .Values.zero.schedulerName }}

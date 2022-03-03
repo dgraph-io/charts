@@ -34,7 +34,7 @@ spec:
           labels:
             cronjob: {{ template "dgraph.backups.fullname" . }}-full
             {{- if .Values.backups.podLabels }}
-{{- .Values.backups.podLabels | toYaml | indent 12}}
+{{ .Values.backups.podLabels | toYaml | indent 12}}
             {{- end }}
         spec:
           {{- if .Values.backups.schedulerName }}
