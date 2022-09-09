@@ -1,4 +1,4 @@
-# ingress-nginx with GRPC support
+# kubernetes-ingress (NGINX ingress) with GRPC support
 # --------------------------------------
 # Two ingress resources will configured for mixed GPRC and HTTP support.
 #
@@ -6,18 +6,16 @@
 # should be configured as an Layer 4 external load balancer.
 #
 # References:
-# * https://github.com/kubernetes-sigs/external-dns/
+# * https://github.com/nginxinc/kubernetes-ingress
+# * https://docs.nginx.com/nginx-ingress-controller/configuration/global-configuration/configmap-resource/#listeners
+# * https://github.com/nginxinc/kubernetes-ingress/tree/v2.3.0/examples/grpc-services
 # * https://cert-manager.io/
-# * https://kubernetes.github.io/ingress-nginx/
-# * https://kubernetes.github.io/ingress-nginx/examples/grpc/
-# * https://github.com/kubernetes/ingress-nginx/tree/master/docs/examples/grpc
+
 global:
   ingress:
     enabled: true
     ingressClassName: nginx
     annotations:
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/backend-protocol: HTTP
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
       - hosts:
@@ -30,8 +28,9 @@ global:
     enabled: true
     ingressClassName: nginx
     annotations:
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      # NOTE: http2 must be configured in configmap for NGINX ingress controller.
+      # IMPORTANT: Change <RELEASE> to release name used at install, e.g. my-release
+      nginx.org/grpc-services: "<RELEASE>-dgraph-alpha"
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
       - hosts:
