@@ -3,7 +3,7 @@
 # Two ingress resources will configured for mixed GPRC and HTTP support.
 #
 # TLS will be terminated by the ingress controller.  The ingress controller
-# should be configured as an Layer 4 external load balancer.
+# should be configured as a Layer 4 external load balancer.
 #
 # References:
 # * https://github.com/nginxinc/kubernetes-ingress
