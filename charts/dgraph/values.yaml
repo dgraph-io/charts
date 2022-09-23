@@ -494,8 +494,6 @@ ratel:
     ## * EKS: https://aws.amazon.com/premiumsupport/knowledge-center/eks-cidr-ip-address-loadbalancer/
     ## * AKS: https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard#restrict-inbound-traffic-to-specific-ip-ranges
     loadBalancerSourceRanges: []
-  serviceHeadless:
-    labels: {}
 
   ## ratel ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
