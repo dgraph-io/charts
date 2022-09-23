@@ -474,7 +474,6 @@ ratel:
   service:
     type: ClusterIP
     labels: {}
-
     annotations: {}
 
     ## References:
@@ -497,7 +496,6 @@ ratel:
     loadBalancerSourceRanges: []
   serviceHeadless:
     labels: {}
-
 
   ## ratel ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
