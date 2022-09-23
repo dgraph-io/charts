@@ -31,6 +31,9 @@ spec:
         component: {{ .Values.ratel.name }}
         release: {{ .Release.Name }}
     spec:
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ .Values.servcieAccount.name }}
+      {{- end }}
       {{- if .Values.ratel.schedulerName }}
       schedulerName: {{ .Values.ratel.schedulerName }}
       {{- end }}
