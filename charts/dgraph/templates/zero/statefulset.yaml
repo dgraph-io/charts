@@ -68,7 +68,7 @@ spec:
         component: {{ .Values.zero.name }}
     spec:
       {{- if .Values.serviceAccount.create }}
-      serviceAccountName: {{ .Values.servcieAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       {{- end }}
       {{- if .Values.zero.schedulerName }}
       schedulerName: {{ .Values.zero.schedulerName }}

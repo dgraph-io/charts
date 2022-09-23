@@ -35,7 +35,7 @@ spec:
             cronjob: {{ template "dgraph.backups.fullname" . }}-full
         spec:
           {{- if .Values.serviceAccount.create }}
-          serviceAccountName: {{ .Values.servcieAccount.name }}
+          serviceAccountName: {{ .Values.serviceAccount.name }}
           {{- end }}
           {{- if .Values.backups.schedulerName }}
           schedulerName: {{ .Values.backups.schedulerName }}

@@ -75,7 +75,7 @@ spec:
         component: {{ .Values.alpha.name }}
     spec:
       {{- if .Values.serviceAccount.create }}
-      serviceAccountName: {{ .Values.servcieAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       {{- end }}
       {{- if .Values.alpha.schedulerName }}
       schedulerName: {{ .Values.alpha.schedulerName }}
