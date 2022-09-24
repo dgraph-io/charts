@@ -65,6 +65,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
+| `serviceAccount.create`                  | Create ServiceAccount                                                 | `true`                                              |
+| `serviceAccount.annotations`             | ServiceAccount annotations                                            | `{}`                                                |
+| `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
 | `zero.name`                              | Zero component name                                                   | `zero`                                              |
 | `zero.metrics.enabled`                   | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `zero.extraAnnotations`                  | Specify annotations for template metadata                             | `{}`                                                |
