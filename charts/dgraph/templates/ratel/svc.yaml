@@ -9,6 +9,9 @@ metadata:
     component: {{ .Values.ratel.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{- with .Values.ratel.service.labels }}
+    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
+    {{- end }}
   {{- with .Values.ratel.service.annotations }}
   annotations:
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}

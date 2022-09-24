@@ -8,6 +8,9 @@ metadata:
     component: {{ .Values.zero.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{- with .Values.zero.serviceHeadless.labels }}
+    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
+    {{- end }}
 spec:
   type: ClusterIP
   clusterIP: None
