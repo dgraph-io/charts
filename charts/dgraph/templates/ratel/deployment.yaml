@@ -30,6 +30,9 @@ spec:
         chart: {{ template "dgraph.chart" . }}
         component: {{ .Values.ratel.name }}
         release: {{ .Release.Name }}
+        {{- if .Values.ratel.podLabels }}
+{{ .Values.ratel.podLabels | toYaml | indent 8}}
+        {{- end }}
     spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
