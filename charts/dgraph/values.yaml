@@ -486,6 +486,9 @@ ratel:
   # Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
 
+  # Arguments appended to a command dgraph-ratel command
+  args: []
+
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use ClusterIP or LoadBalancer
   ##

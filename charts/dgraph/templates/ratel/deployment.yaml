@@ -56,6 +56,7 @@ spec:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         {{- end }}
+        args: {{ .Values.ratel.args | toYaml | nindent 10 }}
         command:
           - dgraph-ratel
         ports:
