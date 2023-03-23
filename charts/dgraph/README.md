@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v21.03.1`                                          |
+| `image.tag`                              | Container image tag                                                   | `v22.0.2`                                           |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
@@ -182,6 +182,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
 | `ratel.extraEnvs`                        | Extra env vars                                                        | `[]`                                                |
+| `ratel.args`                             | Ratel command line arguments                                          | `[]`                                                |
 | `ratel.service.type`                     | Ratel service type                                                    | `ClusterIP`                                         |
 | `ratel.service.labels`                   | Ratel Service labels                                                  | `{}`                                                |
 | `ratel.service.annotations`              | Ratel Service annotations                                             | `{}`                                                |
