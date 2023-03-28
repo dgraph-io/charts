@@ -59,6 +59,9 @@ spec:
       name: {{ template "dgraph.alpha.fullname" . }}
       {{- if or .Values.alpha.metrics.enabled .Values.alpha.extraAnnotations }}
       annotations:
+        {{- if .Values.alpha.configFile }}
+        checksum/config: {{ include (print $.Template.BasePath "/alpha/configs.yaml") . | sha256sum }}
+        {{- end }}
         {{- if .Values.alpha.metrics.enabled }}
         prometheus.io/path: /debug/prometheus_metrics
         prometheus.io/port: "8080"

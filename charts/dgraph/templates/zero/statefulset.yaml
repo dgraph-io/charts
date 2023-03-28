@@ -52,6 +52,9 @@ spec:
       name: {{ template "dgraph.zero.fullname" . }}
       {{- if or .Values.zero.metrics.enabled .Values.zero.extraAnnotations }}
       annotations:
+        {{- if .Values.zero.configFile }}
+        checksum/config: {{ include (print $.Template.BasePath "/zero/configs.yaml") . | sha256sum }}
+        {{- end }}
         {{- if .Values.zero.metrics.enabled }}
         prometheus.io/path: /debug/prometheus_metrics
         prometheus.io/port: "6080"
