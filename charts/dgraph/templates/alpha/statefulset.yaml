@@ -57,7 +57,7 @@ spec:
   template:
     metadata:
       name: {{ template "dgraph.alpha.fullname" . }}
-      {{- if or .Values.alpha.metrics.enabled .Values.alpha.extraAnnotations }}
+      {{- if or (and .Values.alpha.metrics.enabled (not .Values.alpha.servicemonitor.enabled)) .Values.alpha.extraAnnotations }}
       annotations:
         {{- if .Values.alpha.metrics.enabled }}
         prometheus.io/path: /debug/prometheus_metrics

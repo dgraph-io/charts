@@ -70,6 +70,12 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
 | `zero.name`                              | Zero component name                                                   | `zero`                                              |
 | `zero.metrics.enabled`                   | Add annotations for Prometheus metric scraping                        | `true`                                              |
+| `zero.servicemonitor.enabled`            | Enable Prometheus Operator ServiceMonitor monitoring for zero nodes   | `false`                                             |
+| `zero.servicemonitor.annotations`        | Add custom annotations to ServiceMonitor for zero nodes               | `{}`                                                |
+| `zero.servicemonitor.interval`           | Prometheus scrape interval	for zero nodes metrics                     | `60s`                                               |
+| `zero.servicemonitor.labels`             | Add custom labels to ServiceMonitor for zero nodes                    | `{}`                                                |
+| `zero.servicemonitor.namespace`          | Whether to limit ServiceMonitor to the release namespace or not       | `nil`                                               |
+| `zero.servicemonitor.scrapeTimeout`      | Prometheus scrape timeout for zero nodes metrics	                     | `10s`                                               |
 | `zero.extraAnnotations`                  | Specify annotations for template metadata                             | `{}`                                                |
 | `zero.podLabels`                         | Specify additional labels for template metadata                       | `{}`                                                |
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
@@ -112,6 +118,12 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.customReadinessProbe`              | Zero custom readiness probes  (if `zero.readinessProbe` not enabled)  | `{}`                                                |
 | `alpha.name`                             | Alpha component name                                                  | `alpha`                                             |
 | `alpha.metrics.enabled`                  | Add annotations for Prometheus metric scraping                        | `true`                                              |
+| `alpha.servicemonitor.enabled`           | Enable Prometheus Operator ServiceMonitor monitoring for alpha nodes  | `false`                                             |
+| `alpha.servicemonitor.annotations`       | Add custom annotations to ServiceMonitor for alpha nodes              | `{}`                                                |
+| `alpha.servicemonitor.interval`          | Prometheus scrape interval	for alpha nodes metrics                    | `60s`                                               |
+| `alpha.servicemonitor.labels`            | Add custom labels to ServiceMonitor for alpha nodes                   | `{}`                                                |
+| `alpha.servicemonitor.namespace`         | Whether to limit ServiceMonitor to the release namespace or not       | `nil`                                               |
+| `alpha.servicemonitor.scrapeTimeout`     | Prometheus scrape timeout for alpha nodes metrics	                   | `10s`                                               |
 | `alpha.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
 | `alpha.podLabels`                        | Specify additional labels for template metadata                       | `{}`                                                |
 | `alpha.monitorLabel`                     | Monitor label for alpha, used by prometheus.                          | `alpha-dgraph-io`                                   |

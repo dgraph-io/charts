@@ -50,7 +50,7 @@ spec:
   template:
     metadata:
       name: {{ template "dgraph.zero.fullname" . }}
-      {{- if or .Values.zero.metrics.enabled .Values.zero.extraAnnotations }}
+      {{- if or (and .Values.zero.metrics.enabled (not .Values.zero.servicemonitor.enabled)) .Values.zero.extraAnnotations }}
       annotations:
         {{- if .Values.zero.metrics.enabled }}
         prometheus.io/path: /debug/prometheus_metrics
