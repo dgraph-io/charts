@@ -1,5 +1,5 @@
 ## backup-nfs-config.yaml
-## * https://dgraph.io/docs/master/enterprise-features/binary-backups/
+## * https://dgraph.io/docs/enterprise-features/binary-backups/
 ##
 ## Demonstrates binary backups to NFS Server
 ## Note that NFS server must be configured previously and firewall rules to allow
