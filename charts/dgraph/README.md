@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v22.0.2`                                           |
+| `image.tag`                              | Container image tag                                                   | `v23.0.0`                                           |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
