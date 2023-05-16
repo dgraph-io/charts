@@ -101,7 +101,7 @@ zero:
   extraFlags: ""
 
   ## Configuration file for dgraph zero used as an alternative to command-line options
-  ## Ref: https://dgraph.io/docs/deploy/#config
+  ## Ref: https://dgraph.io/docs/deploy/config/
   configFile: {}
 
   ## Kubernetes configuration
@@ -280,7 +280,7 @@ alpha:
   extraFlags: ""
 
   ## Configuration file for dgraph alpha used as an alternative to command-line options
-  ## Ref: https://dgraph.io/docs/deploy/#config
+  ## Ref: https://dgraph.io/docs/deploy/config/
   configFile: {}
 
   ## Kubernetes configuration
@@ -340,7 +340,7 @@ alpha:
 
   ## TLS Configuration
   ## Documentation on dgraph alpha TLS options,
-  ##  see https://dgraph.io/docs/deploy/#tls-options
+  ##  see https://dgraph.io/docs/deploy/security/tls-configuration/#tls-options
   tls:
     enabled: false
     ## Files created from './tls' directory set with `dgraph cert` command
@@ -442,7 +442,7 @@ alpha:
   ## Examples can include:
   ## * offline data restore from binary backups with `dgraph restore`
   ##   (ref. https://dgraph.io/docs/enterprise-features/binary-backups/#restore-from-backup)
-  ## * bulk loader (ref. https://dgraph.io/docs/deploy/fast-data-loading/#bulk-loader)
+  ## * bulk loader (ref. https://dgraph.io/docs/howto/importdata/bulk-loader/)
   initContainers:
     init:
       enabled: false
@@ -585,12 +585,12 @@ backups:
     # password: password
     ## Mutual TLS client certficate and key can be used to secure transaction that was created with
     ## dgraph cert --client <name-of-client> should be specified here.
-    ## ref. https://dgraph.io/docs/deploy/tls-configuration/
+    ## ref. https://dgraph.io/docs/deploy/security/tls-configuration/#tls-options
     tls_client: ""
     ## Authorization Token can be used to secure /login and /admin.  The auth token
     ## string that is set Alpha configuration or environment variable needs to be
     ## specified here so that backups can properly login.
-    ## ref. https://dgraph.io/docs/deploy/dgraph-administration/#securing-alter-operations
+    ## ref. https://dgraph.io/docs/deploy/admin/dgraph-administration/#secure-alter-operations
     auth_token: ""
   ## Backups image - image needs at least curl command
   ## default is to reuse dgraph image
