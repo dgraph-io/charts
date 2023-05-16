@@ -25,17 +25,16 @@ spec:
   externalTrafficPolicy: {{ .Values.zero.externalTrafficPolicy }}
   {{- end }}
   ports:
-  - port: 5080
-    targetPort: 5080
-    name: grpc-zero
-  - port: 6080
-    targetPort: 6080
-    name: http-zero
+    - port: 5080
+      targetPort: 5080
+      name: grpc-zero
+    - port: 6080
+      targetPort: 6080
+      name: http-zero
   {{- with .Values.zero.service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  publishNotReadyAddresses: {{ .Values.zero.service.publishNotReadyAddresses }}
   selector:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}

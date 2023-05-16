@@ -3,8 +3,8 @@
 ##
 ## Demonstrates
 ## * Binary Backups to S3
-## * Mutual TLS (see https://dgraph.io/docs/deploy/tls-configuration/)
-## * Auth Token (see https://dgraph.io/docs/deploy/dgraph-administration/#securing-alter-operations)
+## * Mutual TLS (see https://dgraph.io/docs/deploy/security/tls-configuration/#tls-options)
+## * Auth Token (see https://dgraph.io/docs/deploy/admin/dgraph-administration/#secure-alter-operations)
 backups:
   full:
     enabled: true

@@ -503,7 +503,7 @@ helm install $RELNAME \
 
 ## Binary backups (enterprise feature)
 
-Dgraph [Binary Backups](https://dgraph.io/docs/master/enterprise-features/binary-backups/) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
+Dgraph [Binary Backups](https://dgraph.io/docs/enterprise-features/binary-backups/) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
 
 * Full backup at midnight: `0 * * * *`
 * Incremental backups every hour, except midnight: `0 1-23 * * *`
@@ -603,4 +603,4 @@ done
 Dgraph exposes Prometheus metrics to monitor the state of various components involved in
 the cluster, this includes Dgraph Alpha and Dgraph Zero.
 
-Further information can be found in the [Monitoring in Kubernetes](https://dgraph.io/docs/deploy/kubernetes/#monitoring-in-kubernetes) documentation.
+Further information can be found in the [Monitoring in Kubernetes](https://dgraph.io/docs/deploy/installation/kubernetes/monitoring-cluster#monitoring-the-kubernetes-cluster) documentation.
