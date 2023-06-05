@@ -141,6 +141,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.ingress.tls`                      | Alpha ingress TLS settings                                            | `nil`                                               |
 | `alpha.ingress_grpc.enabled`             | Alpha ingress-grpc resource enabled                                   | `false`                                             |
 | `alpha.ingress_grpc.hostname`            | Alpha ingress-grpc virtual hostname                                   | `nil`                                               |
+| `alpha.ingress_grpc.ingressClassName`    | Alpha ingress-grpc ingress class to select ingress controller         | `nil`                                               |
 | `alpha.ingress_grpc.annotations`         | Alpha ingress-gcpc annotations                                        | `nil`                                               |
 | `alpha.ingress_grpc.tls`                 | Alpha ingress-grpc TLS settings                                       | `nil`                                               |
 | `alpha.securityContext.enabled`          | Security context for Alpha nodes enabled                              | `false`                                             |
@@ -191,6 +192,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.service.loadBalancerSourceRanges` | restrict CIDR IP addresses for a LoadBalancer type                    | `[]`                                                |
 | `ratel.ingress.enabled`                  | Ratel Ingress resource enabled                                        | `false`                                             |
 | `ratel.ingress.hostname`                 | Ratel Ingress virtual hostname                                        | `nil`                                               |
+| `ratel.ingress.ingressClassName`         | Ratel ingress class to select ingress controller                      | `nil`                                               |
 | `ratel.ingress.annotations`              | Ratel Ingress annotations                                             | `nil`                                               |
 | `ratel.ingress.tls`                      | Ratel Ingress TLS settings                                            | `nil`                                               |
 | `ratel.securityContext.enabled`          | Security context for ratel nodes enabled                              | `false`                                             |
@@ -238,12 +240,15 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `global.ingress.enabled`                 | Enable global ingress resource (overrides Alpha/Ratel ingress)        | `false`                                             |
 | `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
 | `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |
-| `global.ingress.ratel_hostname`          | global ingress virtual host name for Ratel service                    | `""`                                                |
-| `global.ingress.alpha_hostname`          | global ingress virtual host name for Alpha service                    | `""`                                                |
-| `global.ingress_grpc.enabled`             | Enable global ingress-grpc resource (overrides Alpha ingress-grpc)   | `false`                                             |
-| `global.ingress_grpc.annotations`         | global ingress-grpc annotations                                      | `{}`                                                |
-| `global.ingress_grpc.tls`                 | global ingress-grpc tls settings                                     | `{}`                                                |
-| `global.ingress_grpc.alpha_grpc_hostname` | global ingress-grpc virtual host name for Alpha GRPC service         | `""`                                                |
+| `global.ingress.ratel_hostname`          | global ingress virtual host name for Ratel service                    | `nil`                                               |
+| `global.ingress.alpha_hostname`          | global ingress virtual host name for Alpha service                    | `nil`                                               |
+| `global.ingress.ingressClassName`        | global ingress class to select ingress controller                     | `nil`                                               |
+| `global.ingress_grpc.enabled`            | Enable global ingress-grpc resource (overrides Alpha ingress-grpc)    | `false`                                             |
+| `global.ingress_grpc.annotations`        | global ingress-grpc annotations                                       | `{}`                                                |
+| `global.ingress_grpc.tls`                | global ingress-grpc tls settings                                      | `{}`                                                |
+| `global.ingress_grpc.alpha_grpc_hostname`| global ingress-grpc virtual host name for Alpha GRPC service          | `nil`                                               |
+| `global.ingress_grpc.ingressClassName`   | global ingress-grpc ingress class to select ingress controller        | `nil`                                               |
+
 ## Ingress resource
 
 You can define ingress resources through `alpha.ingress` for the Alpha HTTP(S) service and `ratel.ingress` for the ratel UI service, or you can use a combined single ingress with `global.ingress` for both Alpha HTTP(S) and ratel UI services.
