@@ -41,9 +41,6 @@ The following table lists the configurable parameters of the ratel chart and the
 | `imagePullSecrets`                       | Image pull secrets auth tokens used to access a private registry      | `[]`                                                |
 | `nameOverride`                           | Name override of the default chart name                               | `""`                                                |
 | `fullnameOverride`                       | Full Name override of the release name + chart name                   | `""`                                                |
-| `script.enabled`                         | Enable adding a lambda script                                         | `false`                                             |
-| `script.script`                          | Embedded lambda script stored in a config map                         | `""`                                                |
-| `env`                                    | Environment variables                                                 | see `values.yaml`                                   |
 | `serviceAccount.create`                  | Specifies if service account should be created                        | `true`                                              |
 | `serviceAccount.annotations`             | Service Account annotations                                           | `{}`                                                |
 | `serviceAccount.name`                    | Service Account name                                                  | `""`                                                |
@@ -52,7 +49,6 @@ The following table lists the configurable parameters of the ratel chart and the
 | `securityContext`                        | Container Security context to define privilege and access control     | `{}      `                                          |
 | `service.type`                           | Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)                | `ClusterIP`                                         |
 | `service.port`                           | Service inbound port                                                  | `80`                                                |
-| `service.targetPort`                     | Service targetPort of dgraph-lambda service                           | `8686`                                              |
 | `ingress.enabled`                        | Ingress enabled                                                       | `false`                                             |
 | `ingress.annotations`                    | Ingress annotations                                                   | `{}`                                                |
 | `ingress.hosts`                          | Ingress hosts list to configure virtual hosts + routes to the service | see `values.yaml`                                   |
