@@ -669,11 +669,11 @@ global:
     ingressClassName: null
     annotations: {}
     tls: {}
-    ratel_hostname: ""
-    alpha_hostname: ""
+    ratel_hostname: null
+    alpha_hostname: null
   ingress_grpc:
     enabled: false
     ingressClassName: null
     annotations: {}
     tls: {}
-    alpha_grpc_hostname: ""
+    alpha_grpc_hostname: null

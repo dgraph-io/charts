@@ -1,3 +1,22 @@
+{{- /* Generate ingress path */}}
+{{- define "path" -}}
+  {{- $path := "/" -}}
+  {{- if .Values.global.ingress.ingressClassName -}}
+    {{- if eq .Values.global.ingress.ingressClassName "gce" "alb" "nsx" }}
+      {{- $path = "/*" -}}
+    {{- else }}
+      {{- $path = "/" -}}
+    {{- end }}
+  {{- else if index $.Values.global.ingress "annotations" -}}
+    {{- if eq (index $.Values.global.ingress.annotations "kubernetes.io/ingress.class" | default "") "gce" "alb" "nsx" }}
+      {{- $path = "/*" -}}
+    {{- else }}
+      {{- $path = "/" -}}
+    {{- end }}
+  {{- end -}}
+  {{- printf "%s" $path -}}
+{{- end -}}
+{{- /* Alpha ingress resource */}}
 {{- if and (eq .Values.alpha.ingress.enabled true) (eq .Values.global.ingress.enabled false) -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -28,8 +47,7 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-    - host: {{ .Values.alpha.ingress.hostname }}
-      http:
+    - http:
         paths:
           - backend:
               service:
@@ -37,16 +55,12 @@ spec:
                 port:
                   number: 8080
             pathType: ImplementationSpecific
-            {{- if index $.Values.alpha.ingress "annotations" }}
-            {{- if eq (index $.Values.alpha.ingress.annotations "kubernetes.io/ingress.class" | default "") "gce" "alb" "nsx" }}
-            path: /*
-            {{- else }}{{/* Has annotations but ingress class is not "gce" nor "alb" */}}
-            path: /
-            {{- end }}
-            {{- else}}{{/* Has no annotations */}}
-            path: /
-            {{- end }}
+            path: {{ template "path" . }}
+      {{- if .Values.alpha.ingress.hostname }}
+      host: {{ .Values.alpha.ingress.hostname }}
+      {{- end }}
 {{- end }}
+{{- /* Alpha grpc ingress resource */}}
 {{- if and (eq .Values.alpha.ingress_grpc.enabled true) (eq .Values.global.ingress_grpc.enabled false) -}}
 ---
 apiVersion: networking.k8s.io/v1
@@ -78,8 +92,7 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-    - host: {{ .Values.alpha.ingress_grpc.hostname }}
-      http:
+    - http:
         paths:
           - backend:
               service:
@@ -87,13 +100,8 @@ spec:
                 port:
                   number: 9080
             pathType: ImplementationSpecific
-            {{- if index $.Values.alpha.ingress_grpc "annotations" }}
-            {{- if eq (index $.Values.alpha.ingress_grpc.annotations "kubernetes.io/ingress.class" | default "") "gce" "alb" "nsx" }}
-            path: /*
-            {{- else }}{{/* Has annotations but ingress class is not "gce" nor "alb" */}}
-            path: /
-            {{- end }}
-            {{- else}}{{/* Has no annotations */}}
-            path: /
-            {{- end }}
+            path: {{ template "path" . }}
+      {{- if .Values.alpha.ingress_grpc.hostname }}
+      host: {{ .Values.alpha.ingress_grpc.hostname }}
+      {{- end }}
 {{- end }}
