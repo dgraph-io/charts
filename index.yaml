@@ -484,4 +484,15 @@ entries:
     urls:
     - https://github.com/dgraph-io/charts/releases/download/dgraph-lambda-0.0.1/dgraph-lambda-0.0.1.tgz
     version: 0.0.1
-generated: "2023-05-16T10:31:06.388113-07:00"
+  ratel:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-06-19T12:08:11.853492-07:00"
+    description: A Helm chart for Kubernetes
+    digest: 5a102537255978dd5d6f9be4e713417d33187c7ac1700206c167857cf2683ed1
+    name: ratel
+    type: application
+    urls:
+    - https://github.com/dgraph-io/charts/releases/download/ratel-0.1.0/ratel-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-06-19T12:08:11.853587-07:00"
