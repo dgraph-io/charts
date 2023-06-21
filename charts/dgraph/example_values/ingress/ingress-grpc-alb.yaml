@@ -1,0 +1,19 @@
+# aws-load-balancer-controller
+# * https://github.com/kubernetes-sigs/aws-load-balancer-controller
+global:
+  ingress:
+    enabled: true
+    alpha_hostname: alpha.example.com
+    ingressClassName: alb
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/group: dgraph
+  ingress_grpc:
+    enabled: true
+    alpha_grpc_hostname: alpha-grpc.example.com
+    ingressClassName: alb
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/group: dgraph
