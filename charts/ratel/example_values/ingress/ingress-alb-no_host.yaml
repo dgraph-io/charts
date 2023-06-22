@@ -1,0 +1,16 @@
+# aws-load-balancer-controller
+# * https://github.com/kubernetes-sigs/aws-load-balancer-controller
+# NOTE: 
+#  * shared ALB with group name of 'dgraph' will be used.  
+#    This avoids provisioning multiple ALBs
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group: dgraph
+  hosts:
+    - paths:
+        - path: /*
+          pathType: ImplementationSpecific
+      host: ratel.example.com
