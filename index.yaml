@@ -3,6 +3,30 @@ entries:
   dgraph:
   - apiVersion: v1
     appVersion: v23.0.0
+    created: "2023-06-24T18:52:07.902655-07:00"
+    description: Dgraph is a horizontally scalable and distributed graph database,
+      providing ACID transactions, consistent replication and linearizable reads.
+    digest: c76d1682c427573134feed2213faee03518a0d3e6ade0a24d5e21c6a3a1b3cd7
+    home: https://dgraph.io/
+    icon: https://dgraph.io/assets/images/logo.png
+    keywords:
+    - dgraph
+    - database
+    - Graph
+    - GraphQL
+    - nosql
+    maintainers:
+    - email: contact@dgraph.io
+      name: dgraph
+    name: dgraph
+    sources:
+    - https://github.com/dgraph-io/charts/
+    - https://github.com/dgraph-io/dgraph
+    urls:
+    - https://github.com/dgraph-io/charts/releases/download/dgraph-0.1.1/dgraph-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v1
+    appVersion: v23.0.0
     created: "2023-05-16T10:31:06.388051-07:00"
     description: Dgraph is a horizontally scalable and distributed graph database,
       providing ACID transactions, consistent replication and linearizable reads.
@@ -486,6 +510,16 @@ entries:
     version: 0.0.1
   ratel:
   - apiVersion: v2
+    appVersion: v21.12.0
+    created: "2023-06-24T18:52:08.069017-07:00"
+    description: A Helm chart for Kubernetes
+    digest: 99ea4f4333eb483b8f09bb1ff7dd853ee289434512aaf1c8921f838763c6af8b
+    name: ratel
+    type: application
+    urls:
+    - https://github.com/dgraph-io/charts/releases/download/ratel-0.1.1/ratel-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 1.16.0
     created: "2023-06-19T12:08:11.853492-07:00"
     description: A Helm chart for Kubernetes
@@ -495,4 +529,4 @@ entries:
     urls:
     - https://github.com/dgraph-io/charts/releases/download/ratel-0.1.0/ratel-0.1.0.tgz
     version: 0.1.0
-generated: "2023-06-19T12:08:11.853587-07:00"
+generated: "2023-06-24T18:52:08.069509-07:00"
