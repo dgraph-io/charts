@@ -10,7 +10,7 @@
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v23.0.0
+  tag: v23.0.1
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -67,7 +67,7 @@ zero:
   ## StatefulSet controller supports relax its ordering guarantees while preserving its uniqueness and identity guarantees. There are two valid pod management policies: OrderedReady and Parallel
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#pod-management-policy
   ##
-  podManagementPolicy: OrderedReady
+  podManagementPolicy: Parallel
 
   ## Number of dgraph zero pods
   ##
@@ -193,7 +193,7 @@ zero:
     successThreshold: 1
 
   livenessProbe:
-    enabled: false
+    enabled: true
     port: 6080
     path: /health
     initialDelaySeconds: 15
@@ -203,9 +203,9 @@ zero:
     successThreshold: 1
 
   readinessProbe:
-    enabled: false
+    enabled: true
     port: 6080
-    path: /health
+    path: /state
     initialDelaySeconds: 15
     periodSeconds: 10
     timeoutSeconds: 5
@@ -247,7 +247,7 @@ alpha:
   ## StatefulSet controller supports relax its ordering guarantees while preserving its uniqueness and identity guarantees. There are two valid pod management policies: OrderedReady and Parallel
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#pod-management-policy
   ##
-  podManagementPolicy: OrderedReady
+  podManagementPolicy: Parallel
 
   ## Number of dgraph nodes
   ##
@@ -414,7 +414,7 @@ alpha:
     successThreshold: 1
 
   livenessProbe:
-    enabled: false
+    enabled: true
     port: 8080
     path: /health?live=1
     initialDelaySeconds: 15
@@ -424,9 +424,9 @@ alpha:
     successThreshold: 1
 
   readinessProbe:
-    enabled: false
+    enabled: true
     port: 8080
-    path: /health
+    path: /probe/graphql
     initialDelaySeconds: 15
     periodSeconds: 10
     timeoutSeconds: 5
