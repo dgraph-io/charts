@@ -25,7 +25,7 @@
 {{- $hasS3Keys := include "dgraph.backups.keys.s3.enabled" . -}}
 {{- $hasMinioKeys := include "dgraph.backups.keys.minio.enabled" . -}}
 {{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
-{{- $initContainerEnabled := .Values.alpha.initContainers.init.enabled }}
+{{- $initContainerEnabled := or .Values.alpha.initContainers.init.enabled .Values.alpha.extraInitContainers }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
