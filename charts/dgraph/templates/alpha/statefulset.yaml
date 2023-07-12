@@ -129,10 +129,17 @@ spec:
       {{- end }}
       {{- if $initContainerEnabled }}
       initContainers:
+      {{- with .Values.alpha.extraInitContainers }}
+        {{- tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
       {{- if .Values.alpha.initContainers.init.enabled }}
       - name: {{ template "dgraph.alpha.fullname" . }}-init
         image: {{ template "dgraph.initContainers.init.image" . }}
         imagePullPolicy: {{ .Values.alpha.initContainers.init.image.pullPolicy | quote }}
+        env:
+        {{- with .Values.alpha.initContainers.init.env }}
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
         command:
         {{- range .Values.alpha.initContainers.init.command }}
           - {{ . | quote }}
