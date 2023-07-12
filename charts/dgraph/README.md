@@ -166,11 +166,13 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.customStartupProbe`               | Alpha custom startup probes (if `alpha.startupProbe` not enabled)     | `{}`                                                |
 | `alpha.customLivenessProbe`              | Alpha custom liveness probes (if `alpha.livenessProbe` not enabled)   | `{}`                                                |
 | `alpha.customReadinessProbe`             | Alpha custom readiness probes (if `alpha.readinessProbe` not enabled) | `{}`                                                |
+| `alpha.extraInitContainers`             | Enables extra init containers to be added to the alpha statefulset | `[]`                                                |
 | `alpha.initContainers.init.enabled`      | Alpha initContainer enabled                                           | `true`                                              |
 | `alpha.initContainers.init.image.registry`   | Alpha initContainer registry name                                 | `docker.io`                                         |
 | `alpha.initContainers.init.image.repository` | Alpha initContainer image name                                    | `dgraph/dgraph`                                     |
 | `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v21.03.0`                                          |
 | `alpha.initContainers.init.image.pullPolicy` | Alpha initContainer pull policy                                   | `IfNotPresent`                                      |
+| `alpha.initContainers.init.env` | Adds environment variables for the alpha init container                                 | `[]`                                      |
 | `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `false`                                             |
