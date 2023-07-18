@@ -437,6 +437,9 @@ alpha:
   customStartupProbe: {}
   customLivenessProbe: {}
   customReadinessProbe: {}
+  
+  # Enables extra init containers to be added to the alpha statefulset
+  extraInitContainers: []
 
   ## You may want to initialize the Alphas with data before starting Alpha containers.
   ## Examples can include:
@@ -446,6 +449,8 @@ alpha:
   initContainers:
     init:
       enabled: false
+      # Adds environment variables for the alpha init container
+      env: []
       image:
         << : *image
       command:
