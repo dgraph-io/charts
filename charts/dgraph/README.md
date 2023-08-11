@@ -68,6 +68,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `serviceAccount.create`                  | Create ServiceAccount                                                 | `true`                                              |
 | `serviceAccount.annotations`             | ServiceAccount annotations                                            | `{}`                                                |
 | `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
+| `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
+| `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
+| `serviceAccount.automountServiceAccountToken` | automatially mount a ServiceAccount API credentials              | `true`                                              |
 | `zero.name`                              | Zero component name                                                   | `zero`                                              |
 | `zero.metrics.enabled`                   | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `zero.extraAnnotations`                  | Specify annotations for template metadata                             | `{}`                                                |
@@ -86,6 +89,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.extraEnvs`                         | extra env vars                                                        | `[]`                                                |
 | `zero.extraFlags`                        | Zero extra flags for command line                                     | `""`                                                |
 | `zero.configFile`                        | Zero config file                                                      | `{}`                                                |
+| `zero.automountServiceAccountToken`      | automatially mount a ServiceAccount API credentials                   | `true`                                              |
 | `zero.service.type`                      | Zero service type                                                     | `ClusterIP`                                         |
 | `zero.service.labels`                    | Zero service labels                                                   | `{}`                                                |
 | `zero.service.annotations`               | Zero service annotations                                              | `{}`                                                |
@@ -127,6 +131,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
 | `alpha.extraFlags`                       | Alpha extra flags for command                                         | `""`                                                |
 | `alpha.configFile`                       | Alpha config file                                                     | `{}`                                                |
+| `alpha.automountServiceAccountToken`     | automatially mount a ServiceAccount API credentials                   | `true`                                              |
 | `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
 | `alpha.service.labels`                   | Alpha service labels                                                  | `{}`                                                |
 | `alpha.service.annotations`              | Alpha service annotations                                             | `{}`                                                |
@@ -186,6 +191,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
 | `ratel.extraEnvs`                        | Extra env vars                                                        | `[]`                                                |
 | `ratel.args`                             | Ratel command line arguments                                          | `[]`                                                |
+| `ratel.automountServiceAccountToken`     | automatially mount a ServiceAccount API credentials                   | `true`                                              |
 | `ratel.service.type`                     | Ratel service type                                                    | `ClusterIP`                                         |
 | `ratel.service.labels`                   | Ratel Service labels                                                  | `{}`                                                |
 | `ratel.service.annotations`              | Ratel Service annotations                                             | `{}`                                                |
