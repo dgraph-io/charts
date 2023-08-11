@@ -36,6 +36,9 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: dgraph
+  # automatically mount a ServiceAccount API credentials
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#opt-out-of-api-credential-automounting
+  automountServiceAccountToken: true
 
 zero:
   name: zero
