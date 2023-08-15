@@ -79,6 +79,7 @@ spec:
     spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      automountServiceAccountToken: {{ .Values.alpha.automountServiceAccountToken }}
       {{- end }}
       {{- if .Values.alpha.schedulerName }}
       schedulerName: {{ .Values.alpha.schedulerName }}

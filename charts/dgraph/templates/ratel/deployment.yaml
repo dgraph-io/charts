@@ -36,6 +36,7 @@ spec:
     spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      automountServiceAccountToken: {{ .Values.ratel.automountServiceAccountToken }}
       {{- end }}
       {{- if .Values.ratel.schedulerName }}
       schedulerName: {{ .Values.ratel.schedulerName }}
