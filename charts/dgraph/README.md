@@ -68,8 +68,6 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `serviceAccount.create`                  | Create ServiceAccount                                                 | `true`                                              |
 | `serviceAccount.annotations`             | ServiceAccount annotations                                            | `{}`                                                |
 | `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
-| `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
-| `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
 | `serviceAccount.automountServiceAccountToken` | automatially mount a ServiceAccount API credentials              | `true`                                              |
 | `zero.name`                              | Zero component name                                                   | `zero`                                              |
 | `zero.metrics.enabled`                   | Add annotations for Prometheus metric scraping                        | `true`                                              |
