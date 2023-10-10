@@ -137,9 +137,9 @@ spec:
       - name: {{ template "dgraph.alpha.fullname" . }}-init
         image: {{ template "dgraph.initContainers.init.image" . }}
         imagePullPolicy: {{ .Values.alpha.initContainers.init.image.pullPolicy | quote }}
-        env:
         {{- with .Values.alpha.initContainers.init.env }}
-          {{- toYaml . | nindent 12 }}
+        env:
+          {{- tpl (toYaml .) $ | nindent 10 }}
         {{- end }}
         command:
         {{- range .Values.alpha.initContainers.init.command }}
