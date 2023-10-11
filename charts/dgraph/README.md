@@ -84,6 +84,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.antiAffinity`                      | Zero anti-affinity policy                                             | `soft`                                              |
 | `zero.podAntiAffinitytopologyKey`        | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
 | `zero.nodeAffinity`                      | Zero node affinity policy                                             | `{}`                                                |
+| `zero.envFrom`                           | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
 | `zero.extraEnvs`                         | extra env vars                                                        | `[]`                                                |
 | `zero.extraFlags`                        | Zero extra flags for command line                                     | `""`                                                |
 | `zero.configFile`                        | Zero config file                                                      | `{}`                                                |
@@ -126,6 +127,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.antiAffinity`                     | Alpha anti-affinity policy                                            | `soft`                                              |
 | `alpha.podAntiAffinitytopologyKey`       | Anti affinity topology key for zero nodes                             | `kubernetes.io/hostname`                            |
 | `alpha.nodeAffinity`                     | Alpha node affinity policy                                            | `{}`                                                |
+| `alpha.envFrom`                          | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
 | `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
 | `alpha.extraFlags`                       | Alpha extra flags for command                                         | `""`                                                |
 | `alpha.configFile`                       | Alpha config file                                                     | `{}`                                                |
@@ -176,6 +178,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v21.03.0`                                          |
 | `alpha.initContainers.init.image.pullPolicy` | Alpha initContainer pull policy                                   | `IfNotPresent`                                      |
 | `alpha.initContainers.init.env` | Adds environment variables for the alpha init container                                  | `[]`                                      |
+| `alpha.initContainers.init.envFrom`      | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
 | `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `false`                                             |
@@ -187,6 +190,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.image.pullPolicy`                 | Container pull policy                                                 | `IfNotPresent`                                      |
 | `ratel.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
+| `ratel.envFrom`                          | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
 | `ratel.extraEnvs`                        | Extra env vars                                                        | `[]`                                                |
 | `ratel.args`                             | Ratel command line arguments                                          | `[]`                                                |
 | `ratel.automountServiceAccountToken`     | automatially mount a ServiceAccount API credentials                   | `true`                                              |
