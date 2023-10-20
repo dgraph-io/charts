@@ -179,6 +179,16 @@ Create a default fully qualified alpha name.
 {{ template "dgraph.fullname" . }}-{{ .Values.alpha.name }}
 {{- end -}}
 
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "dgraph.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "dgraph.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
 
 {{/*
 Create a default fully qualified ratel name.
