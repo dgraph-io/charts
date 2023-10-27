@@ -470,7 +470,17 @@ alpha:
         - |
           trap "exit" SIGINT SIGTERM
           echo "Write to /dgraph/doneinit when ready."
-          until [ -f /dgraph/doneinit ]; do sleep 2; done
+          until [ -f /dgraph/doneinit ]; do sleep 2; done          
+      ## Configure resource requests
+      ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+      ##
+      ## resources:
+      ##   requests:
+      ##     memory: 256Mi
+      ##     cpu: 250m
+      ##   limits:
+      ##     memory: 1Gi
+      ##     cpu: 1
 
 ratel:
   name: ratel
