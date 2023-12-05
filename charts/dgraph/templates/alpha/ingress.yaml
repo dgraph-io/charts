@@ -22,6 +22,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "dgraph.alpha.fullname" . }}-ingress
+  namespace: {{ include "dgraph.namespace" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
@@ -67,6 +68,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "dgraph.alpha.fullname" . }}-ingress-grpc
+  namespace: {{ include "dgraph.namespace" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}

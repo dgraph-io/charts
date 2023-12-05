@@ -186,3 +186,10 @@ Create a default fully qualified ratel name.
 {{- define "dgraph.ratel.fullname" -}}
 {{ template "dgraph.fullname" . }}-{{ .Values.ratel.name }}
 {{- end -}}
+
+{{/*
+Allow overriding namespace
+*/}}
+{{- define "dgraph.namespace" -}}
+{{- default .Release.Namespace .Values.namespaceOverride -}}
+{{- end -}}

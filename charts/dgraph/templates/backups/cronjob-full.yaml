@@ -16,6 +16,7 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ template "dgraph.backups.fullname" . }}-full
+  namespace: {{ include "dgraph.namespace" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
