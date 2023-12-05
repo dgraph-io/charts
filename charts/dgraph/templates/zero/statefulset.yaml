@@ -23,6 +23,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: "{{ template "dgraph.zero.fullname" . }}"
+  namespace: {{ include "dgraph.namespace" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}

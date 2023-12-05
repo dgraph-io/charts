@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "dgraph.ratel.fullname" . }}
+  namespace: {{ include "dgraph.namespace" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}

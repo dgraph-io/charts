@@ -64,6 +64,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `image.tag`                              | Container image tag                                                   | `v23.0.1`                                           |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
+| `namespaceOverride`                      | Deployment namespace override if specified.                           | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
 | `serviceAccount.create`                  | Create ServiceAccount                                                 | `true`                                              |
 | `serviceAccount.annotations`             | ServiceAccount annotations                                            | `{}`                                                |
