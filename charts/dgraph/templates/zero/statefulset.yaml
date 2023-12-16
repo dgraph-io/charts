@@ -143,6 +143,10 @@ spec:
         {{- with .Values.zero.extraEnvs }}
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{- with .Values.zero.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         command:
           - bash
           - "-c"
