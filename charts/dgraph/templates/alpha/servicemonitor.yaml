@@ -1,0 +1,40 @@
+{{- if and (not .Values.alpha.metrics.enabled) .Values.alpha.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "dgraph.alpha.fullname" . }}
+  labels:
+    app: {{ template "dgraph.name" . }}
+    chart: {{ template "dgraph.chart" . }}
+    component: {{ .Values.alpha.name }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- with .Values.alpha.servicemonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- if .Values.alpha.servicemonitor.annotations }}
+  annotations:
+    {{- with .Values.alpha.servicemonitor.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}
+spec:
+  jobLabel: {{ template "dgraph.alpha.fullname" . }}
+  selector:
+    matchLabels:
+      app: {{ template "dgraph.name" . }}
+      chart: {{ template "dgraph.chart" . }}
+      component: {{ .Values.alpha.name }}
+      release: {{ .Release.Name }}
+      heritage: {{ .Release.Service }}
+{{- if .Values.alpha.servicemonitor.namespace }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}
+  endpoints:
+  - path: /debug/prometheus_metrics
+    port: http-alpha
+    interval: {{ .Values.alpha.servicemonitor.interval }}
+    scrapeTimeout: {{ .Values.alpha.servicemonitor.scrapeTimeout }}
+{{- end }}
