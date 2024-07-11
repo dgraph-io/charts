@@ -58,6 +58,10 @@ spec:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         {{- end }}
+        {{- with .Values.ratel.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         args: {{ .Values.ratel.args | toYaml | nindent 10 }}
         command:
           - dgraph-ratel
