@@ -1,6 +1,6 @@
 ## Dgraph lambda
 
-This demonstrates how to use [Lambda Resolvers](https://dgraph.io/docs/dgraphcloud/cloud-api/lambda/) on a Kubernetes cluster.
+This demonstrates how to use [Lambda Resolvers](https://dgraph.io/docs/cloud/cloud-api/lambda/) on a Kubernetes cluster.
 
 ## Instructions
 
