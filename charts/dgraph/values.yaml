@@ -97,6 +97,9 @@ zero:
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
 
+  ## Extra environment variables loaded from configmap(s) and/or secret(s)
+  envFrom: []
+
   ## Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
 
@@ -275,6 +278,9 @@ alpha:
   ## This is the node affinity settings as defined in
   ## https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
   nodeAffinity: {}
+
+  ## Extra environment variables loaded from configmap(s) and/or secret(s)
+  envFrom: []
 
   ## Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
@@ -462,6 +468,7 @@ alpha:
       enabled: false
       # Adds environment variables for the alpha init container
       env: []
+      envFrom: []
       image:
         << : *image
       command:
@@ -498,6 +505,9 @@ ratel:
   ## Number of dgraph nodes
   ##
   replicaCount: 1
+
+  ## Extra environment variables loaded from configmap(s) and/or secret(s)
+  envFrom: []
 
   # Extra environment variables which will be appended to the env: definition for the container.
   extraEnvs: []
