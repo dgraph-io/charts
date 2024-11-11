@@ -2,8 +2,6 @@
 
 Dgraph helm chart ready to be deployed on Kubernetes using [Kubernetes Helm](https://github.com/helm/helm).
 
-**Use [Discuss Issues](https://discuss.dgraph.io/tags/c/issues/35/charts) for reporting issues about this repository.**
-
 ## TL;DR
 
 ```bash
