@@ -181,6 +181,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.initContainers.init.env` | Adds environment variables for the alpha init container                                  | `[]`                                      |
 | `alpha.initContainers.init.envFrom`      | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
 | `alpha.initContainers.init.command`      | Alpha initContainer command line to execute                           | See `values.yaml` for defaults                      |
+| `alpha.initContainers.init.resources`    | Alpha initContainer resource requests and/or limits                   | `{}`                                                |
 | `ratel.name`                             | Ratel component name                                                  | `ratel`                                             |
 | `ratel.enabled`                          | Ratel service enabled or disabled                                     | `false`                                             |
 | `ratel.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |

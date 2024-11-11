@@ -150,6 +150,10 @@ spec:
         {{- range .Values.alpha.initContainers.init.command }}
           - {{ . | quote }}
         {{- end }}
+        {{- with .Values.alpha.initContainers.init.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         {{- if .Values.alpha.persistence.enabled }}
         volumeMounts:
         - name: datadir
