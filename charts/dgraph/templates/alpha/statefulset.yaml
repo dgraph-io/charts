@@ -142,6 +142,10 @@ spec:
         env:
           {{- tpl (toYaml .) $ | nindent 10 }}
         {{- end }}
+        {{- with .Values.alpha.initContainers.init.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         command:
         {{- range .Values.alpha.initContainers.init.command }}
           - {{ . | quote }}
@@ -198,6 +202,10 @@ spec:
             value: /dgraph/config/{{ first (keys .Values.alpha.configFile | uniq | sortAlpha) }}
           {{- end }}
         {{- with .Values.alpha.extraEnvs }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.alpha.envFrom }}
+        envFrom:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         {{/* NOTE: awk '{gsub(/\.$/,"") needed to trim */}}
