@@ -30,6 +30,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "dgraph.alpha.fullname" . }}
+  namespace: {{ include "dgraph.namespace" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
@@ -137,13 +138,21 @@ spec:
       - name: {{ template "dgraph.alpha.fullname" . }}-init
         image: {{ template "dgraph.initContainers.init.image" . }}
         imagePullPolicy: {{ .Values.alpha.initContainers.init.image.pullPolicy | quote }}
-        env:
         {{- with .Values.alpha.initContainers.init.env }}
-          {{- toYaml . | nindent 12 }}
+        env:
+          {{- tpl (toYaml .) $ | nindent 10 }}
+        {{- end }}
+        {{- with .Values.alpha.initContainers.init.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
         {{- end }}
         command:
         {{- range .Values.alpha.initContainers.init.command }}
           - {{ . | quote }}
+        {{- end }}
+        {{- with .Values.alpha.initContainers.init.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
         {{- end }}
         {{- if .Values.alpha.persistence.enabled }}
         volumeMounts:
@@ -197,6 +206,10 @@ spec:
             value: /dgraph/config/{{ first (keys .Values.alpha.configFile | uniq | sortAlpha) }}
           {{- end }}
         {{- with .Values.alpha.extraEnvs }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.alpha.envFrom }}
+        envFrom:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         {{/* NOTE: awk '{gsub(/\.$/,"") needed to trim */}}

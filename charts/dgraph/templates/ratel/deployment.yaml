@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "dgraph.ratel.fullname" . }}
+  namespace: {{ include "dgraph.namespace" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
@@ -56,6 +57,10 @@ spec:
         {{- with .Values.ratel.extraEnvs }}
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{- end }}
+        {{- with .Values.ratel.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
         {{- end }}
         args: {{ .Values.ratel.args | toYaml | nindent 10 }}
         command:

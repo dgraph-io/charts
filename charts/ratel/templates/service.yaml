@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "ratel.fullname" . }}
+  namespace: {{ include "ratel.namespace" . }}
   labels:
     {{- include "ratel.labels" . | nindent 4 }}
 spec:

@@ -40,6 +40,7 @@ The following table lists the configurable parameters of the ratel chart and the
 | `image.tag`                              | Container image tag                                                   | `v21.12.0`                                          |
 | `imagePullSecrets`                       | Image pull secrets auth tokens used to access a private registry      | `[]`                                                |
 | `nameOverride`                           | Name override of the default chart name                               | `""`                                                |
+| `namespaceOverride`                      | Namespace override                                                    | `nil`                                               |
 | `fullnameOverride`                       | Full Name override of the release name + chart name                   | `""`                                                |
 | `serviceAccount.create`                  | Specifies if service account should be created                        | `true`                                              |
 | `serviceAccount.annotations`             | Service Account annotations                                           | `{}`                                                |

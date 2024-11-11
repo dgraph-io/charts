@@ -23,6 +23,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: "{{ template "dgraph.zero.fullname" . }}"
+  namespace: {{ include "dgraph.namespace" . }}
   labels:
     app: {{ template "dgraph.name" . }}
     chart: {{ template "dgraph.chart" . }}
@@ -140,6 +141,10 @@ spec:
             value: /dgraph/config/{{ first (keys .Values.zero.configFile | uniq | sortAlpha) }}
           {{- end }}
         {{- with .Values.zero.extraEnvs }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.zero.envFrom }}
+        envFrom:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         command:
