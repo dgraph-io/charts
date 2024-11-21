@@ -12,7 +12,7 @@
 {{- end -}}
 {{- end -}}
 {{- if .Values.backups.incremental.enabled -}}
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ template "dgraph.backups.fullname" . }}-inc
