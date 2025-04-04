@@ -6,7 +6,7 @@ entries:
     created: "2025-04-03T18:21:37.75736-08:00"
     description: Dgraph is a horizontally scalable and distributed graph database,
       providing ACID transactions, consistent replication and linearizable reads.
-    digest: 12150689c0dd1f4e7851c21d5093375f0823b0be47b460aba5707a39e18583dd
+    digest: 5cfc8973c627c59637ab551fa888ecb0ce778fa26515a1ba821f8cbca9e8bd3c
     home: https://dgraph.io/
     icon: https://dgraph.io/assets/images/logo.png
     keywords:
