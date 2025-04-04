@@ -1,7 +1,7 @@
 apiVersion: v1
 entries:
   dgraph:
- - apiVersion: v1
+  - apiVersion: v1
     appVersion: v24.1.1
     created: "2025-04-03T18:21:37.75736-08:00"
     description: Dgraph is a horizontally scalable and distributed graph database,
