@@ -10,7 +10,7 @@
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v24.1.1
+  tag: v24.1.4
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
