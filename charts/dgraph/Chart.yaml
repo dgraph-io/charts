@@ -1,7 +1,7 @@
 apiVersion: v1
 name: dgraph
-version: 24.1.1
-appVersion: v24.1.1
+version: 24.1.4
+appVersion: v24.1.4
 description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
 keywords:
 - dgraph
@@ -12,8 +12,8 @@ keywords:
 home: https://dgraph.io/
 sources:
 - https://github.com/dgraph-io/charts/
-- https://github.com/dgraph-io/dgraph
+- https://github.com/hypermodeinc/dgraph
 maintainers:
 - name: dgraph
-  email: contact@dgraph.io
+  email: hello@hypermode.com
 icon: https://dgraph.io/assets/images/logo.png
