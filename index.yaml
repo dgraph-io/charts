@@ -726,6 +726,16 @@ entries:
     version: 0.0.1
   ratel:
   - apiVersion: v2
+    appVersion: v25.0.3
+    created: "2025-09-11T21:38:51.198826061Z"
+    description: A Helm chart for Kubernetes
+    digest: 85005bfed0afae9e5f28e19de220694d02ac3312e277c4e0c35bcb4570a3df36
+    name: ratel
+    type: application
+    urls:
+    - https://github.com/dgraph-io/charts/releases/download/ratel-25.0.3/ratel-25.0.3.tgz
+    version: 25.0.3
+  - apiVersion: v2
     appVersion: v23.1.0
     created: "2023-12-07T23:05:31.541486+08:00"
     description: A Helm chart for Kubernetes
@@ -755,4 +765,4 @@ entries:
     urls:
     - https://github.com/dgraph-io/charts/releases/download/ratel-0.1.0/ratel-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-11T21:21:37.75764-08:00"
+generated: "2025-09-11T21:38:51.198913435Z"
