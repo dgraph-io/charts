@@ -2,11 +2,6 @@ name: Release Charts
 
 on:
   workflow_dispatch:
-    inputs:
-      chart:
-        type: string
-        description: Chart name (dgraph, ratel)
-        required: true
 
 permissions:
   contents: write
@@ -32,4 +27,4 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          charts_dir: "charts/${{ inputs.chart }}"
+          charts_dir: charts
