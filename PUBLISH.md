@@ -1,4 +1,6 @@
-## Publish Helm Charts
+Helm charts should auto-build and publish using the GitHub Actions workflow defined in `.github/workflows/cd-charts.yml`.
+
+## Manually Publish Helm Charts
 
 ### Before we begin
 
