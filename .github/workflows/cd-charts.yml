@@ -31,4 +31,4 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          charts_dir: "charts/${{ inputs.chart }}"
+          charts_dir: "${{ inputs.chart }}"
