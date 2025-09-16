@@ -48,6 +48,8 @@ version comparisions used to toggle features or behavior.
   {{- $safeVersion = "v20.07.1" -}}
 {{- else if  (regexMatch "^[^v].*" $safeVersion) -}}
   {{- $safeVersion = "v50.0.0" -}}
+{{- else -}}
+  {{- $safeVersion = regexReplaceAll "-preview.*$" $safeVersion "" -}}
 {{- end -}}
 {{- printf "%s" $safeVersion -}}
 {{- end -}}
