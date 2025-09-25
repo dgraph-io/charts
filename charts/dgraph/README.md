@@ -589,7 +589,7 @@ When ACLs are used, the backup cronjob will log in to the Alpha node using a spe
 When a simple Auth Token is used, the backup cronjob script will submit an auth token when requesting a backup.
 
 * Alpha
-  * Alpha will need to be configured with environment variable `DGRAPH_ALPHA_AUTH_TOKEN` or configuration with `auth_token` set.
+  * Alpha will need to be configured with environment variable `DGRAPH_ALPHA_TOKEN` or configuration with `auth_token` set.
 * Backups
   * `backups.admin.auth_token` - this will need to have the same value configured in Alpha
 
