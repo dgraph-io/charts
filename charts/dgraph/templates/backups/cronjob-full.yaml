@@ -87,7 +87,7 @@ spec:
             - name: tls-volume
               mountPath: /dgraph/tls
             {{- end }}
-            {{- if .Values.alpha.acl.enabled }}
+            {{- if or .Values.alpha.acl.enabled .Values.backups.admin.auth_token }}
             - name: backup-secret-volume
               mountPath: /backup_secrets
             {{- end }}
@@ -126,7 +126,7 @@ spec:
             secret:
               secretName: {{ template "dgraph.alpha.fullname" . }}-tls-secret
           {{- end }}
-          {{- if or (.Values.alpha.acl.enabled) (.Values.backups.admin.auth_token) }}
+          {{- if or .Values.alpha.acl.enabled .Values.backups.admin.auth_token }}
           - name: backup-secret-volume
             secret:
               secretName: {{ template "dgraph.backups.fullname" . }}-secret
