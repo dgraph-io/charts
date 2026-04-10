@@ -14,7 +14,6 @@ spec:
   selector:
     matchLabels:
       app: {{ template "dgraph.name" . }}
-      chart: {{ template "dgraph.chart" . }}
       component: {{ .Values.ratel.name }}
       release: {{ .Release.Name }}
   replicas: {{ .Values.ratel.replicaCount }}
