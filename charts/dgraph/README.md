@@ -26,7 +26,9 @@ Kubernetes cluster using [Helm](https://helm.sh) package manager.
 
 #### v24.x to v25.x (Breaking Changes)
 
-Chart v25 removes the version-specific `chart` label from StatefulSet, Deployment, and Service selectors. This is a breaking change because Kubernetes does not allow modifying `selector.matchLabels` on existing StatefulSets and Deployments.
+Chart v25 removes the version-specific `chart` label (e.g. `chart: dgraph-24.1.4`) from StatefulSet, Deployment, and Service selectors. This is a one-time breaking change because Kubernetes does not allow modifying `selector.matchLabels` on existing StatefulSets and Deployments.
+
+Note that keeping the `chart` label in selectors was already problematic — because it includes the chart version, **every chart upgrade would change the selector value and break**, not just the v24 to v25 transition. Removing it ensures that future chart upgrades will work seamlessly without requiring resource recreation.
 
 **Automated migration**: Chart v25.3.1-preview1 and later include a `pre-upgrade` hook that automatically handles this. The hook:
 
