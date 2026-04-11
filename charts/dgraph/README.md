@@ -39,12 +39,16 @@ No manual intervention is required if you are upgrading to v25.3.1-preview1 or l
 **Manual migration** (for earlier v25 chart versions without the hook):
 
 ```bash
+RELEASE="my-release"
+NAMESPACE="default"
+VERSION="25.3.1-preview1"
+
 # Delete StatefulSets while keeping pods running
-kubectl delete statefulset <release>-dgraph-alpha --cascade=orphan -n <namespace>
-kubectl delete statefulset <release>-dgraph-zero --cascade=orphan -n <namespace>
+kubectl delete statefulset "$RELEASE-dgraph-alpha" --cascade=orphan -n "$NAMESPACE"
+kubectl delete statefulset "$RELEASE-dgraph-zero" --cascade=orphan -n "$NAMESPACE"
 
 # Then run the Helm upgrade
-helm upgrade <release> dgraph/dgraph --version <v25-version>
+helm upgrade "$RELEASE" dgraph/dgraph --version "$VERSION"
 ```
 
 ### Installing the Chart
