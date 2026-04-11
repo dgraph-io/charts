@@ -22,6 +22,31 @@ Kubernetes cluster using [Helm](https://helm.sh) package manager.
 - Kubernetes 1.16+
 - Helm 3.0+
 
+### Upgrading
+
+#### v24.x to v25.x (Breaking Changes)
+
+Chart v25 removes the version-specific `chart` label from StatefulSet, Deployment, and Service selectors. This is a breaking change because Kubernetes does not allow modifying `selector.matchLabels` on existing StatefulSets and Deployments.
+
+**Automated migration**: Chart v25.3.1-preview1 and later include a `pre-upgrade` hook that automatically handles this. The hook:
+
+1. Detects StatefulSets and Deployments that still have the old `chart` selector label
+2. Deletes them with `--cascade=orphan`, which keeps existing pods running
+3. Helm then recreates the resources with the updated selectors and rolls the pods
+
+No manual intervention is required if you are upgrading to v25.3.1-preview1 or later.
+
+**Manual migration** (for earlier v25 chart versions without the hook):
+
+```bash
+# Delete StatefulSets while keeping pods running
+kubectl delete statefulset <release>-dgraph-alpha --cascade=orphan -n <namespace>
+kubectl delete statefulset <release>-dgraph-zero --cascade=orphan -n <namespace>
+
+# Then run the Helm upgrade
+helm upgrade <release> dgraph/dgraph --version <v25-version>
+```
+
 ### Installing the Chart
 
 To install the chart with the release name `my-release`:
