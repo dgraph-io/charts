@@ -21,7 +21,6 @@ spec:
       targetPort: 5080
   selector:
     app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     release: {{ .Release.Name }}
     component: {{ .Values.zero.name }}
   publishNotReadyAddresses: {{ .Values.zero.service.publishNotReadyAddresses }}
