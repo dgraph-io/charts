@@ -35,7 +35,6 @@ spec:
   {{- end }}
   selector:
     app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.ratel.name }}
     release: {{ .Release.Name }}
 

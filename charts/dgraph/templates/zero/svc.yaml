@@ -38,6 +38,5 @@ spec:
   {{- end }}
   selector:
     app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     release: {{ .Release.Name }}
     component: {{ .Values.zero.name }}
