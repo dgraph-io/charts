@@ -4,12 +4,10 @@ metadata:
   name: {{ template "dgraph.zero.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.zero.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
     monitor: {{ .Values.zero.monitorLabel }}
+    app.kubernetes.io/component: {{ .Values.zero.name }}
+    {{- include "dgraph.standardLabels" . | nindent 4 }}
     {{- with .Values.zero.service.labels }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
     {{- end }}

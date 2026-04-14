@@ -5,11 +5,9 @@ metadata:
   name: {{ template "dgraph.ratel.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.ratel.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app.kubernetes.io/component: {{ .Values.ratel.name }}
+    {{- include "dgraph.standardLabels" . | nindent 4 }}
     {{- with .Values.ratel.service.labels }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
     {{- end }}

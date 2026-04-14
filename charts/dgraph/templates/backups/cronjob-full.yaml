@@ -18,11 +18,9 @@ metadata:
   name: {{ template "dgraph.backups.fullname" . }}-full
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.backups.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app.kubernetes.io/component: {{ .Values.backups.name }}
+    {{- include "dgraph.standardLabels" . | nindent 4 }}
 spec:
   schedule: "{{ .Values.backups.full.schedule }}"
   jobTemplate:
@@ -34,6 +32,8 @@ spec:
         metadata:
           labels:
             cronjob: {{ template "dgraph.backups.fullname" . }}-full
+            app.kubernetes.io/component: {{ .Values.backups.name }}
+            {{- include "dgraph.standardLabels" . | nindent 12 }}
             {{- if .Values.backups.podLabels }}
 {{ .Values.backups.podLabels | toYaml | indent 12}}
             {{- end }}

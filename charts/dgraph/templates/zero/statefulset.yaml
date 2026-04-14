@@ -25,11 +25,9 @@ metadata:
   name: "{{ template "dgraph.zero.fullname" . }}"
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.zero.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app.kubernetes.io/component: {{ .Values.zero.name }}
+    {{- include "dgraph.standardLabels" . | nindent 4 }}
 spec:
   serviceName: {{ template "dgraph.zero.fullname" . }}-headless
   replicas: {{ .Values.zero.replicaCount }}
@@ -62,10 +60,9 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        app: {{ template "dgraph.name" . }}
-        chart: {{ template "dgraph.chart" . }}
-        release: {{ .Release.Name }}
         component: {{ .Values.zero.name }}
+        app.kubernetes.io/component: {{ .Values.zero.name }}
+        {{- include "dgraph.standardLabels" . | nindent 8 }}
         {{- if .Values.zero.podLabels }}
 {{ .Values.zero.podLabels | toYaml | indent 8}}
         {{- end }}

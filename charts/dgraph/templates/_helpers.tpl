@@ -200,6 +200,24 @@ Create a default fully qualified ratel name.
 {{- end -}}
 
 {{/*
+Common labels shared by all resources. Includes both legacy Helm labels and
+Kubernetes recommended labels (excluding component, which varies per resource).
+*/}}
+{{- define "dgraph.standardLabels" -}}
+app: {{ include "dgraph.name" . }}
+chart: {{ include "dgraph.chart" . }}
+release: {{ .Release.Name }}
+heritage: {{ .Release.Service }}
+helm.sh/chart: {{ include "dgraph.chart" . }}
+app.kubernetes.io/name: {{ include "dgraph.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
 Allow overriding namespace
 */}}
 {{- define "dgraph.namespace" -}}

@@ -4,12 +4,10 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.alpha.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
     monitor: {{ .Values.alpha.monitorLabel }}
+    app.kubernetes.io/component: {{ .Values.alpha.name }}
+    {{- include "dgraph.standardLabels" . | nindent 4 }}
     {{- with .Values.alpha.service.labels }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
     {{- end }}

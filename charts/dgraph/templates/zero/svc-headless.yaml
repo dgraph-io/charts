@@ -4,11 +4,9 @@ metadata:
   name: {{ template "dgraph.zero.fullname" . }}-headless
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.zero.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app.kubernetes.io/component: {{ .Values.zero.name }}
+    {{- include "dgraph.standardLabels" . | nindent 4 }}
     {{- with .Values.zero.serviceHeadless.labels }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
     {{- end }}

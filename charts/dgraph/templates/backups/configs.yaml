@@ -5,11 +5,9 @@ metadata:
   name: {{ template "dgraph.backups.fullname" . }}-config
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
     component: {{ .Values.backups.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app.kubernetes.io/component: {{ .Values.backups.name }}
+    {{- include "dgraph.standardLabels" . | nindent 4 }}
 data:
   backup.sh: |
     ######
