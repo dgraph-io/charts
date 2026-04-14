@@ -28,6 +28,12 @@ image: &image
   ##
   debug: false
 
+preUpgradeHook:
+  image:
+    registry: docker.io
+    repository: bitnami/kubectl
+    tag: "1.31"
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true

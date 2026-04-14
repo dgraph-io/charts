@@ -77,16 +77,16 @@ spec:
       {{- end }}
       containers:
         - name: pre-upgrade
-          image: bitnami/kubectl:latest
+          image: {{ .Values.preUpgradeHook.image.registry }}/{{ .Values.preUpgradeHook.image.repository }}:{{ .Values.preUpgradeHook.image.tag }}
           command:
             - /bin/sh
-            - -c
+            - -ec
             - |
               NS="{{ include "dgraph.namespace" . }}"
 
               # StatefulSets (Alpha and Zero)
               for STS in {{ template "dgraph.alpha.fullname" . }} {{ template "dgraph.zero.fullname" . }}; do
-                SELECTOR=$(kubectl get statefulset "$STS" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}' 2>/dev/null)
+                SELECTOR=$(kubectl get statefulset "$STS" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}' 2>/dev/null || true)
                 if [ -n "$SELECTOR" ]; then
                   echo "StatefulSet $STS has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
                   kubectl delete statefulset "$STS" --cascade=orphan -n "$NS"
@@ -97,7 +97,7 @@ spec:
 
               # Deployments (Ratel)
               for DEPLOY in {{ template "dgraph.ratel.fullname" . }}; do
-                SELECTOR=$(kubectl get deployment "$DEPLOY" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}' 2>/dev/null)
+                SELECTOR=$(kubectl get deployment "$DEPLOY" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}' 2>/dev/null || true)
                 if [ -n "$SELECTOR" ]; then
                   echo "Deployment $DEPLOY has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
                   kubectl delete deployment "$DEPLOY" --cascade=orphan -n "$NS"
