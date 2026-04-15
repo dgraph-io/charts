@@ -4,12 +4,7 @@ metadata:
   name: {{ template "dgraph.zero.fullname" . }}-headless
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app.kubernetes.io/component: {{ .Values.zero.name }}
-    component: {{ .Values.zero.name }}
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
-    {{- with .Values.zero.serviceHeadless.labels }}
-    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
-    {{- end }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.zero.name "extra" .Values.zero.serviceHeadless.labels) | nindent 4 }}
 spec:
   type: ClusterIP
   clusterIP: None

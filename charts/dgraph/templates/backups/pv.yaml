@@ -5,9 +5,7 @@ metadata:
   name: {{ template "dgraph.backups.fullname" . }}-fileserver
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app.kubernetes.io/component: {{ .Values.backups.name }}
-    component: {{ .Values.backups.name }}
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.backups.name) | nindent 4 }}
 spec:
   capacity:
     storage: {{ .Values.backups.nfs.storage }}

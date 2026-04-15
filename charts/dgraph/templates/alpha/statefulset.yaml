@@ -32,9 +32,7 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app.kubernetes.io/component: {{ .Values.alpha.name }}
-    component: {{ .Values.alpha.name }}
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.alpha.name) | nindent 4 }}
 spec:
   serviceName: {{ template "dgraph.alpha.fullname" . }}-headless
   replicas: {{ .Values.alpha.replicaCount }}
@@ -67,12 +65,7 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        app.kubernetes.io/component: {{ .Values.alpha.name }}
-        component: {{ .Values.alpha.name }}
-        {{- include "dgraph.standardLabels" . | nindent 8 }}
-        {{- with .Values.alpha.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- include "dgraph.labels" (dict "ctx" . "component" .Values.alpha.name "podLabels" .Values.alpha.podLabels) | nindent 8 }}
     spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}

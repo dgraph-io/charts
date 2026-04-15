@@ -18,9 +18,7 @@ metadata:
   name: {{ template "dgraph.backups.fullname" . }}-full
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app.kubernetes.io/component: {{ .Values.backups.name }}
-    component: {{ .Values.backups.name }}
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.backups.name) | nindent 4 }}
 spec:
   schedule: "{{ .Values.backups.full.schedule }}"
   jobTemplate:
@@ -31,12 +29,8 @@ spec:
       template:
         metadata:
           labels:
-            app.kubernetes.io/component: {{ .Values.backups.name }}
-            cronjob: {{ template "dgraph.backups.fullname" . }}-full
-            {{- include "dgraph.standardLabels" . | nindent 12 }}
-            {{- with .Values.backups.podLabels }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
+            {{- $extra := dict "cronjob" (printf "%s-full" (include "dgraph.backups.fullname" .)) }}
+            {{- include "dgraph.labels" (dict "ctx" . "component" .Values.backups.name "extra" $extra "podLabels" .Values.backups.podLabels) | nindent 12 }}
           {{- with .Values.backups.podAnnotations }}
           annotations:
             {{- toYaml . | nindent 12 }}

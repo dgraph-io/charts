@@ -5,9 +5,7 @@ metadata:
   name: {{ template "dgraph.zero.fullname" . }}-config
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app.kubernetes.io/component: {{ .Values.zero.name }}
-    component: {{ .Values.zero.name }}
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.zero.name) | nindent 4 }}
 data:
   {{- with .Values.zero.configFile }}
     {{- toYaml . | trimSuffix "\n" | nindent 2 }}

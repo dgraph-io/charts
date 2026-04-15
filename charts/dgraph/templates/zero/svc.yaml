@@ -4,13 +4,9 @@ metadata:
   name: {{ template "dgraph.zero.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app.kubernetes.io/component: {{ .Values.zero.name }}
-    component: {{ .Values.zero.name }}
-    monitor: {{ .Values.zero.monitorLabel }}
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
-    {{- with .Values.zero.service.labels }}
-    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
-    {{- end }}
+    {{- $extra := dict "monitor" .Values.zero.monitorLabel }}
+    {{- with .Values.zero.service.labels }}{{ $extra = merge $extra . }}{{ end }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.zero.name "extra" $extra) | nindent 4 }}
   {{- with .Values.zero.service.annotations }}
   annotations:
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}

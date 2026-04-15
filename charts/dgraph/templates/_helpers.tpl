@@ -200,25 +200,41 @@ Create a default fully qualified ratel name.
 {{- end -}}
 
 {{/*
-Common labels shared by all resources. Includes both legacy Helm labels and
-Kubernetes recommended labels (excluding component, which varies per resource).
+Build a complete label set as a dict and render via toYaml so that keys
+are always sorted alphabetically by Go's YAML marshaler.
+
+Parameters (passed as a dict):
+  ctx        — the Helm root context (required)
+  component  — value for component / app.kubernetes.io/component (optional)
+  extra      — dict of additional labels, e.g. monitor or cronjob (optional)
+  podLabels  — dict of user-supplied per-component pod labels (optional)
 */}}
-{{- define "dgraph.standardLabels" -}}
-app: {{ include "dgraph.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/name: {{ include "dgraph.name" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-chart: {{ include "dgraph.chart" . }}
-helm.sh/chart: {{ include "dgraph.chart" . }}
-heritage: {{ .Release.Service }}
-release: {{ .Release.Name }}
-{{- with .Values.commonLabels }}
-{{ toYaml . }}
-{{- end }}
-{{- end }}
+{{- define "dgraph.labels" -}}
+{{- $ctx := .ctx -}}
+{{- $labels := dict
+  "app" (include "dgraph.name" $ctx)
+  "app.kubernetes.io/instance" $ctx.Release.Name
+  "app.kubernetes.io/managed-by" $ctx.Release.Service
+  "app.kubernetes.io/name" (include "dgraph.name" $ctx)
+  "chart" (include "dgraph.chart" $ctx)
+  "helm.sh/chart" (include "dgraph.chart" $ctx)
+  "heritage" $ctx.Release.Service
+  "release" $ctx.Release.Name
+-}}
+{{- if $ctx.Chart.AppVersion -}}
+{{- $_ := set $labels "app.kubernetes.io/version" $ctx.Chart.AppVersion -}}
+{{- end -}}
+{{- if .component -}}
+{{- $_ := set $labels "app.kubernetes.io/component" .component -}}
+{{- $_ := set $labels "component" .component -}}
+{{- end -}}
+{{- range $key, $val := (default (dict) .extra) -}}
+{{- $_ := set $labels $key $val -}}
+{{- end -}}
+{{- $labels = merge $labels (default (dict) .podLabels) -}}
+{{- $labels = merge $labels (default (dict) $ctx.Values.commonLabels) -}}
+{{- toYaml $labels -}}
+{{- end -}}
 
 {{/*
 Allow overriding namespace

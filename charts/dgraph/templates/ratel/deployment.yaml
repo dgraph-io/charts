@@ -5,9 +5,7 @@ metadata:
   name: {{ template "dgraph.ratel.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app.kubernetes.io/component: {{ .Values.ratel.name }}
-    component: {{ .Values.ratel.name }}
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.ratel.name) | nindent 4 }}
 spec:
   selector:
     matchLabels:
@@ -24,12 +22,7 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        app.kubernetes.io/component: {{ .Values.ratel.name }}
-        component: {{ .Values.ratel.name }}
-        {{- include "dgraph.standardLabels" . | nindent 8 }}
-        {{- with .Values.ratel.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- include "dgraph.labels" (dict "ctx" . "component" .Values.ratel.name "podLabels" .Values.ratel.podLabels) | nindent 8 }}
     spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}

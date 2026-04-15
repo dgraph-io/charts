@@ -10,7 +10,7 @@ metadata:
   name: {{ template "dgraph.fullname" . }}-pre-upgrade
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
@@ -22,7 +22,7 @@ metadata:
   name: {{ template "dgraph.fullname" . }}-pre-upgrade
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
@@ -38,7 +38,7 @@ metadata:
   name: {{ template "dgraph.fullname" . }}-pre-upgrade
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
@@ -58,7 +58,7 @@ metadata:
   name: {{ template "dgraph.fullname" . }}-pre-upgrade
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    {{- include "dgraph.standardLabels" . | nindent 4 }}
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "0"
@@ -69,10 +69,7 @@ spec:
     metadata:
       name: {{ template "dgraph.fullname" . }}-pre-upgrade
       labels:
-        {{- include "dgraph.standardLabels" . | nindent 8 }}
-        {{- with .Values.preUpgradeHook.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- include "dgraph.labels" (dict "ctx" . "podLabels" .Values.preUpgradeHook.podLabels) | nindent 8 }}
       {{- with .Values.preUpgradeHook.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
