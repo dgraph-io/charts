@@ -1,9 +1,9 @@
 ## backup-minio-config.yaml
-## * https://dgraph.io/docs/enterprise-features/binary-backups/
+## * https://dgraph.io/docs/binary-backups/
 ##
 ## Demonstrates
 ## * Binary Backups to Minio
-## * ACL feature with Alice user (see https://dgraph.io/docs/enterprise-features/access-control-lists/)
+## * ACL feature with Alice user (see https://dgraph.io/docs/access-control-lists/)
 backups:
   full:
     enabled: true

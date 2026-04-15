@@ -13,7 +13,7 @@ commonLabels: {}
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v25.0.0-preview6
+  tag: v25.3.1
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -376,8 +376,7 @@ alpha:
     files: {}
 
   ## ACL Configuration
-  ## Documentation on Enterprise ACL Feature
-  ##  see https://dgraph.io/docs/enterprise-features/access-control-lists/
+  ## ref: https://dgraph.io/docs/access-control-lists/
   acl:
     enabled: false
     ## The values in `file: {}` will be the filename as key and the file data as the value.
@@ -388,8 +387,7 @@ alpha:
     #   hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
 
   ## Encryption at Rest Configuration
-  ## Documentation on Enterprise ACL Feature
-  ##  see https://dgraph.io/docs/enterprise-features/encryption-at-rest/
+  ## ref: https://dgraph.io/docs/encryption-at-rest/
   encryption:
     enabled: false
     ## The values in `file: {}` will be the filename as key and the file data as the value.
@@ -472,7 +470,7 @@ alpha:
   ## You may want to initialize the Alphas with data before starting Alpha containers.
   ## Examples can include:
   ## * offline data restore from binary backups with `dgraph restore`
-  ##   (ref. https://dgraph.io/docs/enterprise-features/binary-backups/#restore-from-backup)
+  ##   (ref. https://dgraph.io/docs/binary-backups/#restore-from-backup)
   ## * bulk loader (ref. https://dgraph.io/docs/howto/importdata/bulk-loader/)
   initContainers:
     init:
@@ -617,8 +615,8 @@ ratel:
   customLivenessProbe: {}
   customReadinessProbe: {}
 
-## Binary Backup CronJob Configuration (Enterprise feature)
-## ref: https://dgraph.io/docs/enterprise-features/binary-backups/
+## Binary Backup CronJob Configuration
+## ref: https://dgraph.io/docs/binary-backups/
 ##
 backups:
   name: backups
@@ -633,7 +631,7 @@ backups:
   admin:
     ## backup user and password that is a member of 'guardians'group used to
     ## login if ACLs are enabled.  This fetches an access token used to trigger backups
-    ## ref: https://dgraph.io/docs/enterprise-features/access-control-lists/
+    ## ref: https://dgraph.io/docs/access-control-lists/
     user: groot
     # password: password
     ## Mutual TLS client certficate and key can be used to secure transaction that was created with

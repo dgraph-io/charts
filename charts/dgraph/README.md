@@ -186,10 +186,10 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.securityContext.runAsUser`        | User ID for the Alpha container                                       | `1001`                                              |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
 | `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
-| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled (Enterprise feature)                 | `false`                                             |
-| `alpha.encryption.file`                  | Alpha Encryption at Rest key file (Enterprise feature)                | `nil`                                               |
-| `alpha.acl.enabled`                      | Alpha ACL enabled (Enterprise feature)                                | `false`                                             |
-| `alpha.acl.file`                         | Alpha ACL secret file (Enterprise feature)                            | `nil`                                               |
+| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled                                      | `false`                                             |
+| `alpha.encryption.file`                  | Alpha Encryption at Rest key file                                     | `nil`                                               |
+| `alpha.acl.enabled`                      | Alpha ACL enabled                                                     | `false`                                             |
+| `alpha.acl.file`                         | Alpha ACL secret file                                                 | `nil`                                               |
 | `alpha.persistence.enabled`              | Enable persistence for alpha using PVC                                | `true`                                              |
 | `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
 | `alpha.persistence.accessModes`          | PVC Access Mode for alpha volume                                      | `['ReadWriteOnce']`                                 |
@@ -461,7 +461,7 @@ curl --silent \
   https://localhost:6080/state
 ```
 
-## Alpha encryption at rest (enterprise feature)
+## Alpha encryption at rest
 
 You can generate a secret for the key file using `base64` tool:
 
@@ -505,7 +505,7 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
-## Alpha access control lists (enterprise feature)
+## Alpha access control lists
 
 You can generate a secret for the secrets file using `base64` tool:
 
@@ -549,9 +549,9 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
-## Binary backups (enterprise feature)
+## Binary backups
 
-Dgraph [Binary Backups](https://dgraph.io/docs/enterprise-features/binary-backups/) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
+Dgraph [Binary Backups](https://dgraph.io/docs/binary-backups/) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
 
 * Full backup at midnight: `0 * * * *`
 * Incremental backups every hour, except midnight: `0 1-23 * * *`
@@ -610,7 +610,7 @@ If Dgraph Alpha TLS options are used, backup cronjobs will submit the requests u
 When ACLs are used, the backup cronjob will log in to the Alpha node using a specified user account.  Through this process, the backup cronjob script will receive an AccessJWT token that will be submitted when requesting a backup.
 
 * Alpha
-  * see [Alpha Access Control Lists](#alpha-access-control-lists-enterprise-feature) above.
+  * see [Alpha Access Control Lists](#alpha-access-control-lists) above.
 * Backups
   * `backups.admin.user` (default: `groot`) - a user that is a member of `guardians` group will need to be specified.
   * `backups.admin.password` (default: `password`) - the corresponding password for that user will need to be specified.
