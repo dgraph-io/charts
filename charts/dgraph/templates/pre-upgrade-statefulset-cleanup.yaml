@@ -82,6 +82,9 @@ spec:
       name: {{ template "dgraph.fullname" . }}-pre-upgrade
       labels:
         {{- include "dgraph.standardLabels" . | nindent 8 }}
+        {{- with .Values.jobPodLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         {{- with .Values.preUpgradeHook.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
