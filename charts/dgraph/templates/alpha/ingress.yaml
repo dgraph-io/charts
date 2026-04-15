@@ -24,8 +24,8 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}-ingress
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    component: {{ .Values.alpha.name }}
     app.kubernetes.io/component: {{ .Values.alpha.name }}
+    component: {{ .Values.alpha.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   {{- if or .Values.alpha.ingress.annotations .Values.commonAnnotations }}
   annotations:
@@ -73,8 +73,8 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}-ingress-grpc
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    component: {{ .Values.alpha.name }}
     app.kubernetes.io/component: {{ .Values.alpha.name }}
+    component: {{ .Values.alpha.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   {{- if or .Values.alpha.ingress_grpc.annotations .Values.commonAnnotations }}
   annotations:

@@ -24,8 +24,8 @@ metadata:
   name: {{ template "dgraph.ratel.fullname" . }}-ingress
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    component: {{ .Values.ratel.name }}
     app.kubernetes.io/component: {{ .Values.ratel.name }}
+    component: {{ .Values.ratel.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   {{- if or .Values.ratel.ingress.annotations .Values.commonAnnotations }}
   annotations:

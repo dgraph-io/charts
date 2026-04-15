@@ -25,8 +25,8 @@ metadata:
   name: "{{ template "dgraph.zero.fullname" . }}"
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    component: {{ .Values.zero.name }}
     app.kubernetes.io/component: {{ .Values.zero.name }}
+    component: {{ .Values.zero.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
@@ -67,8 +67,8 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        component: {{ .Values.zero.name }}
         app.kubernetes.io/component: {{ .Values.zero.name }}
+        component: {{ .Values.zero.name }}
         {{- include "dgraph.standardLabels" . | nindent 8 }}
         {{- with .Values.zero.podLabels }}
         {{- toYaml . | nindent 8 }}

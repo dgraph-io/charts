@@ -5,8 +5,8 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}-config
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    component: {{ .Values.alpha.name }}
     app.kubernetes.io/component: {{ .Values.alpha.name }}
+    component: {{ .Values.alpha.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:

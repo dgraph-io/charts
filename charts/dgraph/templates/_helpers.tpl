@@ -205,16 +205,16 @@ Kubernetes recommended labels (excluding component, which varies per resource).
 */}}
 {{- define "dgraph.standardLabels" -}}
 app: {{ include "dgraph.name" . }}
-chart: {{ include "dgraph.chart" . }}
-release: {{ .Release.Name }}
-heritage: {{ .Release.Service }}
-helm.sh/chart: {{ include "dgraph.chart" . }}
-app.kubernetes.io/name: {{ include "dgraph.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/name: {{ include "dgraph.name" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+chart: {{ include "dgraph.chart" . }}
+helm.sh/chart: {{ include "dgraph.chart" . }}
+heritage: {{ .Release.Service }}
+release: {{ .Release.Name }}
 {{- with .Values.commonLabels }}
 {{ toYaml . }}
 {{- end }}

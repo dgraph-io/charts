@@ -32,8 +32,8 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    component: {{ .Values.alpha.name }}
     app.kubernetes.io/component: {{ .Values.alpha.name }}
+    component: {{ .Values.alpha.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
@@ -74,8 +74,8 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        component: {{ .Values.alpha.name }}
         app.kubernetes.io/component: {{ .Values.alpha.name }}
+        component: {{ .Values.alpha.name }}
         {{- include "dgraph.standardLabels" . | nindent 8 }}
         {{- with .Values.alpha.podLabels }}
         {{- toYaml . | nindent 8 }}

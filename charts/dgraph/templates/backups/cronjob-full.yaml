@@ -18,8 +18,8 @@ metadata:
   name: {{ template "dgraph.backups.fullname" . }}-full
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    component: {{ .Values.backups.name }}
     app.kubernetes.io/component: {{ .Values.backups.name }}
+    component: {{ .Values.backups.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
@@ -35,8 +35,8 @@ spec:
       template:
         metadata:
           labels:
-            cronjob: {{ template "dgraph.backups.fullname" . }}-full
             app.kubernetes.io/component: {{ .Values.backups.name }}
+            cronjob: {{ template "dgraph.backups.fullname" . }}-full
             {{- include "dgraph.standardLabels" . | nindent 12 }}
             {{- with .Values.backups.podLabels }}
             {{- toYaml . | nindent 12 }}

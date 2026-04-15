@@ -4,9 +4,9 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
+    app.kubernetes.io/component: {{ .Values.alpha.name }}
     component: {{ .Values.alpha.name }}
     monitor: {{ .Values.alpha.monitorLabel }}
-    app.kubernetes.io/component: {{ .Values.alpha.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
     {{- with .Values.alpha.service.labels }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}

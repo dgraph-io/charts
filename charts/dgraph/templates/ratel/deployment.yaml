@@ -5,8 +5,8 @@ metadata:
   name: {{ template "dgraph.ratel.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    component: {{ .Values.ratel.name }}
     app.kubernetes.io/component: {{ .Values.ratel.name }}
+    component: {{ .Values.ratel.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
@@ -31,8 +31,8 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        component: {{ .Values.ratel.name }}
         app.kubernetes.io/component: {{ .Values.ratel.name }}
+        component: {{ .Values.ratel.name }}
         {{- include "dgraph.standardLabels" . | nindent 8 }}
         {{- with .Values.ratel.podLabels }}
         {{- toYaml . | nindent 8 }}
