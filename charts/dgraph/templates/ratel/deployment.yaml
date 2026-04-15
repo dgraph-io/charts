@@ -8,10 +8,6 @@ metadata:
     app.kubernetes.io/component: {{ .Values.ratel.name }}
     component: {{ .Values.ratel.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
   selector:
     matchLabels:
@@ -21,11 +17,8 @@ spec:
   replicas: {{ .Values.ratel.replicaCount }}
   template:
     metadata:
-      {{- if or .Values.ratel.extraAnnotations .Values.commonAnnotations }}
+      {{- if .Values.ratel.extraAnnotations }}
       annotations:
-        {{- with .Values.commonAnnotations }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
         {{- with .Values.ratel.extraAnnotations }}
 {{- toYaml . | trimSuffix "\n" | nindent 8 }}
         {{- end }}

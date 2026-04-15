@@ -9,8 +9,6 @@
 
 ## Labels to add to all resources
 commonLabels: {}
-## Annotations to add to all resources
-commonAnnotations: {}
 
 image: &image
   registry: docker.io

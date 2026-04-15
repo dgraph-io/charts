@@ -11,14 +11,9 @@ metadata:
     {{- with .Values.ratel.service.labels }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
     {{- end }}
-  {{- if or .Values.ratel.service.annotations .Values.commonAnnotations }}
+  {{- with .Values.ratel.service.annotations }}
   annotations:
-    {{- with .Values.commonAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with .Values.ratel.service.annotations }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
-    {{- end }}
   {{- end }}
 spec:
   type: {{ .Values.ratel.service.type }}

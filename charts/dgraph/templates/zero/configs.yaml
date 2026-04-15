@@ -8,10 +8,6 @@ metadata:
     app.kubernetes.io/component: {{ .Values.zero.name }}
     component: {{ .Values.zero.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 data:
   {{- with .Values.zero.configFile }}
     {{- toYaml . | trimSuffix "\n" | nindent 2 }}

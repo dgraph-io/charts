@@ -11,14 +11,9 @@ metadata:
     {{- with .Values.alpha.service.labels }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
     {{- end }}
-  {{- if or .Values.alpha.service.annotations .Values.commonAnnotations }}
+  {{- with .Values.alpha.service.annotations }}
   annotations:
-    {{- with .Values.commonAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with .Values.alpha.service.annotations }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
-    {{- end }}
   {{- end }}
 spec:
   type: {{ .Values.alpha.service.type }}

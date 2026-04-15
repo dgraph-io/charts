@@ -12,9 +12,6 @@ metadata:
   labels:
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   annotations:
-    {{- with .Values.commonAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -27,9 +24,6 @@ metadata:
   labels:
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   annotations:
-    {{- with .Values.commonAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -46,9 +40,6 @@ metadata:
   labels:
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   annotations:
-    {{- with .Values.commonAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -69,9 +60,6 @@ metadata:
   labels:
     {{- include "dgraph.standardLabels" . | nindent 4 }}
   annotations:
-    {{- with .Values.commonAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -85,14 +73,9 @@ spec:
         {{- with .Values.preUpgradeHook.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- if or .Values.preUpgradeHook.podAnnotations .Values.commonAnnotations }}
+      {{- with .Values.preUpgradeHook.podAnnotations }}
       annotations:
-        {{- with .Values.commonAnnotations }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
-        {{- with .Values.preUpgradeHook.podAnnotations }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
       {{- end }}
     spec:
       serviceAccountName: {{ template "dgraph.fullname" . }}-pre-upgrade

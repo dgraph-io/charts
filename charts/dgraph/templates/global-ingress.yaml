@@ -27,14 +27,9 @@ metadata:
     app.kubernetes.io/component: {{ .Values.alpha.name }}
     component: {{ .Values.alpha.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- if or .Values.global.ingress.annotations .Values.commonAnnotations }}
+  {{- with .Values.global.ingress.annotations }}
   annotations:
-    {{- with .Values.commonAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with .Values.global.ingress.annotations }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
-    {{- end }}
   {{- end }}
 spec:
 {{- if .Values.global.ingress.ingressClassName }}
@@ -89,14 +84,9 @@ metadata:
     app.kubernetes.io/component: {{ .Values.alpha.name }}
     component: {{ .Values.alpha.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- if or .Values.global.ingress_grpc.annotations .Values.commonAnnotations }}
+  {{- with .Values.global.ingress_grpc.annotations }}
   annotations:
-    {{- with .Values.commonAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with .Values.global.ingress_grpc.annotations }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
-    {{- end }}
   {{- end }}
 spec:
 {{- if .Values.global.ingress_grpc.ingressClassName }}

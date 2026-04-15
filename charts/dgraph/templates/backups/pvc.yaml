@@ -8,10 +8,6 @@ metadata:
     app.kubernetes.io/component: {{ .Values.backups.name }}
     component: {{ .Values.backups.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
   accessModes:
     - ReadWriteMany

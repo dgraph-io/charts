@@ -21,10 +21,6 @@ metadata:
     app.kubernetes.io/component: {{ .Values.backups.name }}
     component: {{ .Values.backups.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
   schedule: "{{ .Values.backups.full.schedule }}"
   jobTemplate:
@@ -41,14 +37,9 @@ spec:
             {{- with .Values.backups.podLabels }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- if or .Values.backups.podAnnotations .Values.commonAnnotations }}
+          {{- with .Values.backups.podAnnotations }}
           annotations:
-            {{- with .Values.commonAnnotations }}
             {{- toYaml . | nindent 12 }}
-            {{- end }}
-            {{- with .Values.backups.podAnnotations }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
           {{- end }}
         spec:
           {{- if .Values.serviceAccount.create }}

@@ -8,10 +8,6 @@ metadata:
     app.kubernetes.io/component: {{ .Values.alpha.name }}
     component: {{ .Values.alpha.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 data:
   {{- with .Values.alpha.configFile }}
     {{- toYaml . | trimSuffix "\n" | nindent 2 }}

@@ -28,10 +28,6 @@ metadata:
     app.kubernetes.io/component: {{ .Values.zero.name }}
     component: {{ .Values.zero.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
   serviceName: {{ template "dgraph.zero.fullname" . }}-headless
   replicas: {{ .Values.zero.replicaCount }}
@@ -52,11 +48,8 @@ spec:
   template:
     metadata:
       name: {{ template "dgraph.zero.fullname" . }}
-      {{- if or .Values.zero.metrics.enabled .Values.zero.extraAnnotations .Values.commonAnnotations }}
+      {{- if or .Values.zero.metrics.enabled .Values.zero.extraAnnotations }}
       annotations:
-        {{- with .Values.commonAnnotations }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
         {{- if .Values.zero.metrics.enabled }}
         prometheus.io/path: /debug/prometheus_metrics
         prometheus.io/port: "6080"
