@@ -68,7 +68,7 @@
 
     export RATEL_POD_NAME=$(kubectl get pods --namespace {{ include "dgraph.namespace" . }} --selector "component={{ .Values.ratel.name }},release={{ .Release.Name }}" --output jsonpath="{.items[0].metadata.name}")
     echo "Access Ratel HTTP/S using http://localhost:8000"
-    kubectl --namespace {{ include "dgraph.namespace" . }} port-forward $POD_NARATEL_POD_NAMEME 8000:8000
+    kubectl --namespace {{ include "dgraph.namespace" . }} port-forward $RATEL_POD_NAME 8000:8000
 
 {{- end }}
 

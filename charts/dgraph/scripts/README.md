@@ -4,7 +4,7 @@ Here are some scripts that may be useful for generating helm chart values for us
 
 ## make_tls_secrets.sh
 
-For intructions run `./make_tls_secrets.sh --help`
+For instructions run `./make_tls_secrets.sh --help`
 
 As an example:
 

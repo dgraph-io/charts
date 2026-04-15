@@ -637,7 +637,7 @@ backups:
     ## ref: https://dgraph.io/docs/access-control-lists/
     user: groot
     # password: password
-    ## Mutual TLS client certficate and key can be used to secure transaction that was created with
+    ## Mutual TLS client certificate and key can be used to secure transaction that was created with
     ## dgraph cert --client <name-of-client> should be specified here.
     ## ref. https://dgraph.io/docs/deploy/security/tls-configuration/#tls-options
     tls_client: ""
@@ -681,7 +681,7 @@ backups:
     ## enable bash debugging (set -x)
     debug: false
     ## incremental backup schedule
-    ## every hour, except 12AM serer time
+    ## every hour, except 12AM server time
     schedule: "0 1-23 * * *"
     ## restart policy
     restartPolicy: Never
@@ -691,7 +691,7 @@ backups:
   ##   s3://s3.us-west-2.amazonaws.com/<bucketname>
   ##   minio://my-release-minio.default.svc:9000/<bucketname>
   destination: *nfs_backups_path
-  ## subpath directory useful to store full and reclated incremental backuups
+  ## subpath directory useful to store full and related incremental backups
   ## in the same directory.
   ## NOTE: It is important to create directory name that matches the schedule.
   ##       For example, daily fulls and hourly incrementals, a directory could

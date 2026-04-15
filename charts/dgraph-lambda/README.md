@@ -93,7 +93,7 @@ script:
 
 #### Deploy Dgraph Lambda
 
-We can deploy the example above, named `my-lambda.yaml`, with the follwing:
+We can deploy the example above, named `my-lambda.yaml`, with the following:
 
 ```bash
 helm install $LAMBDA_REL dgraph/dgraph-lambda \
