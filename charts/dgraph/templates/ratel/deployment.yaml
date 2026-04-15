@@ -34,9 +34,6 @@ spec:
         component: {{ .Values.ratel.name }}
         app.kubernetes.io/component: {{ .Values.ratel.name }}
         {{- include "dgraph.standardLabels" . | nindent 8 }}
-        {{- with .Values.deploymentPodLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
         {{- if .Values.ratel.podLabels }}
 {{ .Values.ratel.podLabels | toYaml | indent 8}}
         {{- end }}

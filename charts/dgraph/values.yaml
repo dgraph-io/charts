@@ -12,12 +12,6 @@ commonLabels: {}
 ## Annotations to add to all resources
 commonAnnotations: {}
 
-## Pod labels applied to pods by workload type (additive with commonLabels and per-component podLabels)
-statefulSetPodLabels: {}
-deploymentPodLabels: {}
-cronJobPodLabels: {}
-jobPodLabels: {}
-
 image: &image
   registry: docker.io
   repository: dgraph/dgraph

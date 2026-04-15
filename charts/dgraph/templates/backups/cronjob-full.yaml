@@ -38,9 +38,6 @@ spec:
             cronjob: {{ template "dgraph.backups.fullname" . }}-full
             app.kubernetes.io/component: {{ .Values.backups.name }}
             {{- include "dgraph.standardLabels" . | nindent 12 }}
-            {{- with .Values.cronJobPodLabels }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
             {{- if .Values.backups.podLabels }}
 {{ .Values.backups.podLabels | toYaml | indent 12}}
             {{- end }}
