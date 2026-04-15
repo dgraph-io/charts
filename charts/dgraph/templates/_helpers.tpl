@@ -206,8 +206,15 @@ are always sorted alphabetically by Go's YAML marshaler.
 Parameters (passed as a dict):
   ctx        — the Helm root context (required)
   component  — value for component / app.kubernetes.io/component (optional)
-  extra      — dict of additional labels, e.g. monitor or cronjob (optional)
+  extra      — dict of additional chart-defined labels, e.g. monitor or cronjob (optional)
   podLabels  — dict of user-supplied per-component pod labels (optional)
+
+Precedence (first wins on key conflicts):
+  standard labels > component > extra > podLabels > commonLabels
+
+Note: extra labels (like monitor) cannot be overridden by podLabels or
+commonLabels. This is intentional — chart-defined labels take priority
+over user-supplied ones.
 */}}
 {{- define "dgraph.labels" -}}
 {{- $ctx := .ctx -}}

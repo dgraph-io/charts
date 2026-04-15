@@ -37,7 +37,10 @@ preUpgradeHook:
     repository: bitnami/kubectl
     tag: "1.31"
   podLabels: {}
+  ## Note: annotations with boolean-looking values (e.g. "false") should be
+  ## set via --set-string or a values file to avoid YAML type coercion.
   podAnnotations: {}
+  tolerations: []
 
 serviceAccount:
   # Specifies whether a service account should be created

@@ -77,7 +77,7 @@ spec:
     spec:
       serviceAccountName: {{ template "dgraph.fullname" . }}-pre-upgrade
       restartPolicy: Never
-      {{- with .Values.alpha.tolerations }}
+      {{- with .Values.preUpgradeHook.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -92,22 +92,30 @@ spec:
 
               # StatefulSets (Alpha and Zero)
               for STS in {{ template "dgraph.alpha.fullname" . }} {{ template "dgraph.zero.fullname" . }}; do
-                SELECTOR=$(kubectl get statefulset "$STS" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}' 2>/dev/null || true)
-                if [ -n "$SELECTOR" ]; then
-                  echo "StatefulSet $STS has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
-                  kubectl delete statefulset "$STS" --cascade=orphan -n "$NS"
+                if kubectl get statefulset "$STS" -n "$NS" > /dev/null 2>&1; then
+                  SELECTOR=$(kubectl get statefulset "$STS" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}')
+                  if [ -n "$SELECTOR" ]; then
+                    echo "StatefulSet $STS has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
+                    kubectl delete statefulset "$STS" --cascade=orphan -n "$NS"
+                  else
+                    echo "StatefulSet $STS does not have 'chart' selector label, skipping."
+                  fi
                 else
-                  echo "StatefulSet $STS does not have 'chart' selector label, skipping."
+                  echo "StatefulSet $STS not found, skipping."
                 fi
               done
 
               # Deployments (Ratel)
               for DEPLOY in {{ template "dgraph.ratel.fullname" . }}; do
-                SELECTOR=$(kubectl get deployment "$DEPLOY" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}' 2>/dev/null || true)
-                if [ -n "$SELECTOR" ]; then
-                  echo "Deployment $DEPLOY has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
-                  kubectl delete deployment "$DEPLOY" --cascade=orphan -n "$NS"
+                if kubectl get deployment "$DEPLOY" -n "$NS" > /dev/null 2>&1; then
+                  SELECTOR=$(kubectl get deployment "$DEPLOY" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}')
+                  if [ -n "$SELECTOR" ]; then
+                    echo "Deployment $DEPLOY has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
+                    kubectl delete deployment "$DEPLOY" --cascade=orphan -n "$NS"
+                  else
+                    echo "Deployment $DEPLOY does not have 'chart' selector label, skipping."
+                  fi
                 else
-                  echo "Deployment $DEPLOY does not have 'chart' selector label, skipping."
+                  echo "Deployment $DEPLOY not found, skipping."
                 fi
               done
