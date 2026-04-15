@@ -7,6 +7,11 @@
 #   imagePullSecrets:
 #     - myRegistryKeySecretName
 
+## Labels to add to all resources
+commonLabels: {}
+## Annotations to add to all resources
+commonAnnotations: {}
+
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
@@ -33,6 +38,8 @@ preUpgradeHook:
     registry: docker.io
     repository: bitnami/kubectl
     tag: "1.31"
+  podLabels: {}
+  podAnnotations: {}
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -623,6 +630,8 @@ backups:
   # schedulerName: stork
   ## CronJob spec.jobTemplate.spec.template.metadata.labels
   podLabels: {}
+  ## CronJob spec.jobTemplate.spec.template.metadata.annotations
+  podAnnotations: {}
   admin:
     ## backup user and password that is a member of 'guardians'group used to
     ## login if ACLs are enabled.  This fetches an access token used to trigger backups

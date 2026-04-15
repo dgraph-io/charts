@@ -27,9 +27,14 @@ metadata:
     component: {{ .Values.ratel.name }}
     app.kubernetes.io/component: {{ .Values.ratel.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
-  {{- with .Values.ratel.ingress.annotations }}
+  {{- if or .Values.ratel.ingress.annotations .Values.commonAnnotations }}
   annotations:
+    {{- with .Values.commonAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.ratel.ingress.annotations }}
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}
+    {{- end }}
   {{- end }}
 spec:
 {{- if .Values.ratel.ingress.ingressClassName }}

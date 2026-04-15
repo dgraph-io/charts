@@ -8,6 +8,10 @@ metadata:
     component: {{ .Values.backups.name }}
     app.kubernetes.io/component: {{ .Values.backups.name }}
     {{- include "dgraph.standardLabels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 data:
   backup.sh: |
     ######
