@@ -24,7 +24,7 @@ spec:
   jobTemplate:
     metadata:
       labels:
-        cronjob: {{ template "dgraph.backups.fullname" . }}-full
+        {{- include "dgraph.labels" (dict "ctx" . "component" .Values.backups.name "extra" (dict "cronjob" (printf "%s-full" (include "dgraph.backups.fullname" .)))) | nindent 8 }}
     spec:
       template:
         metadata:
