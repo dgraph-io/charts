@@ -38,8 +38,8 @@ spec:
             cronjob: {{ template "dgraph.backups.fullname" . }}-full
             app.kubernetes.io/component: {{ .Values.backups.name }}
             {{- include "dgraph.standardLabels" . | nindent 12 }}
-            {{- if .Values.backups.podLabels }}
-{{ .Values.backups.podLabels | toYaml | indent 12}}
+            {{- with .Values.backups.podLabels }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- if or .Values.backups.podAnnotations .Values.commonAnnotations }}
           annotations:

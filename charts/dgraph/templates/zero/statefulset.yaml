@@ -70,8 +70,8 @@ spec:
         component: {{ .Values.zero.name }}
         app.kubernetes.io/component: {{ .Values.zero.name }}
         {{- include "dgraph.standardLabels" . | nindent 8 }}
-        {{- if .Values.zero.podLabels }}
-{{ .Values.zero.podLabels | toYaml | indent 8}}
+        {{- with .Values.zero.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.serviceAccount.create }}
