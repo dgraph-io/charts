@@ -33,6 +33,9 @@ image: &image
   ##
   debug: false
 
+## Pre-upgrade hook Job that handles v24-to-v25 StatefulSet selector migration.
+## Runs automatically on helm upgrade — detects and recreates StatefulSets
+## with stale selector labels using --cascade=orphan to avoid downtime.
 preUpgradeHook:
   image:
     registry: docker.io

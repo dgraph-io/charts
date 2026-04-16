@@ -36,14 +36,14 @@ Note that keeping the `chart` label in selectors was already problematic — bec
 2. Deletes them with `--cascade=orphan`, which keeps existing pods running
 3. Helm then recreates the resources with the updated selectors and rolls the pods
 
-No manual intervention is required if you are upgrading to v25.3.1-preview1 or later.
+No manual intervention is required if you are upgrading to v25.3.1-preview1 or later. If upgrading to v25.3.1-preview2+, also review the [v25.3.1-preview2 breaking changes](#v2531-preview2-breaking-changes) below.
 
 **Manual migration** (for earlier v25 chart versions without the hook):
 
 ```bash
 RELEASE="my-release"
 NAMESPACE="default"
-VERSION="25.3.1-preview1"
+VERSION="25.3.1-preview2"
 
 # Delete StatefulSets while keeping pods running
 kubectl delete statefulset "$RELEASE-dgraph-alpha" --cascade=orphan -n "$NAMESPACE"
