@@ -84,7 +84,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `commonLabels`                           | Labels to add to all resources and pod templates                      | `{}`                                                |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v24.1.4`                                           |
+| `image.tag`                              | Container image tag                                                   | `v25.3.1`                                           |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `namespaceOverride`                      | Deployment namespace override if specified.                           | `nil`                                               |
@@ -248,7 +248,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.podAnnotations`                 | Annotations for backup CronJob pods                                   | `{}`                                                |
 | `backups.schedulerName`                  | Configure an explicit scheduler for Backups Kubernetes CronJobs       | `nil`                                               |
 | `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
-| `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |
+| `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `nil`                                               |
 | `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
@@ -611,7 +611,7 @@ When ACLs are used, the backup cronjob will log in to the Alpha node using a spe
   * see [Alpha Access Control Lists](#alpha-access-control-lists) above.
 * Backups
   * `backups.admin.user` (default: `groot`) - a user that is a member of `guardians` group will need to be specified.
-  * `backups.admin.password` (default: `password`) - the corresponding password for that user will need to be specified.
+  * `backups.admin.password` (required) - the corresponding password for that user will need to be specified.
 
 ### Using an auth token
 

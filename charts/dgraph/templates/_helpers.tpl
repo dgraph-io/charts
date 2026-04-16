@@ -236,7 +236,7 @@ show their chart-defined monitorLabel value instead.
 {{- define "dgraph.labels" -}}
 {{- $ctx := .ctx -}}
 {{- $labels := default (dict) $ctx.Values.commonLabels | deepCopy -}}
-{{- $labels = merge (default (dict) .podLabels) $labels -}}
+{{- $labels = merge (default (dict) .podLabels | deepCopy) $labels -}}
 {{- range $key, $val := (default (dict) .extra) -}}
 {{- $_ := set $labels $key $val -}}
 {{- end -}}
