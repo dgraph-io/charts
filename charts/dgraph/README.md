@@ -30,30 +30,15 @@ Chart v25 removes the version-specific `chart` label (e.g. `chart: dgraph-24.1.4
 
 Note that keeping the `chart` label in selectors was already problematic — because it includes the chart version, **every chart upgrade would change the selector value and break**, not just the v24 to v25 transition. Removing it ensures that future chart upgrades will work seamlessly without requiring resource recreation.
 
-**Automated migration**: Chart v25.3.1-preview1 and later include a `pre-upgrade` hook that automatically handles this. The hook:
+**Automated migration**: The chart includes a `pre-upgrade` hook that automatically handles this. The hook:
 
 1. Detects StatefulSets and Deployments that still have the old `chart` selector label
 2. Deletes them with `--cascade=orphan`, which keeps existing pods running
 3. Helm then recreates the resources with the updated selectors and rolls the pods
 
-No manual intervention is required if you are upgrading to v25.3.1-preview1 or later. If upgrading to v25.3.1-preview2+, also review the [v25.3.1-preview2 breaking changes](#v2531-preview2-breaking-changes) below.
+No manual intervention is required. Also review the [additional breaking changes](#additional-v25-breaking-changes) below.
 
-**Manual migration** (for earlier v25 chart versions without the hook):
-
-```bash
-RELEASE="my-release"
-NAMESPACE="default"
-VERSION="25.3.1-preview2"
-
-# Delete StatefulSets while keeping pods running
-kubectl delete statefulset "$RELEASE-dgraph-alpha" --cascade=orphan -n "$NAMESPACE"
-kubectl delete statefulset "$RELEASE-dgraph-zero" --cascade=orphan -n "$NAMESPACE"
-
-# Then run the Helm upgrade
-helm upgrade "$RELEASE" dgraph/dgraph --version "$VERSION"
-```
-
-#### v25.3.1-preview2 (Breaking Changes)
+#### Additional v25 breaking changes
 
 **Full backup restartPolicy fix**: The full backup CronJob previously read its `restartPolicy` from `backups.incremental.restartPolicy` instead of `backups.full.restartPolicy`. This has been fixed. If you were working around this bug by setting `backups.incremental.restartPolicy` to control the full backup's restart policy, you will need to move that value to `backups.full.restartPolicy`.
 
