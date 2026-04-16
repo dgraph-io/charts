@@ -30,7 +30,7 @@ env:
   - name: DGRAPH_URL
     value: ""
   ## DGRAPH_TOKEN is set for X-Auth-Token
-  ## See: https://dgraph.io/docs/slash-graphql/admin/authentication/
+  ## See: https://docs.dgraph.io/admin/security/admin-endpoint-security
   # - name: DGRAPH_TOKEN
   #   value: ""
   # - name: NODE_ENV
