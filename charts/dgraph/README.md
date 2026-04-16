@@ -53,6 +53,12 @@ kubectl delete statefulset "$RELEASE-dgraph-zero" --cascade=orphan -n "$NAMESPAC
 helm upgrade "$RELEASE" dgraph/dgraph --version "$VERSION"
 ```
 
+#### v25.3.1-preview2 (Breaking Changes)
+
+**Full backup restartPolicy fix**: The full backup CronJob previously read its `restartPolicy` from `backups.incremental.restartPolicy` instead of `backups.full.restartPolicy`. This has been fixed. If you were working around this bug by setting `backups.incremental.restartPolicy` to control the full backup's restart policy, you will need to move that value to `backups.full.restartPolicy`.
+
+**Backup admin password now required**: When `alpha.acl.enabled` is true and backups are enabled, `backups.admin.password` must be explicitly set. Previously the chart would silently render an empty secret, which would cause backup failures at runtime. The chart now fails at install/upgrade time with a clear error message if the password is missing.
+
 ### Installing the Chart
 
 To install the chart with the release name `my-release`:
