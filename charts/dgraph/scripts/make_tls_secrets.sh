@@ -40,7 +40,7 @@ USAGE
 check_environment() {
   ## Check for dgraph command
   command -v dgraph > /dev/null || \
-    { echo "[ERROR]: 'dgraph' command not not found" 1>&2; exit 1; }
+    { echo "[ERROR]: 'dgraph' command not found" 1>&2; exit 1; }
 }
 
 ######
