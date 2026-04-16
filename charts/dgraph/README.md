@@ -564,7 +564,7 @@ helm install $RELNAME \
 
 ## Binary backups
 
-Dgraph [Binary Backups](https://dgraph.io/docs/binary-backups/) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
+Dgraph [Binary Backups](https://docs.dgraph.io/admin/admin-tasks/binary-backups) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
 
 * Full backup at midnight: `0 * * * *`
 * Incremental backups every hour, except midnight: `0 1-23 * * *`

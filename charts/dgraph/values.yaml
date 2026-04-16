@@ -384,7 +384,7 @@ alpha:
     files: {}
 
   ## ACL Configuration
-  ## ref: https://dgraph.io/docs/access-control-lists/
+  ## ref: https://docs.dgraph.io/installation/configuration/enable-acl
   acl:
     enabled: false
     ## The values in `file: {}` will be the filename as key and the file data as the value.
@@ -395,7 +395,7 @@ alpha:
     #   hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
 
   ## Encryption at Rest Configuration
-  ## ref: https://dgraph.io/docs/encryption-at-rest/
+  ## ref: https://docs.dgraph.io/installation/configuration/encryption-at-rest
   encryption:
     enabled: false
     ## The values in `file: {}` will be the filename as key and the file data as the value.
@@ -478,7 +478,7 @@ alpha:
   ## You may want to initialize the Alphas with data before starting Alpha containers.
   ## Examples can include:
   ## * offline data restore from binary backups with `dgraph restore`
-  ##   (ref. https://dgraph.io/docs/binary-backups/#restore-from-backup)
+  ##   (ref. https://docs.dgraph.io/admin/admin-tasks/binary-backups#online-restore)
   ## * bulk loader (ref. https://dgraph.io/docs/howto/importdata/bulk-loader/)
   initContainers:
     init:
@@ -624,7 +624,7 @@ ratel:
   customReadinessProbe: {}
 
 ## Binary Backup CronJob Configuration
-## ref: https://dgraph.io/docs/binary-backups/
+## ref: https://docs.dgraph.io/admin/admin-tasks/binary-backups
 ##
 backups:
   name: backups
@@ -639,7 +639,7 @@ backups:
   admin:
     ## backup user and password that is a member of 'guardians'group used to
     ## login if ACLs are enabled.  This fetches an access token used to trigger backups
-    ## ref: https://dgraph.io/docs/access-control-lists/
+    ## ref: https://docs.dgraph.io/installation/configuration/enable-acl
     user: groot
     # password: password
     ## Mutual TLS client certificate and key can be used to secure transaction that was created with

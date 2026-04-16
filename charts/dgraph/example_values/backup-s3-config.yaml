@@ -1,5 +1,5 @@
 ## backup-s3-config.yaml
-## * https://dgraph.io/docs/binary-backups/
+## * https://docs.dgraph.io/admin/admin-tasks/binary-backups
 ##
 ## Demonstrates
 ## * Binary Backups to S3
