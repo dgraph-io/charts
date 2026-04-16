@@ -209,37 +209,34 @@ Parameters (passed as a dict):
   extra      — dict of additional chart-defined labels, e.g. monitor or cronjob (optional)
   podLabels  — dict of user-supplied per-component pod labels (optional)
 
-Precedence (first wins on key conflicts):
-  standard labels > component > extra > podLabels > commonLabels
+Precedence (last applied wins on key conflicts):
+  commonLabels < podLabels < extra < component < standard labels
 
-Note: extra labels (like monitor) cannot be overridden by podLabels or
-commonLabels. This is intentional — chart-defined labels take priority
-over user-supplied ones.
+User-supplied commonLabels have the lowest priority and cannot override
+any chart-defined or per-component label.
 */}}
 {{- define "dgraph.labels" -}}
 {{- $ctx := .ctx -}}
-{{- $labels := dict
-  "app" (include "dgraph.name" $ctx)
-  "app.kubernetes.io/instance" $ctx.Release.Name
-  "app.kubernetes.io/managed-by" $ctx.Release.Service
-  "app.kubernetes.io/name" (include "dgraph.name" $ctx)
-  "chart" (include "dgraph.chart" $ctx)
-  "helm.sh/chart" (include "dgraph.chart" $ctx)
-  "heritage" $ctx.Release.Service
-  "release" $ctx.Release.Name
--}}
-{{- if $ctx.Chart.AppVersion -}}
-{{- $_ := set $labels "app.kubernetes.io/version" $ctx.Chart.AppVersion -}}
+{{- $labels := default (dict) $ctx.Values.commonLabels | deepCopy -}}
+{{- $labels = merge (default (dict) .podLabels) $labels -}}
+{{- range $key, $val := (default (dict) .extra) -}}
+{{- $_ := set $labels $key $val -}}
 {{- end -}}
 {{- if .component -}}
 {{- $_ := set $labels "app.kubernetes.io/component" .component -}}
 {{- $_ := set $labels "component" .component -}}
 {{- end -}}
-{{- range $key, $val := (default (dict) .extra) -}}
-{{- $_ := set $labels $key $val -}}
+{{- $_ := set $labels "app" (include "dgraph.name" $ctx) -}}
+{{- $_ := set $labels "app.kubernetes.io/instance" $ctx.Release.Name -}}
+{{- $_ := set $labels "app.kubernetes.io/managed-by" $ctx.Release.Service -}}
+{{- $_ := set $labels "app.kubernetes.io/name" (include "dgraph.name" $ctx) -}}
+{{- if $ctx.Chart.AppVersion -}}
+{{- $_ := set $labels "app.kubernetes.io/version" $ctx.Chart.AppVersion -}}
 {{- end -}}
-{{- $labels = merge $labels (default (dict) .podLabels) -}}
-{{- $labels = merge $labels (default (dict) $ctx.Values.commonLabels) -}}
+{{- $_ := set $labels "chart" (include "dgraph.chart" $ctx) -}}
+{{- $_ := set $labels "helm.sh/chart" (include "dgraph.chart" $ctx) -}}
+{{- $_ := set $labels "heritage" $ctx.Release.Service -}}
+{{- $_ := set $labels "release" $ctx.Release.Name -}}
 {{- toYaml $labels -}}
 {{- end -}}
 
