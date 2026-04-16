@@ -90,6 +90,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 
 |              Parameter                   |                             Description                               |                       Default                       |
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
+| `commonLabels`                           | Labels to add to all resources and pod templates                      | `{}`                                                |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
 | `image.tag`                              | Container image tag                                                   | `v24.1.4`                                           |
@@ -97,6 +98,11 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `namespaceOverride`                      | Deployment namespace override if specified.                           | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
+| `preUpgradeHook.image.registry`          | Pre-upgrade hook image registry                                       | `docker.io`                                         |
+| `preUpgradeHook.image.repository`        | Pre-upgrade hook image repository                                     | `bitnami/kubectl`                                   |
+| `preUpgradeHook.image.tag`               | Pre-upgrade hook image tag                                            | `1.31`                                              |
+| `preUpgradeHook.podLabels`               | Labels for pre-upgrade hook Job pods                                  | `{}`                                                |
+| `preUpgradeHook.podAnnotations`          | Annotations for pre-upgrade hook Job pods                             | `{}`                                                |
 | `serviceAccount.create`                  | Create ServiceAccount                                                 | `true`                                              |
 | `serviceAccount.annotations`             | ServiceAccount annotations                                            | `{}`                                                |
 | `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
@@ -107,7 +113,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.podLabels`                         | Specify additional labels for template metadata                       | `{}`                                                |
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
 | `zero.schedulerName`                     | Configure an explicit scheduler                                       | `nil`                                               |
-| `zero.monitorLabel`                      | Monitor label for zero, used by prometheus.                           | `zero-dgraph-io`                                    |
+| `zero.monitorLabel`                      | "monitor" label on the zero Service (for Prometheus service discovery) | `zero-dgraph-io`                                    |
 | `zero.rollingUpdatePartition`            | Partition update strategy                                             | `nil`                                               |
 | `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `OrderedReady`                                      |
 | `zero.replicaCount`                      | Number of zero nodes                                                  | `3`                                                 |
@@ -149,7 +155,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.metrics.enabled`                  | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `alpha.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
 | `alpha.podLabels`                        | Specify additional labels for template metadata                       | `{}`                                                |
-| `alpha.monitorLabel`                     | Monitor label for alpha, used by prometheus.                          | `alpha-dgraph-io`                                   |
+| `alpha.monitorLabel`                     | "monitor" label on the alpha Service (for Prometheus service discovery) | `alpha-dgraph-io`                                   |
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
 | `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `alpha.rollingUpdatePartition`           | Partition update strategy                                             | `nil`                                               |
@@ -248,6 +254,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
 | `backups.name`                           | Backups component name                                                | `backups`                                           |
 | `backups.podLabels`                      | Specify additional labels for template metadata                       | `{}`                                                |
+| `backups.podAnnotations`                 | Annotations for backup CronJob pods                                   | `{}`                                                |
 | `backups.schedulerName`                  | Configure an explicit scheduler for Backups Kubernetes CronJobs       | `nil`                                               |
 | `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
 | `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |

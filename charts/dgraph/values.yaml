@@ -7,7 +7,9 @@
 #   imagePullSecrets:
 #     - myRegistryKeySecretName
 
-## Labels to add to all resources
+## Labels to add to all resources and pod templates.
+## These have the lowest priority — chart-defined labels (like monitorLabel)
+## and per-component podLabels will override commonLabels on key conflicts.
 commonLabels: {}
 
 image: &image
@@ -64,6 +66,8 @@ zero:
   ## StatefulSet spec.template.metadata.labels
   podLabels: {}
 
+  ## Value for the "monitor" label on the zero Service (not on pods or other resources).
+  ## Used by Prometheus for service discovery.
   monitorLabel: zero-dgraph-io
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
@@ -251,6 +255,8 @@ alpha:
   ## StatefulSet spec.template.metadata.labels
   podLabels: {}
 
+  ## Value for the "monitor" label on the alpha Service (not on pods or other resources).
+  ## Used by Prometheus for service discovery.
   monitorLabel: alpha-dgraph-io
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
