@@ -1,7 +1,7 @@
 1. You have just deployed Dgraph, version '{{ .Values.image.tag }}'.
 
    For further information:
-     * Documentation: https://dgraph.io/docs/
+     * Documentation: https://docs.dgraph.io/
      * Community and Issues: https://discuss.dgraph.io/
    {{ if or (eq .Values.image.tag "latest") (eq .Values.image.tag "master") }}
    NOTE: Using 'latest' or 'master' for 'image.tag' is DANGEROUS and can lead to data loss.

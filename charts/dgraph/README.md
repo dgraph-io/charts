@@ -664,4 +664,4 @@ done
 Dgraph exposes Prometheus metrics to monitor the state of various components involved in
 the cluster, this includes Dgraph Alpha and Dgraph Zero.
 
-Further information can be found in the [Monitoring in Kubernetes](https://dgraph.io/docs/deploy/installation/kubernetes/monitoring-cluster#monitoring-the-kubernetes-cluster) documentation.
+Further information can be found in the [Monitoring in Kubernetes](https://docs.dgraph.io/admin/observability/monitoring) documentation.
