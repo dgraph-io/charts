@@ -4,14 +4,7 @@ metadata:
   name: {{ template "dgraph.zero.fullname" . }}-headless
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    component: {{ .Values.zero.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- with .Values.zero.serviceHeadless.labels }}
-    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
-    {{- end }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.zero.name "extra" .Values.zero.serviceHeadless.labels) | nindent 4 }}
 spec:
   type: ClusterIP
   clusterIP: None

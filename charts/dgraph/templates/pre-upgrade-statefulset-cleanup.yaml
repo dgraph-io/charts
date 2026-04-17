@@ -10,10 +10,7 @@ metadata:
   name: {{ template "dgraph.fullname" . }}-pre-upgrade
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
@@ -25,10 +22,7 @@ metadata:
   name: {{ template "dgraph.fullname" . }}-pre-upgrade
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
@@ -44,10 +38,7 @@ metadata:
   name: {{ template "dgraph.fullname" . }}-pre-upgrade
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "-10"
@@ -67,10 +58,7 @@ metadata:
   name: {{ template "dgraph.fullname" . }}-pre-upgrade
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-upgrade
     "helm.sh/hook-weight": "0"
@@ -80,6 +68,12 @@ spec:
   template:
     metadata:
       name: {{ template "dgraph.fullname" . }}-pre-upgrade
+      labels:
+        {{- include "dgraph.labels" (dict "ctx" . "podLabels" .Values.preUpgradeHook.podLabels) | nindent 8 }}
+      {{- with .Values.preUpgradeHook.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       serviceAccountName: {{ template "dgraph.fullname" . }}-pre-upgrade
       restartPolicy: Never
@@ -89,31 +83,31 @@ spec:
       {{- end }}
       containers:
         - name: pre-upgrade
-          image: bitnami/kubectl:latest
+          image: {{ .Values.preUpgradeHook.image.registry }}/{{ .Values.preUpgradeHook.image.repository }}:{{ .Values.preUpgradeHook.image.tag }}
           command:
             - /bin/sh
-            - -c
+            - -ec
             - |
               NS="{{ include "dgraph.namespace" . }}"
 
               # StatefulSets (Alpha and Zero)
               for STS in {{ template "dgraph.alpha.fullname" . }} {{ template "dgraph.zero.fullname" . }}; do
-                SELECTOR=$(kubectl get statefulset "$STS" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}' 2>/dev/null)
+                SELECTOR=$(kubectl get statefulset "$STS" -n "$NS" --ignore-not-found -o jsonpath='{.spec.selector.matchLabels.chart}')
                 if [ -n "$SELECTOR" ]; then
                   echo "StatefulSet $STS has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
                   kubectl delete statefulset "$STS" --cascade=orphan -n "$NS"
                 else
-                  echo "StatefulSet $STS does not have 'chart' selector label, skipping."
+                  echo "StatefulSet $STS does not have 'chart' selector label (or does not exist), skipping."
                 fi
               done
 
               # Deployments (Ratel)
               for DEPLOY in {{ template "dgraph.ratel.fullname" . }}; do
-                SELECTOR=$(kubectl get deployment "$DEPLOY" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}' 2>/dev/null)
+                SELECTOR=$(kubectl get deployment "$DEPLOY" -n "$NS" --ignore-not-found -o jsonpath='{.spec.selector.matchLabels.chart}')
                 if [ -n "$SELECTOR" ]; then
                   echo "Deployment $DEPLOY has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
                   kubectl delete deployment "$DEPLOY" --cascade=orphan -n "$NS"
                 else
-                  echo "Deployment $DEPLOY does not have 'chart' selector label, skipping."
+                  echo "Deployment $DEPLOY does not have 'chart' selector label (or does not exist), skipping."
                 fi
               done

@@ -1,6 +1,6 @@
 ## alpha-acl-config.yaml
 ## Specify Access Control Lists configuration options for `dgraph alpha`
-## * https://dgraph.io/docs/enterprise-features/access-control-lists/
+## * https://docs.dgraph.io/installation/configuration/enable-acl
 alpha:
   acl:
     enabled: true

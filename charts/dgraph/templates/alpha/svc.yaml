@@ -4,15 +4,9 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    component: {{ .Values.alpha.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    monitor: {{ .Values.alpha.monitorLabel }}
-    {{- with .Values.alpha.service.labels }}
-    {{- toYaml . | trimSuffix "\n" | nindent 4 }}
-    {{- end }}
+    {{- $extra := dict "monitor" .Values.alpha.monitorLabel }}
+    {{- with .Values.alpha.service.labels }}{{ $extra = merge $extra . }}{{ end }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.alpha.name "extra" $extra) | nindent 4 }}
   {{- with .Values.alpha.service.annotations }}
   annotations:
     {{- toYaml . | trimSuffix "\n" | nindent 4 }}

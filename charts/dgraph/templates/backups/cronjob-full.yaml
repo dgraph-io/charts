@@ -18,25 +18,23 @@ metadata:
   name: {{ template "dgraph.backups.fullname" . }}-full
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    component: {{ .Values.backups.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.backups.name) | nindent 4 }}
 spec:
   schedule: "{{ .Values.backups.full.schedule }}"
   jobTemplate:
     metadata:
       labels:
-        cronjob: {{ template "dgraph.backups.fullname" . }}-full
+        {{- include "dgraph.labels" (dict "ctx" . "component" .Values.backups.name "extra" (dict "cronjob" (printf "%s-full" (include "dgraph.backups.fullname" .)))) | nindent 8 }}
     spec:
       template:
         metadata:
           labels:
-            cronjob: {{ template "dgraph.backups.fullname" . }}-full
-            {{- if .Values.backups.podLabels }}
-{{ .Values.backups.podLabels | toYaml | indent 12}}
-            {{- end }}
+            {{- $extra := dict "cronjob" (printf "%s-full" (include "dgraph.backups.fullname" .)) }}
+            {{- include "dgraph.labels" (dict "ctx" . "component" .Values.backups.name "extra" $extra "podLabels" .Values.backups.podLabels) | nindent 12 }}
+          {{- with .Values.backups.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         spec:
           {{- if .Values.serviceAccount.create }}
           serviceAccountName: {{ .Values.serviceAccount.name }}
@@ -116,7 +114,7 @@ spec:
               value: /dgraph/tls/client.{{ .Values.backups.admin.tls_client }}.key
             {{- end }}
             {{- end }}
-          restartPolicy: {{ .Values.backups.incremental.restartPolicy }}
+          restartPolicy: {{ .Values.backups.full.restartPolicy }}
           volumes:
           - name: backup-config-volume
             configMap:

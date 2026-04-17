@@ -5,11 +5,7 @@ metadata:
   name: {{ template "dgraph.ratel.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    component: {{ .Values.ratel.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.ratel.name) | nindent 4 }}
 spec:
   selector:
     matchLabels:
@@ -26,13 +22,7 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        app: {{ template "dgraph.name" . }}
-        chart: {{ template "dgraph.chart" . }}
-        component: {{ .Values.ratel.name }}
-        release: {{ .Release.Name }}
-        {{- if .Values.ratel.podLabels }}
-{{ .Values.ratel.podLabels | toYaml | indent 8}}
-        {{- end }}
+        {{- include "dgraph.labels" (dict "ctx" . "component" .Values.ratel.name "podLabels" .Values.ratel.podLabels) | nindent 8 }}
     spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}

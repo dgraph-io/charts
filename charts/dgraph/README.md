@@ -30,28 +30,19 @@ Chart v25 removes the version-specific `chart` label (e.g. `chart: dgraph-24.1.4
 
 Note that keeping the `chart` label in selectors was already problematic — because it includes the chart version, **every chart upgrade would change the selector value and break**, not just the v24 to v25 transition. Removing it ensures that future chart upgrades will work seamlessly without requiring resource recreation.
 
-**Automated migration**: Chart v25.3.1-preview1 and later include a `pre-upgrade` hook that automatically handles this. The hook:
+**Automated migration**: The chart includes a `pre-upgrade` hook that automatically handles this. The hook:
 
 1. Detects StatefulSets and Deployments that still have the old `chart` selector label
 2. Deletes them with `--cascade=orphan`, which keeps existing pods running
 3. Helm then recreates the resources with the updated selectors and rolls the pods
 
-No manual intervention is required if you are upgrading to v25.3.1-preview1 or later.
+No manual intervention is required. Also review the [additional breaking changes](#additional-v25-breaking-changes) below.
 
-**Manual migration** (for earlier v25 chart versions without the hook):
+#### Additional v25 breaking changes
 
-```bash
-RELEASE="my-release"
-NAMESPACE="default"
-VERSION="25.3.1-preview1"
+**Full backup restartPolicy fix**: The full backup CronJob previously read its `restartPolicy` from `backups.incremental.restartPolicy` instead of `backups.full.restartPolicy`. This has been fixed. If you were working around this bug by setting `backups.incremental.restartPolicy` to control the full backup's restart policy, you will need to move that value to `backups.full.restartPolicy`.
 
-# Delete StatefulSets while keeping pods running
-kubectl delete statefulset "$RELEASE-dgraph-alpha" --cascade=orphan -n "$NAMESPACE"
-kubectl delete statefulset "$RELEASE-dgraph-zero" --cascade=orphan -n "$NAMESPACE"
-
-# Then run the Helm upgrade
-helm upgrade "$RELEASE" dgraph/dgraph --version "$VERSION"
-```
+**Backup admin password now required**: When `alpha.acl.enabled` is true and backups are enabled, `backups.admin.password` must be explicitly set. Previously the chart would silently render an empty secret, which would cause backup failures at runtime. The chart now fails at install/upgrade time with a clear error message if the password is missing.
 
 ### Installing the Chart
 
@@ -90,24 +81,30 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 
 |              Parameter                   |                             Description                               |                       Default                       |
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
+| `commonLabels`                           | Labels to add to all resources and pod templates                      | `{}`                                                |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v24.1.4`                                           |
+| `image.tag`                              | Container image tag                                                   | `v25.3.1`                                           |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `namespaceOverride`                      | Deployment namespace override if specified.                           | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
+| `preUpgradeHook.image.registry`          | Pre-upgrade hook image registry                                       | `docker.io`                                         |
+| `preUpgradeHook.image.repository`        | Pre-upgrade hook image repository                                     | `bitnami/kubectl`                                   |
+| `preUpgradeHook.image.tag`               | Pre-upgrade hook image tag                                            | `1.31`                                              |
+| `preUpgradeHook.podLabels`               | Labels for pre-upgrade hook Job pods                                  | `{}`                                                |
+| `preUpgradeHook.podAnnotations`          | Annotations for pre-upgrade hook Job pods                             | `{}`                                                |
 | `serviceAccount.create`                  | Create ServiceAccount                                                 | `true`                                              |
 | `serviceAccount.annotations`             | ServiceAccount annotations                                            | `{}`                                                |
 | `serviceAccount.name`                    | ServiceAccount name                                                   | `dgraph`                                            |
-| `serviceAccount.automountServiceAccountToken` | automatially mount a ServiceAccount API credentials              | `true`                                              |
+| `serviceAccount.automountServiceAccountToken` | automatically mount a ServiceAccount API credentials              | `true`                                              |
 | `zero.name`                              | Zero component name                                                   | `zero`                                              |
 | `zero.metrics.enabled`                   | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `zero.extraAnnotations`                  | Specify annotations for template metadata                             | `{}`                                                |
 | `zero.podLabels`                         | Specify additional labels for template metadata                       | `{}`                                                |
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
 | `zero.schedulerName`                     | Configure an explicit scheduler                                       | `nil`                                               |
-| `zero.monitorLabel`                      | Monitor label for zero, used by prometheus.                           | `zero-dgraph-io`                                    |
+| `zero.monitorLabel`                      | "monitor" label on the zero Service (for Prometheus service discovery) | `zero-dgraph-io`                                    |
 | `zero.rollingUpdatePartition`            | Partition update strategy                                             | `nil`                                               |
 | `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `OrderedReady`                                      |
 | `zero.replicaCount`                      | Number of zero nodes                                                  | `3`                                                 |
@@ -120,7 +117,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.extraEnvs`                         | extra env vars                                                        | `[]`                                                |
 | `zero.extraFlags`                        | Zero extra flags for command line                                     | `""`                                                |
 | `zero.configFile`                        | Zero config file                                                      | `{}`                                                |
-| `zero.automountServiceAccountToken`      | automatially mount a ServiceAccount API credentials                   | `true`                                              |
+| `zero.automountServiceAccountToken`      | automatically mount a ServiceAccount API credentials                   | `true`                                              |
 | `zero.service.type`                      | Zero service type                                                     | `ClusterIP`                                         |
 | `zero.service.labels`                    | Zero service labels                                                   | `{}`                                                |
 | `zero.service.annotations`               | Zero service annotations                                              | `{}`                                                |
@@ -149,7 +146,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.metrics.enabled`                  | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `alpha.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
 | `alpha.podLabels`                        | Specify additional labels for template metadata                       | `{}`                                                |
-| `alpha.monitorLabel`                     | Monitor label for alpha, used by prometheus.                          | `alpha-dgraph-io`                                   |
+| `alpha.monitorLabel`                     | "monitor" label on the alpha Service (for Prometheus service discovery) | `alpha-dgraph-io`                                   |
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
 | `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `alpha.rollingUpdatePartition`           | Partition update strategy                                             | `nil`                                               |
@@ -163,7 +160,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
 | `alpha.extraFlags`                       | Alpha extra flags for command                                         | `""`                                                |
 | `alpha.configFile`                       | Alpha config file                                                     | `{}`                                                |
-| `alpha.automountServiceAccountToken`     | automatially mount a ServiceAccount API credentials                   | `true`                                              |
+| `alpha.automountServiceAccountToken`     | automatically mount a ServiceAccount API credentials                   | `true`                                              |
 | `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
 | `alpha.service.labels`                   | Alpha service labels                                                  | `{}`                                                |
 | `alpha.service.annotations`              | Alpha service annotations                                             | `{}`                                                |
@@ -186,10 +183,10 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.securityContext.runAsUser`        | User ID for the Alpha container                                       | `1001`                                              |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
 | `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
-| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled (Enterprise feature)                 | `false`                                             |
-| `alpha.encryption.file`                  | Alpha Encryption at Rest key file (Enterprise feature)                | `nil`                                               |
-| `alpha.acl.enabled`                      | Alpha ACL enabled (Enterprise feature)                                | `false`                                             |
-| `alpha.acl.file`                         | Alpha ACL secret file (Enterprise feature)                            | `nil`                                               |
+| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled                                      | `false`                                             |
+| `alpha.encryption.file`                  | Alpha Encryption at Rest key file                                     | `nil`                                               |
+| `alpha.acl.enabled`                      | Alpha ACL enabled                                                     | `false`                                             |
+| `alpha.acl.file`                         | Alpha ACL secret file                                                 | `nil`                                               |
 | `alpha.persistence.enabled`              | Enable persistence for alpha using PVC                                | `true`                                              |
 | `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
 | `alpha.persistence.accessModes`          | PVC Access Mode for alpha volume                                      | `['ReadWriteOnce']`                                 |
@@ -226,7 +223,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.envFrom`                          | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
 | `ratel.extraEnvs`                        | Extra env vars                                                        | `[]`                                                |
 | `ratel.args`                             | Ratel command line arguments                                          | `[]`                                                |
-| `ratel.automountServiceAccountToken`     | automatially mount a ServiceAccount API credentials                   | `true`                                              |
+| `ratel.automountServiceAccountToken`     | automatically mount a ServiceAccount API credentials                   | `true`                                              |
 | `ratel.service.type`                     | Ratel service type                                                    | `ClusterIP`                                         |
 | `ratel.service.labels`                   | Ratel Service labels                                                  | `{}`                                                |
 | `ratel.service.annotations`              | Ratel Service annotations                                             | `{}`                                                |
@@ -248,9 +245,10 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.customReadinessProbe`             | Ratel custom readiness probes (if `ratel.readinessProbe` not enabled) | `{}`                                                |
 | `backups.name`                           | Backups component name                                                | `backups`                                           |
 | `backups.podLabels`                      | Specify additional labels for template metadata                       | `{}`                                                |
+| `backups.podAnnotations`                 | Annotations for backup CronJob pods                                   | `{}`                                                |
 | `backups.schedulerName`                  | Configure an explicit scheduler for Backups Kubernetes CronJobs       | `nil`                                               |
 | `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
-| `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `password`                                          |
+| `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `nil`                                               |
 | `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
@@ -461,7 +459,7 @@ curl --silent \
   https://localhost:6080/state
 ```
 
-## Alpha encryption at rest (enterprise feature)
+## Alpha encryption at rest
 
 You can generate a secret for the key file using `base64` tool:
 
@@ -505,7 +503,7 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
-## Alpha access control lists (enterprise feature)
+## Alpha access control lists
 
 You can generate a secret for the secrets file using `base64` tool:
 
@@ -549,9 +547,9 @@ helm install $RELNAME \
  dgraph/dgraph
 ```
 
-## Binary backups (enterprise feature)
+## Binary backups
 
-Dgraph [Binary Backups](https://dgraph.io/docs/enterprise-features/binary-backups/) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
+Dgraph [Binary Backups](https://docs.dgraph.io/admin/admin-tasks/binary-backups) are supported by Kubernetes CronJobs. There are two types of Kubernetes CronJobs supported:
 
 * Full backup at midnight: `0 * * * *`
 * Incremental backups every hour, except midnight: `0 1-23 * * *`
@@ -610,10 +608,10 @@ If Dgraph Alpha TLS options are used, backup cronjobs will submit the requests u
 When ACLs are used, the backup cronjob will log in to the Alpha node using a specified user account.  Through this process, the backup cronjob script will receive an AccessJWT token that will be submitted when requesting a backup.
 
 * Alpha
-  * see [Alpha Access Control Lists](#alpha-access-control-lists-enterprise-feature) above.
+  * see [Alpha Access Control Lists](#alpha-access-control-lists) above.
 * Backups
   * `backups.admin.user` (default: `groot`) - a user that is a member of `guardians` group will need to be specified.
-  * `backups.admin.password` (default: `password`) - the corresponding password for that user will need to be specified.
+  * `backups.admin.password` (required) - the corresponding password for that user will need to be specified.
 
 ### Using an auth token
 
@@ -651,4 +649,4 @@ done
 Dgraph exposes Prometheus metrics to monitor the state of various components involved in
 the cluster, this includes Dgraph Alpha and Dgraph Zero.
 
-Further information can be found in the [Monitoring in Kubernetes](https://dgraph.io/docs/deploy/installation/kubernetes/monitoring-cluster#monitoring-the-kubernetes-cluster) documentation.
+Further information can be found in the [Monitoring in Kubernetes](https://docs.dgraph.io/admin/observability/monitoring) documentation.

@@ -9,10 +9,10 @@ helm install "my-ratel" --namespace "my-ratel" dgraph/ratel
 
 ## Introduction
 
-Ratel is a [SPA](https://wikipedia.org/wiki/Single-page_application) ([single-page-application](https://wikipedia.org/wiki/Single-page_application)) [React](https://react.dev/) client that runs locally from your web browser.  The server component is a small web server that hosts the client application, which is then downloaed into your browser locally. There is no server-to-server connection. 
+Ratel is a [SPA](https://wikipedia.org/wiki/Single-page_application) ([single-page-application](https://wikipedia.org/wiki/Single-page_application)) [React](https://react.dev/) client that runs locally from your web browser.  The server component is a small web server that hosts the client application, which is then downloaded into your browser locally. There is no server-to-server connection. 
 
 
-### Prequisites
+### Prerequisites
 
 * Kubernetes 1.20+
 * Helm 3.0+
@@ -22,7 +22,7 @@ Ratel is a [SPA](https://wikipedia.org/wiki/Single-page_application) ([single-pa
 
 For best practices in security, it is recommended that you install Ratel separately instead of bundled together with the Dgraph.  This small web server should be installed in a namespace that is separate from Dgraph server. If your Kubernetes cluster supports the [network policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) feature, such as [Calico](https://www.tigera.io/project-calico/), you can use these to restrict traffic between the web service hosting Ratel and Dgraph servers.
 
-Given this, use thie helm chart to install Ratel separately from Dgraph
+Given this, use the helm chart to install Ratel separately from Dgraph
 
 ### Accessing Ratel
 

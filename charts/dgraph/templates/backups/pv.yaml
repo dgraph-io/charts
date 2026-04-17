@@ -5,11 +5,7 @@ metadata:
   name: {{ template "dgraph.backups.fullname" . }}-fileserver
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    component: {{ .Values.backups.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.backups.name) | nindent 4 }}
 spec:
   capacity:
     storage: {{ .Values.backups.nfs.storage }}

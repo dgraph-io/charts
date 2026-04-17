@@ -108,7 +108,7 @@ To publish the chart, commit and push the latest changes of index file to `gh-pa
 
 ```bash
 git add index.yaml
-## cample commit strings:
+## example commit strings:
 ##   dgraph-lambda-0.0.1 index.yaml update
 ##   dgraph-0.0.13 index.yaml update
 git commit -m "chart-version index.yaml update"

@@ -4,7 +4,7 @@
   {{- $max := int .Values.zero.replicaCount -}}
   {{- $safeVersion := include "dgraph.version" . -}}
   {{- /* Reset $max to 1 if multiple zeros not supported by dgraph version */}}
-  {{- if semverCompare "< 1.2.3 || 20.03.0" $safeVersion -}}
+  {{- if or (semverCompare "< 1.2.3" $safeVersion) (semverCompare "= 20.03.0" $safeVersion) -}}
      {{- $max = 1 -}}
   {{- end -}}
 
@@ -32,11 +32,7 @@ metadata:
   name: {{ template "dgraph.alpha.fullname" . }}
   namespace: {{ include "dgraph.namespace" . }}
   labels:
-    app: {{ template "dgraph.name" . }}
-    chart: {{ template "dgraph.chart" . }}
-    component: {{ .Values.alpha.name }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.alpha.name) | nindent 4 }}
 spec:
   serviceName: {{ template "dgraph.alpha.fullname" . }}-headless
   replicas: {{ .Values.alpha.replicaCount }}
@@ -69,13 +65,7 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        app: {{ template "dgraph.name" . }}
-        chart: {{ template "dgraph.chart" . }}
-        release: {{ .Release.Name }}
-        component: {{ .Values.alpha.name }}
-        {{- if .Values.alpha.podLabels }}
-{{ .Values.alpha.podLabels | toYaml | indent 8}}
-        {{- end }}
+        {{- include "dgraph.labels" (dict "ctx" . "component" .Values.alpha.name "podLabels" .Values.alpha.podLabels) | nindent 8 }}
     spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
@@ -334,7 +324,6 @@ spec:
         secret:
           secretName: {{ template "dgraph.alpha.fullname" . }}-acl-secret
       {{- end }}
-
 {{- if .Values.alpha.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:

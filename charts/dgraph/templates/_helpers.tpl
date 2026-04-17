@@ -200,6 +200,65 @@ Create a default fully qualified ratel name.
 {{- end -}}
 
 {{/*
+Build a complete label set as a dict and render via toYaml so that keys
+are always sorted alphabetically by Go's YAML marshaler.
+
+Parameters (passed as a dict):
+  ctx        — the Helm root context (required)
+  component  — value for component / app.kubernetes.io/component (optional)
+  extra      — dict of additional chart-defined labels, e.g. monitor or cronjob (optional)
+  podLabels  — dict of user-supplied per-component pod labels (optional)
+
+On key conflicts, higher-priority sources override lower-priority ones:
+  (lowest)  commonLabels  — from values.yaml, applied to every resource
+            podLabels     — from values.yaml, only passed on pod templates
+            extra         — chart-defined, only passed by specific templates
+            component     — chart-defined, omitted on shared resources like the ServiceAccount
+  (highest) standard labels (app, chart, release, heritage, app.kubernetes.io/*)
+
+For example, commonLabels cannot override standard labels like "app" or
+"release", and podLabels cannot override chart-defined extra labels.
+
+Not every call passes every parameter. The "extra" parameter is only
+used by templates that need additional chart-defined labels:
+  - alpha/zero non-headless Services pass extra.monitor (from monitorLabel)
+  - alpha/zero headless Services pass extra from serviceHeadless.labels
+  - ratel Service passes extra from service.labels
+  - backup CronJob pod templates pass extra.cronjob
+The "component" parameter is omitted on the shared ServiceAccount and
+the pre-upgrade hook resources (which aren't component-specific).
+
+Note on monitorLabel: because "monitor" is only passed as an extra on
+the two non-headless Services, setting commonLabels.monitor will add a
+"monitor" label to most resources, but those two Services will still
+show their chart-defined monitorLabel value instead.
+*/}}
+{{- define "dgraph.labels" -}}
+{{- $ctx := .ctx -}}
+{{- $labels := default (dict) $ctx.Values.commonLabels | deepCopy -}}
+{{- $_ := deepCopy (default (dict) .podLabels) | mergeOverwrite $labels -}}
+{{- range $key, $val := (default (dict) .extra) -}}
+{{- $_ := set $labels $key $val -}}
+{{- end -}}
+{{- if .component -}}
+{{- $_ := set $labels "app.kubernetes.io/component" .component -}}
+{{- $_ := set $labels "component" .component -}}
+{{- end -}}
+{{- $_ := set $labels "app" (include "dgraph.name" $ctx) -}}
+{{- $_ := set $labels "app.kubernetes.io/instance" $ctx.Release.Name -}}
+{{- $_ := set $labels "app.kubernetes.io/managed-by" $ctx.Release.Service -}}
+{{- $_ := set $labels "app.kubernetes.io/name" (include "dgraph.name" $ctx) -}}
+{{- if $ctx.Chart.AppVersion -}}
+{{- $_ := set $labels "app.kubernetes.io/version" $ctx.Chart.AppVersion -}}
+{{- end -}}
+{{- $_ := set $labels "chart" (include "dgraph.chart" $ctx) -}}
+{{- $_ := set $labels "helm.sh/chart" (include "dgraph.chart" $ctx) -}}
+{{- $_ := set $labels "heritage" $ctx.Release.Service -}}
+{{- $_ := set $labels "release" $ctx.Release.Name -}}
+{{- toYaml $labels -}}
+{{- end -}}
+
+{{/*
 Allow overriding namespace
 */}}
 {{- define "dgraph.namespace" -}}

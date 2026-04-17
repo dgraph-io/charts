@@ -1,10 +1,10 @@
 ## backup-s3-config.yaml
-## * https://dgraph.io/docs/enterprise-features/binary-backups/
+## * https://docs.dgraph.io/admin/admin-tasks/binary-backups
 ##
 ## Demonstrates
 ## * Binary Backups to S3
-## * Mutual TLS (see https://dgraph.io/docs/deploy/security/tls-configuration/#tls-options)
-## * Auth Token (see https://dgraph.io/docs/deploy/admin/dgraph-administration/#secure-alter-operations)
+## * Mutual TLS (see https://docs.dgraph.io/admin/security/tls-configuration#tls-options)
+## * Auth Token (see https://docs.dgraph.io/admin/security/admin-endpoint-security#securing-alter-operations)
 backups:
   full:
     enabled: true
