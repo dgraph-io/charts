@@ -14,4 +14,3 @@ ingress:
     - paths:
         - path: /*
           pathType: ImplementationSpecific
-      host: ratel.example.com
