@@ -50,17 +50,19 @@ spec:
   rules:
     - http:
         paths:
+          {{- range $path := .Values.global.ingress.alpha_paths | default (list "/graphql") }}
           - backend:
               service:
-                name:  {{ template "dgraph.alpha.fullname" . }}
+                name:  {{ template "dgraph.alpha.fullname" $ }}
                 port:
                   number: 8080
             pathType: ImplementationSpecific
-            path: {{ template "path" . }}
+            path: {{ $path }}
+          {{- end }}
       {{- if .Values.global.ingress.alpha_hostname }}
       host: {{ .Values.global.ingress.alpha_hostname }}
       {{- end }}
-    {{- if .Values.ratel.enabled }}
+    {{- if and .Values.ratel.enabled .Values.global.ingress.expose_ratel }}
     - http:
         paths:
           - backend:

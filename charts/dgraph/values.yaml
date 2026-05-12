@@ -711,6 +711,15 @@ global:
     tls: {}
     ratel_hostname: null
     alpha_hostname: null
+    ## Paths exposed on the alpha hostname. Defaults to GraphQL only so that
+    ## /admin, etc. are not reachable via the public ingress. In-cluster callers
+    ## continue to reach all paths # via the alpha Service.
+    alpha_paths:
+      - /graphql
+    ## When true, add a rule for the Ratel UI to this ingress. Default is off:
+    ## Ratel exposes admin actions against alpha, so it should not share a
+    ## public ingress unless that ingress has its own auth in front of it.
+    expose_ratel: false
   ingress_grpc:
     enabled: false
     ingressClassName: null
