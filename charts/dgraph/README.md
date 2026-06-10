@@ -133,6 +133,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.persistence.storageClass`          | PVC Storage Class for zero volume                                     | `nil`                                               |
 | `zero.persistence.accessModes`           | PVC Access Mode for zero volume                                       | `['ReadWriteOnce']`                                 |
 | `zero.persistence.size`                  | PVC Storage Request for zero volume                                   | `32Gi`                                              |
+| `zero.persistence.persistentVolumeClaimRetentionPolicy` | PVC retention policy for the zero StatefulSet (`whenDeleted`/`whenScaled`, each `Retain` or `Delete`); requires Kubernetes >= 1.27. Unset keeps the Kubernetes default. | _unset_ |
 | `zero.nodeSelector`                      | Node labels for zero pod assignment                                   | `{}`                                                |
 | `zero.tolerations`                       | Zero tolerations                                                      | `[]`                                                |
 | `zero.resources.requests.memory`         | Zero pod resources memory requests                                    | `100Mi`                                             |
@@ -191,6 +192,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
 | `alpha.persistence.accessModes`          | PVC Access Mode for alpha volume                                      | `['ReadWriteOnce']`                                 |
 | `alpha.persistence.size`                 | PVC Storage Request for alpha volume                                  | `100Gi`                                             |
+| `alpha.persistence.persistentVolumeClaimRetentionPolicy` | PVC retention policy for the alpha StatefulSet (`whenDeleted`/`whenScaled`, each `Retain` or `Delete`); requires Kubernetes >= 1.27. Unset keeps the Kubernetes default. | _unset_ |
 | `alpha.nodeSelector`                     | Node labels for alpha pod assignment                                  | `{}`                                                |
 | `alpha.tolerations`                      | Alpha tolerations                                                     | `[]`                                                |
 | `alpha.resources.requests.memory`        | Zero pod resources memory request                                     | `100Mi`                                             |
