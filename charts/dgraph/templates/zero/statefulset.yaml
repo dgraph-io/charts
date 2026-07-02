@@ -236,10 +236,19 @@ spec:
         - name: tls-volume
           mountPath: /dgraph/tls
         {{- end }}
+        {{- with .Values.zero.extraVolumeMounts }}
+          {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.zero.extraContainers }}
+        {{- tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.zero.terminationGracePeriodSeconds }}
       {{- with (include "dgraph.zero.volumes" . | trim) }}
       volumes:
         {{- . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.zero.extraVolumes }}
+        {{- tpl (toYaml .) $ | nindent 6 }}
       {{- end }}
 {{- if .Values.zero.persistence.enabled }}
   volumeClaimTemplates:

@@ -340,10 +340,19 @@ spec:
         - name: backups-vol-volume
           mountPath: {{ .Values.backups.volume.mountPath }}
         {{- end }}
+        {{- with .Values.alpha.extraVolumeMounts }}
+          {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.alpha.extraContainers }}
+        {{- tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       {{- with (include "dgraph.alpha.volumes" . | trim) }}
       volumes:
         {{- . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.alpha.extraVolumes }}
+        {{- tpl (toYaml .) $ | nindent 6 }}
       {{- end }}
 {{- if .Values.alpha.persistence.enabled }}
   volumeClaimTemplates:
