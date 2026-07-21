@@ -1,0 +1,117 @@
+{{- if and .Values.alpha.acl.enabled .Values.alpha.acl.bootstrap.enabled }}
+{{- /*
+  Resolve the Secret that holds the credentials the reconciler reads (groot and
+  per-user passwords). Defaults to the bootstrap-specific existingSecret, then the
+  ACL existingSecret, then the chart-created ACL Secret.
+*/}}
+{{- $bootstrap := .Values.alpha.acl.bootstrap }}
+{{- $secretName := $bootstrap.existingSecret | default .Values.alpha.acl.existingSecret | default (printf "%s-acl-secret" (include "dgraph.alpha.fullname" .)) }}
+{{- /* native TLS active (alpha.tls.enabled): the reconciler talks HTTPS to
+       Alpha's /admin and mounts the client cert. Reused at each TLS branch below. */}}
+{{- $nativeTLS := .Values.alpha.tls.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-acl-bootstrap
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "acl-bootstrap") | nindent 4 }}
+  annotations:
+    ## Run after Alpha/Zero are up, on both first install and every upgrade.
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      {{- with .Values.alpha.acl.bootstrap.rotation }}
+      annotations:
+        ## Changing acl.bootstrap.rotation changes this annotation, so a rotation
+        ## (e.g. a Terraform counter bump) produces a release diff that re-runs this
+        ## Job and its reconciler. The annotation lands only on the Job, so Alpha is
+        ## never restarted by a rotation.
+        dgraph.io/acl-rotation: {{ . | quote }}
+      {{- end }}
+      labels:
+        {{- include "dgraph.labels" (dict "ctx" . "component" "acl-bootstrap") | nindent 8 }}
+    spec:
+      restartPolicy: Never
+{{- include "dgraph.imagePullSecrets" . | indent 6 }}
+      automountServiceAccountToken: false
+      ## Run alongside Alpha (same taint/label) so the Job can reach the service.
+      {{- if .Values.alpha.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.alpha.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.alpha.tolerations }}
+      tolerations:
+{{ toYaml .Values.alpha.tolerations | indent 8 }}
+      {{- end }}
+      {{- if .Values.alpha.securityContext.enabled }}
+      securityContext:
+        {{- omit .Values.alpha.securityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: acl-bootstrap
+        {{- if .Values.alpha.acl.bootstrap.image }}
+        image: {{ printf "%s/%s:%s" .Values.alpha.acl.bootstrap.image.registry .Values.alpha.acl.bootstrap.image.repository (.Values.alpha.acl.bootstrap.image.tag | toString) }}
+        {{- else }}
+        image: {{ include "dgraph.image" . }}
+        {{- end }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        command: ["/usr/bin/bash", "/scripts/reconcile.sh"]
+        env:
+        - name: ALPHA_HOST
+          {{- if $nativeTLS }}
+          ## Native TLS: target the alpha-0 headless FQDN (…svc.<global.domain>) that
+          ## scripts/make_tls_secrets.sh lists in the cert SANs, so curl's hostname
+          ## verification of Alpha's server cert passes. The bare ClusterIP Service
+          ## name is not a SAN.
+          value: {{ printf "%s-0.%s-headless.%s.svc%s" (include "dgraph.alpha.fullname" .) (include "dgraph.alpha.fullname" .) (include "dgraph.namespace" .) (include "dgraph.domainSuffix" .) | quote }}
+          {{- else }}
+          value: {{ include "dgraph.alpha.fullname" . | quote }}
+          {{- end }}
+        - name: GROOT_PASSWORD_KEY
+          value: {{ .Values.alpha.acl.bootstrap.grootPasswordSecretKey | quote }}
+        - name: USERS_JSON
+          value: {{ .Values.alpha.acl.bootstrap.users | toJson | quote }}
+        - name: GROUPS_JSON
+          value: {{ .Values.alpha.acl.bootstrap.groups | toJson | quote }}
+        {{- if $nativeTLS }}
+        ## Native TLS (alpha.tls.enabled): reconcile.sh reads these to talk HTTPS
+        ## to Alpha's /admin and present a client cert under mutual TLS.
+        - name: CACERT_PATH
+          value: /dgraph/tls/ca.crt
+        {{- if .Values.alpha.tls.clientName }}
+        - name: CLIENT_CERT_PATH
+          value: /dgraph/tls/client.{{ .Values.alpha.tls.clientName }}.crt
+        - name: CLIENT_KEY_PATH
+          value: /dgraph/tls/client.{{ .Values.alpha.tls.clientName }}.key
+        {{- end }}
+        {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+        - name: creds
+          mountPath: /creds
+          readOnly: true
+        {{- if $nativeTLS }}
+        - name: tls-volume
+          mountPath: /dgraph/tls
+          readOnly: true
+        {{- end }}
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ include "dgraph.alpha.fullname" . }}-acl-bootstrap
+          defaultMode: 0555
+      - name: creds
+        secret:
+          secretName: {{ $secretName }}
+      {{- if $nativeTLS }}
+      - name: tls-volume
+        secret:
+          secretName: {{ include "dgraph.alpha.fullname" . }}-tls-secret
+      {{- end }}
+{{- end }}

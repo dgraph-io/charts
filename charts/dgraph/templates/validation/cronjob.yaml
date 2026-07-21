@@ -1,0 +1,39 @@
+{{- if and .Values.validation.enabled .Values.validation.cronjob.enabled }}
+{{- /*
+  Suspended manual-trigger template. It never fires on its own (suspended +
+  a never-occurring schedule); an operator runs it on demand via
+  `kubectl create job --from=cronjob/<release>-alpha-validate ... -manual`.
+  NOTES.txt renders the exact command (with the release's name and namespace
+  substituted) on install; this is a template comment, so it is not the place
+  for a rendered command.
+*/}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-validate
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 4 }}
+spec:
+  schedule: "0 0 31 2 *" # 31 February: never fires.
+  suspend: true
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 8 }}
+    spec:
+      backoffLimit: {{ .Values.validation.job.backoffLimit }}
+      template:
+        metadata:
+          labels:
+            {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 12 }}
+          {{- with .Values.validation.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          {{- include "dgraph.validation.podSpec" . | nindent 10 }}
+{{- end }}

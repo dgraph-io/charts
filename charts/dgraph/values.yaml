@@ -527,6 +527,42 @@ alpha:
     #   ## Note that Kubernetes secrets must be base64-encoded
     #   hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
 
+    ## Bootstrap: a run-once-per-deploy Job (post-install/post-upgrade hook) that
+    ## rotates `groot` off its default password and converges the declared users and
+    ## groups. Idempotent, so it is safe on every helm upgrade. Requires acl.enabled
+    ## and a credentials Secret (acl.existingSecret or the chart-created ACL Secret,
+    ## holding groot and per-user passwords). Default off.
+    ##
+    ## Add an engineer: append a `users` entry with `groups: [guardians]` and add
+    ##   their password under a new key in the credentials Secret (`passwordSecretKey`).
+    ## Add a service: add a `groups` entry with predicate `rules`, then a `users`
+    ##   entry placed in that group.
+    bootstrap:
+      enabled: false
+      ## Secret holding the credentials the Job reads; defaults to acl.existingSecret
+      ## (else the chart-created ACL Secret).
+      existingSecret: ""
+      ## Key in the credentials Secret holding groot's target (rotated) password.
+      grootPasswordSecretKey: groot_password
+      ## Opaque rotation token rendered as a Job pod annotation. Change it (e.g. from
+      ## a Terraform counter) to force a helm upgrade that re-runs the reconciler,
+      ## without touching Alpha. Empty = no annotation.
+      rotation: ""
+      ## Image for the bootstrap Job. Empty (the default) reuses the deployed dgraph
+      ## image, which provides bash, curl, and jq. Set registry/repository/tag to pin
+      ## an explicit override:
+      # image:
+      #   registry: docker.io
+      #   repository: dgraph/dgraph
+      #   tag: v25.3.1
+      image: {}
+      ## Each group: { name, rules: [{ predicate, permission }] }.
+      ## permission is OR-summed: 1=read, 2=write, 4=modify.
+      groups: []
+      ## Each user: { name, passwordSecretKey, groups: [ ... ] }.
+      ## `guardians` is the built-in superadmin group.
+      users: []
+
   ## Encryption at Rest Configuration
   ## ref: https://docs.dgraph.io/installation/configuration/encryption-at-rest
   encryption:
@@ -905,6 +941,61 @@ networkPolicy:
   enabled: false
   clientPodLabels: {}
   extraIngress: []
+
+## Post-install validation subsystem. A validator asserts the running cluster
+## matches what the chart rendered (health, membership, ACL enforcement, admin
+## and per-user logins, group rules, and optionally backup CronJob schedules).
+## Default off and inert on a stock install: nothing renders unless enabled.
+validation:
+  ## Master switch for all validator resources (ConfigMap, test Pod, Job, CronJob, RBAC).
+  enabled: false
+  ## Validator image. Empty (the default) reuses the deployed dgraph image (which
+  ## bundles bash, curl, jq) so the validator always matches the running version.
+  ## Set all three fields below only to pin an explicit override:
+  # image:
+  #   registry: docker.io
+  #   repository: dgraph/dgraph
+  #   tag: v25.3.1
+  image: {}
+  ## Account the validator logs in as for auth-dependent checks. Defaults to the
+  ## groot superadmin.
+  adminUser: groot
+  ## Secret key holding adminUser's password. Empty derives it (groot's key, else
+  ## <adminUser>_password).
+  adminPasswordSecretKey: ""
+  ## The validator reads passwords from the ACL creds Secret (alpha.acl.bootstrap.existingSecret /
+  ## alpha.acl.existingSecret, else the chart-managed <fullname>-acl-secret). An external creds Secret
+  ## must carry the password keys the validator reads — adminPasswordSecretKey (or groot's key) and each
+  ## bootstrap user's passwordSecretKey — otherwise the admin/user-login checks FAIL the gating hook.
+  ## Post-install/upgrade hook Job that gates the release on a passing validation.
+  ## Default off: a failed check would fail `helm install/upgrade`.
+  job:
+    enabled: false
+    ## Job backoffLimit (also used by the manual CronJob's jobTemplate).
+    backoffLimit: 1
+  ## Suspended manual-trigger CronJob (kubectl create job --from=cronjob/...).
+  ## Default off.
+  cronjob:
+    enabled: false
+  ## RBAC for the backup-CronJob check (the validator reads CronJobs via the
+  ## Kubernetes API). Create the validator ServiceAccount/Role/RoleBinding.
+  ## Required by checkBackups.
+  rbac:
+    enabled: false
+  ## Also assert the backup CronJobs exist with their expected schedules (requires rbac.enabled).
+  checkBackups: false
+  ## Trigger a live backup round-trip to S3 (side-effecting, slow; reserved for future use). Default off.
+  backupRoundtrip: false
+  ## Per-check retry attempts before failing.
+  retries: 10
+  ## Seconds between retries.
+  retrySleep: 12
+  ## Extra annotations for validator pods.
+  podAnnotations: {}
+  ## nodeSelector for validator pods. Empty falls back to alpha.nodeSelector.
+  nodeSelector: {}
+  ## tolerations for validator pods. Empty falls back to alpha.tolerations.
+  tolerations: []
 
 global:
   domain: cluster.local

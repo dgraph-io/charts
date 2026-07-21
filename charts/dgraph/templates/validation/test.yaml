@@ -1,0 +1,21 @@
+{{- if .Values.validation.enabled }}
+{{- /*
+  `helm test` entrypoint. Runs the validator on demand (helm test <release>)
+  without gating install/upgrade.
+*/}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-validate-test
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    {{- with .Values.validation.podAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- include "dgraph.validation.podSpec" . | nindent 2 }}
+{{- end }}
