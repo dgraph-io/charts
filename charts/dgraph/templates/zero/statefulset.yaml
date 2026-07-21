@@ -2,11 +2,8 @@
 {{- define "peer_zero" -}}
   {{- $zeroFullName := include "dgraph.zero.fullname" . -}}
 
-  {{- /* Append domain suffix if domain is used */}}
-  {{- $domainSuffix := "" -}}
-  {{- if .Values.global.domain -}}
-  {{- $domainSuffix = printf ".%s" .Values.global.domain -}}
-  {{- end -}}
+  {{- /* Append the cluster-domain suffix (trimmed, omitted when empty). */}}
+  {{- $domainSuffix := include "dgraph.domainSuffix" . -}}
 
   {{- printf "%s-%d.%s-headless.${POD_NAMESPACE}.svc%s:5080" $zeroFullName 0 $zeroFullName $domainSuffix -}}
 {{- end -}}
@@ -100,8 +97,7 @@ spec:
 {{- include "dgraph.imagePullSecrets" . | indent 6 }}
       {{- if .Values.zero.securityContext.enabled }}
       securityContext:
-        fsGroup: {{ .Values.zero.securityContext.fsGroup }}
-        runAsUser: {{ .Values.zero.securityContext.runAsUser }}
+        {{- omit .Values.zero.securityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       {{- if .Values.zero.nodeSelector }}
       nodeSelector:
@@ -114,6 +110,10 @@ spec:
       containers:
       - name: {{ template "dgraph.zero.fullname" . }}
         image: {{ template "dgraph.image" . }}
+        {{- if .Values.zero.containerSecurityContext.enabled }}
+        securityContext:
+          {{- omit .Values.zero.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 5080
           name: grpc-zero
@@ -145,9 +145,9 @@ spec:
               ordinal=${BASH_REMATCH[1]}
               idx=$(($ordinal + 1))
               if [[ $ordinal -eq 0 ]]; then
-                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
+                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }}{{ template "dgraph.logFlags" .Values.zero }} {{ .Values.zero.extraFlags }}
               else
-                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --peer {{ template "peer_zero" . }} {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }} {{ .Values.zero.extraFlags }}
+                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --peer {{ template "peer_zero" . }} {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }}{{ template "dgraph.logFlags" .Values.zero }} {{ .Values.zero.extraFlags }}
               fi
         resources:
 {{ toYaml .Values.zero.resources | indent 10 }}

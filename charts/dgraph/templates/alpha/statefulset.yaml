@@ -8,11 +8,8 @@
      {{- $max = 1 -}}
   {{- end -}}
 
-  {{- /* Append domain suffix if domain is used */}}
-  {{- $domainSuffix := "" -}}
-  {{- if .Values.global.domain -}}
-  {{- $domainSuffix = printf ".%s" .Values.global.domain -}}
-  {{- end -}}
+  {{- /* Append the cluster-domain suffix (trimmed, omitted when empty). */}}
+  {{- $domainSuffix := include "dgraph.domainSuffix" . -}}
 
   {{- /* Create comma-separated list of zeros */}}
   {{- range $idx := until $max }}
@@ -129,8 +126,7 @@ spec:
 {{- include "dgraph.imagePullSecrets" . | indent 6 }}
       {{- if .Values.alpha.securityContext.enabled }}
       securityContext:
-        fsGroup: {{ .Values.alpha.securityContext.fsGroup }}
-        runAsUser: {{ .Values.alpha.securityContext.runAsUser }}
+        {{- omit .Values.alpha.securityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       {{- if .Values.alpha.nodeSelector }}
       nodeSelector:
@@ -149,6 +145,10 @@ spec:
       - name: {{ template "dgraph.alpha.fullname" . }}-init
         image: {{ template "dgraph.initContainers.init.image" . }}
         imagePullPolicy: {{ .Values.alpha.initContainers.init.image.pullPolicy | quote }}
+        {{- if .Values.alpha.containerSecurityContext.enabled }}
+        securityContext:
+          {{- omit .Values.alpha.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
         {{- with .Values.alpha.initContainers.init.env }}
         env:
           {{- tpl (toYaml .) $ | nindent 10 }}
@@ -175,6 +175,10 @@ spec:
       containers:
       - name: {{ template "dgraph.alpha.fullname" . }}
         image: {{ template "dgraph.image" . }}
+        {{- if .Values.alpha.containerSecurityContext.enabled }}
+        securityContext:
+          {{- omit .Values.alpha.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 7080
           name: grpc-alpha-int
@@ -232,7 +236,7 @@ spec:
           {{- /* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
           - |
             set -ex
-            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }} {{ .Values.alpha.extraFlags }}{{- if .Values.alpha.acl.enabled }} --acl "secret-file=/dgraph/acl/{{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }};"{{- end }}{{- if .Values.alpha.encryption.enabled }} --encryption "key-file=/dgraph/enc/{{ .Values.alpha.encryption.keyFile | default "enc_key_file" }};"{{- end }}
+            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}{{ template "dgraph.logFlags" .Values.alpha }} {{ .Values.alpha.extraFlags }}{{- if .Values.alpha.acl.enabled }} --acl "secret-file=/dgraph/acl/{{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }};"{{- end }}{{- if .Values.alpha.encryption.enabled }} --encryption "key-file=/dgraph/enc/{{ .Values.alpha.encryption.keyFile | default "enc_key_file" }};"{{- end }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}
