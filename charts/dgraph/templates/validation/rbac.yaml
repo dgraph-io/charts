@@ -1,0 +1,44 @@
+{{- if and .Values.validation.enabled .Values.validation.rbac.enabled }}
+{{- /*
+  ServiceAccount + Role for the validator's backup-CronJob check (Check G reads
+  CronJobs via the Kubernetes API). Regular release resources, not hooks, so the
+  ServiceAccount exists before the post-install hook Job and persists for `helm
+  test`. Off by default (validation.rbac.enabled=false) for consumers who do not
+  want the validator granted API access.
+*/}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-validate
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-validate
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 4 }}
+rules:
+- apiGroups: ["batch"]
+  resources: ["cronjobs"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-validate
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "dgraph.alpha.fullname" . }}-validate
+subjects:
+- kind: ServiceAccount
+  name: {{ include "dgraph.alpha.fullname" . }}-validate
+  namespace: {{ include "dgraph.namespace" . }}
+{{- end }}
