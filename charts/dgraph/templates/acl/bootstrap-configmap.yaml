@@ -1,0 +1,126 @@
+{{- if and .Values.alpha.acl.enabled .Values.alpha.acl.bootstrap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-acl-bootstrap
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "acl-bootstrap") | nindent 4 }}
+data:
+  reconcile.sh: |
+    #!/usr/bin/env bash
+    ## Idempotent ACL reconciler.
+    ## 1. Rotates `groot` off Dgraph's default password to the supplied per-env one.
+    ## 2. Converges the declared groups (with predicate rules) and users (with group
+    ##    membership), creating or updating as needed.
+    ## Safe to re-run on every helm upgrade. Authenticates via the GraphQL /admin
+    ## endpoint with the same login pattern the backup CronJob uses. The dgraph
+    ## image provides jq and /usr/bin/curl; all parsing goes through jq.
+    set -euo pipefail
+
+    : "${ALPHA_HOST:?ALPHA_HOST not set}"
+    : "${GROOT_PASSWORD_KEY:?GROOT_PASSWORD_KEY not set}"
+    CREDS_DIR="${CREDS_DIR:-/creds}"
+    USERS_JSON="${USERS_JSON:-[]}"
+    GROUPS_JSON="${GROUPS_JSON:-[]}"
+
+    ## TLS: when the Job supplies a CA path (alpha.tls.enabled), talk HTTPS and
+    ## present the client cert if one was provided. Empty CERTOPTS keeps plaintext.
+    ## Mirrors the backup CronJob curl handling.
+    SCHEME="http"
+    CERTOPTS=()
+    if [ -n "${CACERT_PATH:-}" ]; then
+      SCHEME="https"
+      CERTOPTS+=('--cacert' "${CACERT_PATH}")
+      if [ -n "${CLIENT_CERT_PATH:-}" ] && [ -n "${CLIENT_KEY_PATH:-}" ]; then
+        CERTOPTS+=('--cert' "${CLIENT_CERT_PATH}" '--key' "${CLIENT_KEY_PATH}")
+      fi
+    fi
+    ADMIN="${SCHEME}://${ALPHA_HOST}:8080/admin"
+    HEALTH="${SCHEME}://${ALPHA_HOST}:8080/health"
+
+    groot_password="$(cat "${CREDS_DIR}/${GROOT_PASSWORD_KEY}")"
+
+    ## post <token> <json-body> -> response body. Empty token = anonymous (login).
+    post() {
+      local token="$1" body="$2"
+      if [ -n "${token}" ]; then
+        /usr/bin/curl -fsS "${CERTOPTS[@]}" "${ADMIN}" -H 'Content-Type: application/json' \
+          -H "X-Dgraph-AccessToken: ${token}" --data "${body}"
+      else
+        /usr/bin/curl -fsS "${CERTOPTS[@]}" "${ADMIN}" -H 'Content-Type: application/json' --data "${body}"
+      fi
+    }
+
+    ## login <user> <password> -> accessJWT on stdout, non-zero on failure.
+    ## GraphQL variables (not string interpolation) keep credentials injection-safe.
+    login() {
+      local body resp jwt
+      body="$(jq -n --arg u "$1" --arg p "$2" \
+        '{query:"mutation($u:String!,$p:String!){login(userId:$u,password:$p){response{accessJWT}}}",variables:{u:$u,p:$p}}')"
+      resp="$(post "" "${body}")" || return 1
+      jwt="$(printf '%s' "${resp}" | jq -r '.data.login.response.accessJWT // empty')"
+      [ -n "${jwt}" ] || return 1
+      printf '%s' "${jwt}"
+    }
+
+    echo "Waiting for Alpha at ${HEALTH} ..."
+    until /usr/bin/curl -fsS "${CERTOPTS[@]}" "${HEALTH}" >/dev/null 2>&1; do sleep 5; done
+
+    ## --- groot rotation (idempotent) ---
+    if TOKEN="$(login groot "${groot_password}" 2>/dev/null)"; then
+      echo "groot already rotated."
+    else
+      echo "Rotating groot from its default password ..."
+      TOKEN="$(login groot password)" || {
+        echo "FATAL: groot is neither the target nor the default password; refusing to guess." >&2
+        exit 1
+      }
+      body="$(jq -n --arg p "${groot_password}" \
+        '{query:"mutation($p:String!){updateUser(input:{filter:{name:{eq:\"groot\"}},set:{password:$p}}){user{name}}}",variables:{p:$p}}')"
+      post "${TOKEN}" "${body}" | jq -e '.data.updateUser.user[0].name=="groot"' >/dev/null || {
+        echo "FATAL: groot password rotation failed." >&2; exit 1; }
+      TOKEN="$(login groot "${groot_password}")" || {
+        echo "FATAL: cannot log in as groot after rotation." >&2; exit 1; }
+      echo "groot rotated."
+    fi
+
+    ## --- groups: create if absent, then converge rules ---
+    printf '%s' "${GROUPS_JSON}" | jq -c '.[]' | while read -r g; do
+      name="$(printf '%s' "${g}" | jq -r '.name')"
+      rules="$(printf '%s' "${g}" | jq -c '.rules // []')"
+      echo "Ensuring group ${name} ..."
+      add="$(jq -n --arg n "${name}" \
+        '{query:"mutation($n:String!){addGroup(input:[{name:$n}]){group{name}}}",variables:{n:$n}}')"
+      post "${TOKEN}" "${add}" >/dev/null 2>&1 || true   # ignore "already exists"
+      if [ "${rules}" != "[]" ]; then
+        upd="$(jq -n --arg n "${name}" --argjson r "${rules}" \
+          '{query:"mutation($n:String!,$r:[RuleRef!]!){updateGroup(input:{filter:{name:{eq:$n}},set:{rules:$r}}){group{name}}}",variables:{n:$n,r:$r}}')"
+        post "${TOKEN}" "${upd}" | jq -e '.data.updateGroup.group[0].name' >/dev/null || {
+          echo "FATAL: failed to set rules on group ${name}." >&2; exit 1; }
+      fi
+    done
+
+    ## --- users: create if absent, else reset password + group membership ---
+    printf '%s' "${USERS_JSON}" | jq -c '.[]' | while read -r u; do
+      name="$(printf '%s' "${u}" | jq -r '.name')"
+      pwkey="$(printf '%s' "${u}" | jq -r '.passwordSecretKey')"
+      groupsref="$(printf '%s' "${u}" | jq -c '[.groups[]? | {name: .}]')"
+      pw="$(cat "${CREDS_DIR}/${pwkey}")"
+      echo "Ensuring user ${name} ..."
+      add="$(jq -n --arg n "${name}" --arg p "${pw}" --argjson g "${groupsref}" \
+        '{query:"mutation($n:String!,$p:String!,$g:[GroupRef]){addUser(input:[{name:$n,password:$p,groups:$g}]){user{name}}}",variables:{n:$n,p:$p,g:$g}}')"
+      resp="$(post "${TOKEN}" "${add}")"
+      if printf '%s' "${resp}" | jq -e '.data.addUser.user[0].name' >/dev/null 2>&1; then
+        echo "  created ${name}"
+      else
+        upd="$(jq -n --arg n "${name}" --arg p "${pw}" --argjson g "${groupsref}" \
+          '{query:"mutation($n:String!,$p:String!,$g:[GroupRef]){updateUser(input:{filter:{name:{eq:$n}},set:{password:$p,groups:$g}}){user{name}}}",variables:{n:$n,p:$p,g:$g}}')"
+        post "${TOKEN}" "${upd}" | jq -e '.data.updateUser.user[0].name' >/dev/null || {
+          echo "FATAL: could not upsert user ${name}." >&2; exit 1; }
+        echo "  updated ${name}"
+      fi
+    done
+
+    echo "ACL bootstrap complete."
+{{- end }}
