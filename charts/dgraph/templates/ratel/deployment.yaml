@@ -33,14 +33,17 @@ spec:
       {{- end }}
       {{- if .Values.ratel.securityContext.enabled }}
       securityContext:
-        fsGroup: {{ .Values.ratel.securityContext.fsGroup }}
-        runAsUser: {{ .Values.ratel.securityContext.runAsUser }}
+        {{- omit .Values.ratel.securityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
 {{- include "dgraph.imagePullSecrets" . | indent 6 }}
       containers:
       - name: "{{ template "dgraph.ratel.fullname" . }}"
         image: "{{ template "dgraph.ratel.image" . }}"
         imagePullPolicy: {{ .Values.ratel.image.pullPolicy | quote }}
+        {{- if .Values.ratel.containerSecurityContext.enabled }}
+        securityContext:
+          {{- omit .Values.ratel.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
         {{- if .Values.ratel.extraEnvs }}
         env:
         {{- with .Values.ratel.extraEnvs }}
