@@ -60,6 +60,13 @@ spec:
       app: {{ template "dgraph.name" . }}
       release: {{ .Release.Name }}
       component: {{ .Values.zero.name }}
+  {{- if .Values.zero.persistence.enabled }}
+  {{- with .Values.zero.persistence.persistentVolumeClaimRetentionPolicy }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: {{ .whenDeleted | default "Retain" }}
+    whenScaled: {{ .whenScaled | default "Retain" }}
+  {{- end }}
+  {{- end }}
   template:
     metadata:
       name: {{ template "dgraph.zero.fullname" . }}

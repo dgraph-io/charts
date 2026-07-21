@@ -260,6 +260,13 @@ zero:
     accessModes:
       - ReadWriteOnce
     size: 32Gi
+    ## Optionally control PVC lifecycle on StatefulSet deletion (whenDeleted) and
+    ## scale-down (whenScaled). Each is "Retain" (the Kubernetes default) or
+    ## "Delete". Leaving this unset preserves current behavior. Requires
+    ## Kubernetes >= 1.27.
+    # persistentVolumeClaimRetentionPolicy:
+    #   whenDeleted: Retain
+    #   whenScaled: Retain
 
   ## Node labels and tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
@@ -595,6 +602,13 @@ alpha:
       - ReadWriteOnce
     size: 100Gi
     annotations: {}
+    ## Optionally control PVC lifecycle on StatefulSet deletion (whenDeleted) and
+    ## scale-down (whenScaled). Each is "Retain" (the Kubernetes default) or
+    ## "Delete". Leaving this unset preserves current behavior. Requires
+    ## Kubernetes >= 1.27.
+    # persistentVolumeClaimRetentionPolicy:
+    #   whenDeleted: Retain
+    #   whenScaled: Retain
 
   ## Node labels and tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
