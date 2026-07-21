@@ -73,7 +73,7 @@ spec:
                 {{- end }}
 
                 {{- if .Values.alpha.acl.enabled }}
-                ACCESS_TOKEN=$(get_token {{ .Values.backups.admin.user }} $(cat /backup_secrets/backup_admin_password) $AUTH_TOKEN )
+                ACCESS_TOKEN=$(get_token "{{ .Values.backups.admin.user }}" "$(cat /backup_secrets/backup_admin_password)" "${AUTH_TOKEN:-}")
                 {{- end }}
 
                 ## Incremental Backup with optional access and auth tokens
