@@ -1,0 +1,44 @@
+{{- /*
+Prometheus Operator ServiceMonitor for the alpha and zero metrics endpoints.
+Default off. The alpha Service exposes the HTTP port as `http-alpha` (8080) and
+the zero Service as `http-zero` (6080); dgraph serves Prometheus metrics on the
+HTTP port at serviceMonitor.path. Listing both port names in one ServiceMonitor
+is fine — an endpoint whose named port a given Service lacks is simply skipped.
+
+The selector requires the `monitor` label, which only the ClusterIP Services
+carry (set from alpha.monitorLabel / zero.monitorLabel). The headless Services
+share the same app/release labels but do not carry `monitor`, so they are
+never selected.
+*/ -}}
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "dgraph.fullname" . }}
+  namespace: {{ default (include "dgraph.namespace" .) .Values.serviceMonitor.namespace }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ include "dgraph.namespace" . }}
+  selector:
+    matchLabels:
+      app: {{ template "dgraph.name" . }}
+      release: {{ .Release.Name }}
+    matchExpressions:
+      - key: monitor
+        operator: Exists
+  endpoints:
+    - port: http-alpha
+      path: {{ .Values.serviceMonitor.path }}
+      interval: {{ .Values.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+    - port: http-zero
+      path: {{ .Values.serviceMonitor.path }}
+      interval: {{ .Values.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+{{- end }}

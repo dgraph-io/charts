@@ -1,0 +1,57 @@
+{{- /*
+Prometheus Operator PrometheusRule. Default off. The default alerts below are
+deliberately conservative and built only on metrics that are stable regardless
+of this chart's internal metric names:
+  - `up`, emitted by Prometheus for every scrape target (works with the
+    ServiceMonitor above), keyed to the exact alpha/zero Service names; and
+  - `kube_job_status_failed` from kube-state-metrics, for backup CronJob failures.
+Richer dgraph-specific alerts (raft leader churn, replication lag, predicate
+move failures) depend on this image's exact metric names — add them via
+prometheusRule.extraRules once you have validated the names against a live
+target. Set prometheusRule.defaultRules=false to ship only your extraRules.
+*/ -}}
+{{- if .Values.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ template "dgraph.fullname" . }}
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
+    {{- with .Values.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: {{ template "dgraph.fullname" . }}
+      rules:
+        {{- if .Values.prometheusRule.defaultRules }}
+        - alert: DgraphAlphaInstanceDown
+          expr: up{service="{{ template "dgraph.alpha.fullname" . }}"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Dgraph alpha instance {{`{{ $labels.instance }}`}} is down"
+            description: "An alpha pod has been unreachable to Prometheus for 5m. With a 3-node group, losing two alphas drops the group below quorum."
+        - alert: DgraphZeroInstanceDown
+          expr: up{service="{{ template "dgraph.zero.fullname" . }}"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Dgraph zero instance {{`{{ $labels.instance }}`}} is down"
+            description: "A zero pod has been unreachable to Prometheus for 5m. Zero is the cluster's Raft coordinator; losing quorum stalls the cluster."
+        - alert: DgraphBackupJobFailed
+          expr: kube_job_status_failed{namespace="{{ include "dgraph.namespace" . }}", job_name=~"{{ template "dgraph.backups.fullname" . }}-.*"} > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Dgraph backup job {{`{{ $labels.job_name }}`}} failed"
+            description: "A binary-backup CronJob run has failed. Backups may be stale — investigate before relying on point-in-time recovery."
+        {{- end }}
+        {{- with .Values.prometheusRule.extraRules }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+{{- end }}
