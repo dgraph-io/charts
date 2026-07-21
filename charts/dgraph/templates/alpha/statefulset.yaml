@@ -50,6 +50,13 @@ spec:
       app: {{ template "dgraph.name" . }}
       release: {{ .Release.Name }}
       component: {{ .Values.alpha.name }}
+  {{- if .Values.alpha.persistence.enabled }}
+  {{- with .Values.alpha.persistence.persistentVolumeClaimRetentionPolicy }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: {{ .whenDeleted | default "Retain" }}
+    whenScaled: {{ .whenScaled | default "Retain" }}
+  {{- end }}
+  {{- end }}
   template:
     metadata:
       name: {{ template "dgraph.alpha.fullname" . }}
