@@ -316,7 +316,11 @@ leading space, "-v=<n> --logtostderr=<bool>" plus --vmodule / --alsologtostderr 
 */}}
 {{- define "dgraph.logFlags" -}}
 {{- $v := include "dgraph.verbosity" .logLevel -}}
-{{- $logtostderr := .logtostderr | default true -}}
+{{- /* logtostderr defaults to true (values.yaml), but Helm's `default` treats a
+       boolean false as empty, so an explicit `false` would be flipped back to the
+       default. Use a nil check so nil -> true while honoring an explicit false. */}}
+{{- $logtostderr := .logtostderr -}}
+{{- if kindIs "invalid" $logtostderr -}}{{- $logtostderr = true -}}{{- end -}}
 {{- if or (ne $v "0") .vmodule .alsologtostderr .logDir (not $logtostderr) -}}
 {{- printf " -v=%s --logtostderr=%v" $v $logtostderr -}}
 {{- if .vmodule }}{{ printf " --vmodule=%s" .vmodule }}{{ end -}}
