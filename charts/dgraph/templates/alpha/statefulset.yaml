@@ -316,12 +316,18 @@ spec:
       {{- if .Values.alpha.encryption.enabled }}
       - name: enc-volume
         secret:
-          secretName: {{ template "dgraph.alpha.fullname" . }}-encryption-secret
+          # existingSecret lets a pre-created Secret supply the encryption key, so it
+          # never has to be rendered through Helm values; otherwise mount the Secret
+          # the chart renders from `encryption.file`.
+          secretName: {{ .Values.alpha.encryption.existingSecret | default (printf "%s-encryption-secret" (include "dgraph.alpha.fullname" .)) }}
       {{- end }}
-      {{- if or .Values.alpha.acl.enabled }}
+      {{- if .Values.alpha.acl.enabled }}
       - name: acl-volume
         secret:
-          secretName: {{ template "dgraph.alpha.fullname" . }}-acl-secret
+          # existingSecret lets a pre-created Secret (e.g. one managed by Terraform or an
+          # external secrets operator) supply the HMAC key, so it never has to be rendered
+          # through Helm values; otherwise mount the Secret the chart renders from `acl.file`.
+          secretName: {{ .Values.alpha.acl.existingSecret | default (printf "%s-acl-secret" (include "dgraph.alpha.fullname" .)) }}
       {{- end }}
 {{- if .Values.alpha.persistence.enabled }}
   volumeClaimTemplates:
