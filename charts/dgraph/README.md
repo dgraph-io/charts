@@ -46,6 +46,10 @@ No manual intervention is required. Also review the [additional breaking changes
 
 **ACL and encryption flags now auto-activate**: Setting `alpha.acl.enabled: true` (or `alpha.encryption.enabled: true`) now synthesizes the matching `--acl` (or `--encryption`) superflag onto the Alpha command automatically; previously these flags had to be added by hand through `alpha.extraFlags`. If you already pass `--acl` or `--encryption` through `alpha.extraFlags`, remove it — the chart fails rendering rather than pass the flag twice. The chart points the flag at `/dgraph/acl/<alpha.acl.secretFile>` and `/dgraph/enc/<alpha.encryption.keyFile>`, which default to `hmac_secret_file` and `enc_key_file`; override those keys if your Secret stores the file under a different name.
 
+**TLS now activates from the tls block**: Setting `alpha.tls.enabled: true` (or `zero.tls.enabled: true`) now synthesizes the `--tls` superflag onto the Alpha (or Zero) command; previously the flag had to be added by hand through `extraFlags`. If you already pass `--tls` through `alpha.extraFlags` or `zero.extraFlags`, remove it — the chart fails rendering rather than pass the flag twice. Configure TLS through the new `tls.internalPort`, `tls.clientName`, and `tls.clientAuthType` keys; the chart reads the cert files from `/dgraph/tls` (`ca.crt`, `node.crt`, `node.key`, and `client.<clientName>.crt`/`.key`).
+
+**Health probes use HTTPS when TLS is enabled**: With `alpha.tls.enabled: true` (or `zero.tls.enabled: true`), the built-in httpGet startup, liveness, and readiness probes switch to `scheme: HTTPS`. A cert-requiring `clientAuthType` (`REQUIREANY` or `REQUIREANDVERIFY`) makes every client present a certificate, which the kubelet's probes cannot; the chart fails rendering in that case. Set `clientAuthType: VERIFYIFGIVEN`, or supply exec probes through `customStartupProbe`/`customLivenessProbe`/`customReadinessProbe`. A cert-requiring `clientAuthType` also requires `clientName` so in-cluster callers (inter-node TLS) can present a client cert.
+
 ### Installing the Chart
 
 To install the chart with the release name `my-release`:
@@ -144,6 +148,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.customStartupProbe`                | Zero custom startup probes (if `zero.startupProbe` not enabled)       | `{}`                                                |
 | `zero.customLivenessProbe`               | Zero custom liveness probes (if `zero.livenessProbe` not enabled)     | `{}`                                                |
 | `zero.customReadinessProbe`              | Zero custom readiness probes  (if `zero.readinessProbe` not enabled)  | `{}`                                                |
+| `zero.tls.internalPort`                  | Enable TLS on Zero's internal gRPC port (synthesized into `--tls`)    | `true`                                              |
+| `zero.tls.clientName`                    | Client cert basename for Zero `--tls` (empty omits the client cert)   | `""`                                                |
+| `zero.tls.clientAuthType`                | Zero `--tls` client-auth-type, e.g. `REQUIREANDVERIFY` (empty omits)  | `""`                                                |
 | `alpha.name`                             | Alpha component name                                                  | `alpha`                                             |
 | `alpha.metrics.enabled`                  | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `alpha.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
@@ -185,6 +192,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.securityContext.runAsUser`        | User ID for the Alpha container                                       | `1001`                                              |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
 | `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
+| `alpha.tls.internalPort`                 | Enable TLS on Alpha's internal gRPC port (synthesized into `--tls`)   | `true`                                              |
+| `alpha.tls.clientName`                   | Client cert basename for Alpha `--tls` (empty omits the client cert)  | `""`                                                |
+| `alpha.tls.clientAuthType`               | Alpha `--tls` client-auth-type, e.g. `REQUIREANDVERIFY` (empty omits) | `""`                                                |
 | `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled (auto-adds `--encryption`)           | `false`                                             |
 | `alpha.encryption.keyFile`               | Filename/key of the encryption key within the mounted Secret          | `enc_key_file`                                      |
 | `alpha.encryption.existingSecret`        | Name of a pre-created Secret holding the encryption key (suppresses the chart's own) | `""`                                |

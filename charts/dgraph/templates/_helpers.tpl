@@ -323,3 +323,48 @@ leading space, "-v=<n> --logtostderr=<bool>" plus --vmodule / --alsologtostderr 
 {{- if .logDir }}{{ printf " --log_dir=%s" .logDir }}{{ end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Does this tls block force every client to present a certificate?
+
+client-auth-type mirrors Go's crypto/tls.ClientAuthType, which separates
+"require" from "verify". REQUIREANY and REQUIREANDVERIFY are the only values
+that force a cert (REQUIREANY never verifies it, REQUIREANDVERIFY does).
+VERIFYIFGIVEN leaves the cert optional but verifies one that is presented;
+REQUEST asks for a cert and neither requires nor verifies it; "" and OFF
+disable client auth outright.
+
+Returns the STRING "true" or "" (empty) -- NOT a boolean. Compare it as a
+string: eq (include "dgraph.tls.certRequired" (dict "tls" .Values.alpha.tls)) "true".
+
+Single source of truth for the alpha/zero probe guards. Keep them reading from
+here: an inline re-derivation drifts.
+*/}}
+{{- define "dgraph.tls.certRequired" -}}
+{{- $t := .tls.clientAuthType | default "" -}}
+{{- if or (eq $t "REQUIREANDVERIFY") (eq $t "REQUIREANY") -}}true{{- end -}}
+{{- end -}}
+
+{{/*
+Compose Dgraph's --tls superflag from a tier's tls map. Pass a dict
+{"tls": .Values.alpha.tls, "path": "/dgraph/tls"}. Filenames follow the output
+of scripts/make_tls_secrets.sh (ca.crt, node.crt, node.key,
+client.<name>.crt/.key). client-cert/key and client-auth-type are emitted only
+when the corresponding values are set.
+*/}}
+{{- define "dgraph.tlsFlag" -}}
+{{- /* internalPort defaults to true (values.yaml), but Helm's `default` treats a
+       boolean false as empty, so an explicit `false` would be flipped back to the
+       default. Use a nil check so nil -> true while honoring an explicit false. */}}
+{{- $ip := .tls.internalPort -}}
+{{- if kindIs "invalid" $ip -}}{{- $ip = true -}}{{- end -}}
+{{- $opts := list (printf "ca-cert=%s/ca.crt" .path) (printf "server-cert=%s/node.crt" .path) (printf "server-key=%s/node.key" .path) (printf "internal-port=%v" $ip) -}}
+{{- if .tls.clientName -}}
+{{- $opts = append $opts (printf "client-cert=%s/client.%s.crt" .path .tls.clientName) -}}
+{{- $opts = append $opts (printf "client-key=%s/client.%s.key" .path .tls.clientName) -}}
+{{- end -}}
+{{- if .tls.clientAuthType -}}
+{{- $opts = append $opts (printf "client-auth-type=%s" .tls.clientAuthType) -}}
+{{- end -}}
+{{- printf "--tls \"%s;\"" (join "; " $opts) -}}
+{{- end -}}
