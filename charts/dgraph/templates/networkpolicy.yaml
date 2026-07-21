@@ -1,0 +1,49 @@
+{{- /*
+Optional NetworkPolicy restricting ingress to the dgraph pods. Default off so
+it can't silently break connectivity on clusters whose CNI does not enforce
+NetworkPolicy. When enabled it:
+  - always allows intra-cluster dgraph traffic (alpha<->zero, peer gossip) by
+    selecting pods that carry this release's own app/release labels;
+  - grants client access to the alpha HTTP (8080) and gRPC (9080) ports only to
+    pods carrying every label in networkPolicy.clientPodLabels;
+  - appends any rules supplied in networkPolicy.extraIngress verbatim.
+Egress is intentionally not restricted (backups reach S3/MinIO/NFS, etc.).
+*/ -}}
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ template "dgraph.fullname" . }}
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "dgraph.name" . }}
+      release: {{ .Release.Name }}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Intra-cluster: any dgraph pod from this release may reach any other.
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ template "dgraph.name" . }}
+              release: {{ .Release.Name }}
+    {{- with .Values.networkPolicy.clientPodLabels }}
+    # Clients: pods carrying these labels may reach the alpha client ports.
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 9080
+    {{- end }}
+    {{- with .Values.networkPolicy.extraIngress }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

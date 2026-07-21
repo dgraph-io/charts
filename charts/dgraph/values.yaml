@@ -72,6 +72,15 @@ zero:
   ## Value for the "monitor" label on the zero Service (not on pods or other resources).
   ## Used by Prometheus for service discovery.
   monitorLabel: zero-dgraph-io
+
+  ## PodDisruptionBudget for the zero StatefulSet. Default off — see templates/pdb.yaml
+  ## for why minAvailable >= replicaCount can deadlock `kubectl drain` on a
+  ## single-replica group. Review against replicaCount before enabling.
+  pdb:
+    enabled: false
+    minAvailable: 2
+    # maxUnavailable:
+
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
   ##
@@ -261,6 +270,15 @@ alpha:
   ## Value for the "monitor" label on the alpha Service (not on pods or other resources).
   ## Used by Prometheus for service discovery.
   monitorLabel: alpha-dgraph-io
+
+  ## PodDisruptionBudget for the alpha StatefulSet. Default off — see templates/pdb.yaml
+  ## for why minAvailable >= replicaCount can deadlock `kubectl drain` on a
+  ## single-replica group. Review against replicaCount before enabling.
+  pdb:
+    enabled: false
+    minAvailable: 2
+    # maxUnavailable:
+
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
   ##
@@ -743,6 +761,35 @@ backups:
       access: ""
       ## AWS_SECRET_ACCESS_KEY env var
       secret: ""
+
+## Prometheus Operator ServiceMonitor for the alpha and zero metrics endpoints.
+## Default off — requires the Prometheus Operator CRDs to be installed; a
+## stock install with this disabled imposes no CRD dependency.
+serviceMonitor:
+  enabled: false
+  # namespace: monitoring
+  labels: {}
+  interval: 30s
+  scrapeTimeout: 10s
+  path: /debug/prometheus_metrics
+
+## Prometheus Operator PrometheusRule with conservative default alerts for
+## alpha/zero instance availability and backup CronJob failures.
+## Default off — requires the Prometheus Operator CRDs to be installed; a
+## stock install with this disabled imposes no CRD dependency.
+prometheusRule:
+  enabled: false
+  labels: {}
+  defaultRules: true
+  extraRules: []
+
+## Optional NetworkPolicy restricting ingress to the dgraph pods. Default off
+## so it can't silently break connectivity on clusters whose CNI does not
+## enforce NetworkPolicy.
+networkPolicy:
+  enabled: false
+  clientPodLabels: {}
+  extraIngress: []
 
 global:
   domain: cluster.local
