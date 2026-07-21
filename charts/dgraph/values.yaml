@@ -561,7 +561,7 @@ alpha:
       # image:
       #   registry: docker.io
       #   repository: dgraph/dgraph
-      #   tag: v25.3.1
+      #   tag: v25.3.8
       image: {}
       ## Each group: { name, rules: [{ predicate, permission }] }.
       ## permission is OR-summed: 1=read, 2=write, 4=modify.
@@ -969,7 +969,7 @@ validation:
   # image:
   #   registry: docker.io
   #   repository: dgraph/dgraph
-  #   tag: v25.3.1
+  #   tag: v25.3.8
   image: {}
   ## Account the validator logs in as for auth-dependent checks. Defaults to the
   ## groot superadmin.

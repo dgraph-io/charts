@@ -316,8 +316,9 @@ leading space, "-v=<n> --logtostderr=<bool>" plus --vmodule / --alsologtostderr 
 */}}
 {{- define "dgraph.logFlags" -}}
 {{- $v := include "dgraph.verbosity" .logLevel -}}
-{{- if or (ne $v "0") .vmodule .alsologtostderr .logDir (not .logtostderr) -}}
-{{- printf " -v=%s --logtostderr=%v" $v .logtostderr -}}
+{{- $logtostderr := .logtostderr | default true -}}
+{{- if or (ne $v "0") .vmodule .alsologtostderr .logDir (not $logtostderr) -}}
+{{- printf " -v=%s --logtostderr=%v" $v $logtostderr -}}
 {{- if .vmodule }}{{ printf " --vmodule=%s" .vmodule }}{{ end -}}
 {{- if .alsologtostderr }} --alsologtostderr{{ end -}}
 {{- if .logDir }}{{ printf " --log_dir=%s" .logDir }}{{ end -}}

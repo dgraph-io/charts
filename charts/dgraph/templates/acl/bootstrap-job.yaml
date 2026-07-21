@@ -54,7 +54,10 @@ spec:
       {{- end }}
       containers:
       - name: acl-bootstrap
-        {{- if .Values.alpha.acl.bootstrap.image }}
+        {{- /* Use the override only when registry, repository, and tag are all set; a
+               partial override would render an invalid image reference, so fall back to
+               the shared dgraph image instead. */}}
+        {{- if and .Values.alpha.acl.bootstrap.image .Values.alpha.acl.bootstrap.image.registry .Values.alpha.acl.bootstrap.image.repository .Values.alpha.acl.bootstrap.image.tag }}
         image: {{ printf "%s/%s:%s" .Values.alpha.acl.bootstrap.image.registry .Values.alpha.acl.bootstrap.image.repository (.Values.alpha.acl.bootstrap.image.tag | toString) }}
         {{- else }}
         image: {{ include "dgraph.image" . }}
