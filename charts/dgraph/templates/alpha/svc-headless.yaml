@@ -12,6 +12,18 @@ spec:
     - name: grpc-alpha-int
       port: 7080
       targetPort: 7080
+    ## http-alpha (8080) and grpc-alpha (9080) are declared here even though clients
+    ## normally reach Alpha through the ClusterIP Service: the backup CronJobs address a
+    ## single pinned pod (alpha-0) through this headless Service, and under a STRICT mTLS
+    ## service mesh (e.g. Istio) the client sidecar only builds an mTLS route for ports the
+    ## Service declares. Without 8080 here, the backup /admin login falls through to
+    ## plaintext and Alpha's sidecar resets the connection.
+    - name: http-alpha
+      port: 8080
+      targetPort: 8080
+    - name: grpc-alpha
+      port: 9080
+      targetPort: 9080
   selector:
     app: {{ template "dgraph.name" . }}
     component: {{ .Values.alpha.name }}
