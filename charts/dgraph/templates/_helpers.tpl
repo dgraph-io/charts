@@ -147,25 +147,23 @@ Also, we can't use a single if because lazy evaluation is not an option
 
 {{/*
 Return the proper Docker Image Registry Secret Names
+Priority: imagePullSecrets (Kubernetes object list) > global.imagePullSecrets (string list) > image.pullSecrets (string list)
 */}}
 {{- define "dgraph.imagePullSecrets" -}}
-{{/*
-Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
-but Helm 2.9 and 2.10 doesn't support it, so we need to implement this if-else logic.
-Also, we can't use a single if because lazy evaluation is not an option
-*/}}
-{{- if .Values.global }}
-{{- if .Values.global.imagePullSecrets }}
+{{- if .Values.imagePullSecrets }}
+imagePullSecrets:
+{{- range .Values.imagePullSecrets }}
+{{- if kindIs "map" . }}
+  - name: {{ .name }}
+{{- else }}
+  - name: {{ . }}
+{{- end }}
+{{- end }}
+{{- else if and .Values.global .Values.global.imagePullSecrets }}
 imagePullSecrets:
 {{- range .Values.global.imagePullSecrets }}
   - name: {{ . }}
 {{- end }}
-{{- else if .Values.image.pullSecrets }}
-imagePullSecrets:
-{{- range .Values.image.pullSecrets }}
-  - name: {{ . }}
-{{- end }}
-{{- end -}}
 {{- else if .Values.image.pullSecrets }}
 imagePullSecrets:
 {{- range .Values.image.pullSecrets }}
@@ -263,4 +261,65 @@ Allow overriding namespace
 */}}
 {{- define "dgraph.namespace" -}}
 {{- default .Release.Namespace .Values.namespaceOverride -}}
+{{- end -}}
+
+{{/*
+Generate the ingress path. Emits "/*" for ingress classes that need a wildcard
+prefix (gce, alb, nsx) and "/" otherwise, checking global.ingress.ingressClassName
+first and falling back to the kubernetes.io/ingress.class annotation.
+*/}}
+{{- define "dgraph.ingressPath" -}}
+  {{- $path := "/" -}}
+  {{- if .Values.global.ingress.ingressClassName -}}
+    {{- if eq .Values.global.ingress.ingressClassName "gce" "alb" "nsx" }}
+      {{- $path = "/*" -}}
+    {{- else }}
+      {{- $path = "/" -}}
+    {{- end }}
+  {{- else if index $.Values.global.ingress "annotations" -}}
+    {{- if eq (index $.Values.global.ingress.annotations "kubernetes.io/ingress.class" | default "") "gce" "alb" "nsx" }}
+      {{- $path = "/*" -}}
+    {{- else }}
+      {{- $path = "/" -}}
+    {{- end }}
+  {{- end -}}
+  {{- printf "%s" $path -}}
+{{- end -}}
+
+{{/*
+Cluster-domain suffix for in-cluster FQDNs: ".<global.domain>" with the leading
+dot, or empty when global.domain is unset. Trims stray leading/trailing dots so
+a host never renders "...svc." or "...svc..cluster.local".
+Use as: ...svc{{ include "dgraph.domainSuffix" . }}
+*/}}
+{{- define "dgraph.domainSuffix" -}}
+{{- with (.Values.global.domain | default "" | trimAll ".") }}.{{ . }}{{ end -}}
+{{- end -}}
+
+{{/*
+Map a named log level to its glog -v integer; pass any other value (e.g. a raw
+integer) through unchanged. Names are lowercase.
+*/}}
+{{- define "dgraph.verbosity" -}}
+  {{- $m := dict "normal" "0" "verbose" "1" "debug" "2" "trace" "3" -}}
+  {{- $k := toString . -}}
+  {{- index $m $k | default $k -}}
+{{- end -}}
+
+{{/*
+Render the glog flag fragment for a role. "." is a role value map (.Values.alpha
+or .Values.zero). Emits nothing when every value is a glog default (logLevel
+normal/0, empty vmodule, alsologtostderr false, empty logDir, logtostderr true),
+so the default command line is unchanged. When any value differs it emits, with a
+leading space, "-v=<n> --logtostderr=<bool>" plus --vmodule / --alsologtostderr /
+--log_dir when those are set.
+*/}}
+{{- define "dgraph.logFlags" -}}
+{{- $v := include "dgraph.verbosity" .logLevel -}}
+{{- if or (ne $v "0") .vmodule .alsologtostderr .logDir (not .logtostderr) -}}
+{{- printf " -v=%s --logtostderr=%v" $v .logtostderr -}}
+{{- if .vmodule }}{{ printf " --vmodule=%s" .vmodule }}{{ end -}}
+{{- if .alsologtostderr }} --alsologtostderr{{ end -}}
+{{- if .logDir }}{{ printf " --log_dir=%s" .logDir }}{{ end -}}
+{{- end -}}
 {{- end -}}
