@@ -26,6 +26,15 @@
 {{- $hasMinioKeys := include "dgraph.backups.keys.minio.enabled" . -}}
 {{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
 {{- $initContainerEnabled := or .Values.alpha.initContainers.init.enabled .Values.alpha.extraInitContainers }}
+{{- /* ACL and encryption-at-rest activate from `enabled` below by synthesizing the
+       matching superflag onto the alpha command. Fail rather than emit a duplicate
+       flag if the operator also hand-set it in extraFlags. */}}
+{{- if and .Values.alpha.acl.enabled (contains "--acl" (.Values.alpha.extraFlags | default "")) }}
+{{- fail "alpha.acl.enabled synthesizes the --acl superflag, but alpha.extraFlags already contains --acl. Remove --acl from alpha.extraFlags (configure alpha.acl.secretFile / alpha.acl.existingSecret instead) so the flag is not passed twice." }}
+{{- end }}
+{{- if and .Values.alpha.encryption.enabled (contains "--encryption" (.Values.alpha.extraFlags | default "")) }}
+{{- fail "alpha.encryption.enabled synthesizes the --encryption superflag, but alpha.extraFlags already contains --encryption. Remove --encryption from alpha.extraFlags (configure alpha.encryption.keyFile / alpha.encryption.existingSecret instead) so the flag is not passed twice." }}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -210,7 +219,7 @@ spec:
           {{- /* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
           - |
             set -ex
-            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }} {{ .Values.alpha.extraFlags }}
+            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }} {{ .Values.alpha.extraFlags }}{{- if .Values.alpha.acl.enabled }} --acl "secret-file=/dgraph/acl/{{ .Values.alpha.acl.secretFile }};"{{- end }}{{- if .Values.alpha.encryption.enabled }} --encryption "key-file=/dgraph/enc/{{ .Values.alpha.encryption.keyFile }};"{{- end }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}
