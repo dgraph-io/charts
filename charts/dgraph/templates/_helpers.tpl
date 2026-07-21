@@ -306,12 +306,26 @@ key entirely when nothing populates it.
 {{- if .Values.alpha.encryption.enabled }}
 - name: enc-volume
   secret:
-    secretName: {{ template "dgraph.alpha.fullname" . }}-encryption-secret
+    {{- /* existingSecret supplies the key without it passing through Helm values.
+    items pins the on-disk filename, so a Secret missing that key fails at mount. */}}
+    secretName: {{ .Values.alpha.encryption.existingSecret | default (printf "%s-encryption-secret" (include "dgraph.alpha.fullname" .)) }}
+    {{- if .Values.alpha.encryption.existingSecret }}
+    items:
+      - key: {{ .Values.alpha.encryption.keyFile }}
+        path: {{ .Values.alpha.encryption.keyFile }}
+    {{- end }}
 {{- end }}
 {{- if .Values.alpha.acl.enabled }}
 - name: acl-volume
   secret:
-    secretName: {{ template "dgraph.alpha.fullname" . }}-acl-secret
+    {{- /* existingSecret supplies the HMAC key without it passing through Helm values.
+    items pins the on-disk filename, so a Secret missing that key fails at mount. */}}
+    secretName: {{ .Values.alpha.acl.existingSecret | default (printf "%s-acl-secret" (include "dgraph.alpha.fullname" .)) }}
+    {{- if .Values.alpha.acl.existingSecret }}
+    items:
+      - key: {{ .Values.alpha.acl.secretFile }}
+        path: {{ .Values.alpha.acl.secretFile }}
+    {{- end }}
 {{- end }}
 {{- end -}}
 
