@@ -16,6 +16,26 @@
     {{- printf "--idx " -}}
   {{- end -}}
 {{- end -}}
+{{- /* native-TLS is active for zero when zero.tls is on. Computed once here (a
+       bool) and reused for the --tls superflag, the HTTPS probe scheme, and the
+       extraFlags/clientAuthType guards below. */}}
+{{- $nativeTLS := .Values.zero.tls.enabled }}
+{{- /* native TLS synthesizes --tls from zero.tls; a hand-set --tls in extraFlags
+       would be passed twice. */}}
+{{- if and $nativeTLS (contains "--tls" (.Values.zero.extraFlags | default "")) }}
+{{- fail "zero.extraFlags contains --tls, but the chart synthesizes it when zero.tls.enabled=true. Remove --tls from zero.extraFlags and set zero.tls.internalPort / clientName / clientAuthType instead." }}
+{{- end }}
+{{- /* client-auth-type applies to the external ports the built-in probes hit, so a
+       cert-requiring mode breaks the certless kubelet probe handshake. */}}
+{{- $certRequiringAuth := eq (include "dgraph.tls.certRequired" (dict "tls" .Values.zero.tls)) "true" }}
+{{- if and $nativeTLS $certRequiringAuth }}
+{{- if not .Values.zero.tls.clientName }}
+{{- fail (printf "zero.tls.clientAuthType=%s requires zero.tls.clientName so inter-node TLS can present a client certificate." .Values.zero.tls.clientAuthType) }}
+{{- end }}
+{{- if or (and .Values.zero.startupProbe.enabled (not .Values.zero.customStartupProbe)) (and .Values.zero.livenessProbe.enabled (not .Values.zero.customLivenessProbe)) (and .Values.zero.readinessProbe.enabled (not .Values.zero.customReadinessProbe)) }}
+{{- fail (printf "zero.tls.clientAuthType=%s forces every client to present a certificate, which the built-in httpGet probes cannot do (the kubelet has no client cert). Relax zero.tls.clientAuthType (e.g. VERIFYIFGIVEN) on the external ports, or supply zero.customStartupProbe / customLivenessProbe / customReadinessProbe (exec probes that present the client cert)." .Values.zero.tls.clientAuthType) }}
+{{- end }}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -145,9 +165,9 @@ spec:
               ordinal=${BASH_REMATCH[1]}
               idx=$(($ordinal + 1))
               if [[ $ordinal -eq 0 ]]; then
-                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }}{{ template "dgraph.logFlags" .Values.zero }} {{ .Values.zero.extraFlags }}
+                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }}{{ template "dgraph.logFlags" .Values.zero }} {{ .Values.zero.extraFlags }}{{- if $nativeTLS }} {{ include "dgraph.tlsFlag" (dict "tls" .Values.zero.tls "path" "/dgraph/tls") }}{{- end }}
               else
-                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --peer {{ template "peer_zero" . }} {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }}{{ template "dgraph.logFlags" .Values.zero }} {{ .Values.zero.extraFlags }}
+                exec dgraph zero --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):5080 --peer {{ template "peer_zero" . }} {{ template "raft_index_flag" . }}$idx --replicas {{ .Values.zero.shardReplicaCount }}{{ template "dgraph.logFlags" .Values.zero }} {{ .Values.zero.extraFlags }}{{- if $nativeTLS }} {{ include "dgraph.tlsFlag" (dict "tls" .Values.zero.tls "path" "/dgraph/tls") }}{{- end }}
               fi
         resources:
 {{ toYaml .Values.zero.resources | indent 10 }}
@@ -156,6 +176,9 @@ spec:
           httpGet:
             port: {{ .Values.zero.startupProbe.port }}
             path: {{ .Values.zero.startupProbe.path }}
+            {{- if $nativeTLS }}
+            scheme: HTTPS
+            {{- end }}
           periodSeconds: {{ .Values.zero.startupProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.zero.startupProbe.timeoutSeconds }}
           successThreshold: {{ .Values.zero.startupProbe.successThreshold }}
@@ -168,6 +191,9 @@ spec:
           httpGet:
             port: {{ .Values.zero.livenessProbe.port }}
             path: {{ .Values.zero.livenessProbe.path }}
+            {{- if $nativeTLS }}
+            scheme: HTTPS
+            {{- end }}
           initialDelaySeconds: {{ .Values.zero.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.zero.livenessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.zero.livenessProbe.timeoutSeconds }}
@@ -181,6 +207,9 @@ spec:
           httpGet:
             port: {{ .Values.zero.readinessProbe.port }}
             path: {{ .Values.zero.readinessProbe.path }}
+            {{- if $nativeTLS }}
+            scheme: HTTPS
+            {{- end }}
           initialDelaySeconds: {{ .Values.zero.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.zero.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.zero.readinessProbe.timeoutSeconds }}

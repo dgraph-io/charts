@@ -23,6 +23,10 @@
 {{- $hasMinioKeys := include "dgraph.backups.keys.minio.enabled" . -}}
 {{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
 {{- $initContainerEnabled := or .Values.alpha.initContainers.init.enabled .Values.alpha.extraInitContainers }}
+{{- /* native-TLS is active for alpha when alpha.tls is on. Computed once here (a
+       bool) and reused for the --tls superflag, the HTTPS probe scheme, and the
+       extraFlags/clientAuthType guards below. */}}
+{{- $nativeTLS := .Values.alpha.tls.enabled }}
 {{- /* ACL and encryption-at-rest activate from `enabled` below by synthesizing the
        matching superflag onto the alpha command. Fail rather than emit a duplicate
        flag if the operator also hand-set it in extraFlags. */}}
@@ -43,6 +47,22 @@
 {{- if and .Values.alpha.encryption.enabled (not .Values.alpha.encryption.existingSecret) .Values.alpha.encryption.file }}
 {{- if not (hasKey .Values.alpha.encryption.file (.Values.alpha.encryption.keyFile | default "enc_key_file")) }}
 {{- fail (printf "alpha.encryption.keyFile is %q, but alpha.encryption.file has no such key (it has: %s). The chart mounts alpha.encryption.file at /dgraph/enc using its own keys as filenames, and --encryption points at /dgraph/enc/%s. Set alpha.encryption.keyFile to one of those keys, or rename the key in alpha.encryption.file." (.Values.alpha.encryption.keyFile | default "enc_key_file") (join ", " (keys .Values.alpha.encryption.file)) (.Values.alpha.encryption.keyFile | default "enc_key_file")) }}
+{{- end }}
+{{- end }}
+{{- /* native TLS synthesizes --tls from alpha.tls; a hand-set --tls in extraFlags
+       would be passed twice. */}}
+{{- if and $nativeTLS (contains "--tls" (.Values.alpha.extraFlags | default "")) }}
+{{- fail "alpha.extraFlags contains --tls, but the chart synthesizes it when alpha.tls.enabled=true. Remove --tls from alpha.extraFlags and set alpha.tls.internalPort / clientName / clientAuthType instead." }}
+{{- end }}
+{{- /* client-auth-type applies to the external ports the built-in probes hit, so a
+       cert-requiring mode breaks the certless kubelet probe handshake. */}}
+{{- $certRequiringAuth := eq (include "dgraph.tls.certRequired" (dict "tls" .Values.alpha.tls)) "true" }}
+{{- if and $nativeTLS $certRequiringAuth }}
+{{- if not .Values.alpha.tls.clientName }}
+{{- fail (printf "alpha.tls.clientAuthType=%s requires alpha.tls.clientName so in-cluster callers (inter-node TLS) can present a client certificate." .Values.alpha.tls.clientAuthType) }}
+{{- end }}
+{{- if or (and .Values.alpha.startupProbe.enabled (not .Values.alpha.customStartupProbe)) (and .Values.alpha.livenessProbe.enabled (not .Values.alpha.customLivenessProbe)) (and .Values.alpha.readinessProbe.enabled (not .Values.alpha.customReadinessProbe)) }}
+{{- fail (printf "alpha.tls.clientAuthType=%s forces every client to present a certificate, which the built-in httpGet probes cannot do (the kubelet has no client cert). Relax alpha.tls.clientAuthType (e.g. VERIFYIFGIVEN) on the external ports, or supply alpha.customStartupProbe / customLivenessProbe / customReadinessProbe (exec probes that present the client cert)." .Values.alpha.tls.clientAuthType) }}
 {{- end }}
 {{- end }}
 apiVersion: apps/v1
@@ -236,7 +256,7 @@ spec:
           {{- /* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
           - |
             set -ex
-            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}{{ template "dgraph.logFlags" .Values.alpha }} {{ .Values.alpha.extraFlags }}{{- if .Values.alpha.acl.enabled }} --acl "secret-file=/dgraph/acl/{{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }};"{{- end }}{{- if .Values.alpha.encryption.enabled }} --encryption "key-file=/dgraph/enc/{{ .Values.alpha.encryption.keyFile | default "enc_key_file" }};"{{- end }}
+            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }}{{ template "dgraph.logFlags" .Values.alpha }} {{ .Values.alpha.extraFlags }}{{- if .Values.alpha.acl.enabled }} --acl "secret-file=/dgraph/acl/{{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }};"{{- end }}{{- if .Values.alpha.encryption.enabled }} --encryption "key-file=/dgraph/enc/{{ .Values.alpha.encryption.keyFile | default "enc_key_file" }};"{{- end }}{{- if $nativeTLS }} {{ include "dgraph.tlsFlag" (dict "tls" .Values.alpha.tls "path" "/dgraph/tls") }}{{- end }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}
@@ -244,6 +264,9 @@ spec:
           httpGet:
             port: {{ .Values.alpha.startupProbe.port }}
             path: {{ .Values.alpha.startupProbe.path }}
+            {{- if $nativeTLS }}
+            scheme: HTTPS
+            {{- end }}
           periodSeconds: {{ .Values.alpha.startupProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.alpha.startupProbe.timeoutSeconds }}
           successThreshold: {{ .Values.alpha.startupProbe.successThreshold }}
@@ -256,6 +279,9 @@ spec:
           httpGet:
             port: {{ .Values.alpha.livenessProbe.port }}
             path: {{ .Values.alpha.livenessProbe.path }}
+            {{- if $nativeTLS }}
+            scheme: HTTPS
+            {{- end }}
           initialDelaySeconds: {{ .Values.alpha.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.alpha.livenessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.alpha.livenessProbe.timeoutSeconds }}
@@ -269,6 +295,9 @@ spec:
           httpGet:
             port: {{ .Values.alpha.readinessProbe.port }}
             path: {{ .Values.alpha.readinessProbe.path }}
+            {{- if $nativeTLS }}
+            scheme: HTTPS
+            {{- end }}
           initialDelaySeconds: {{ .Values.alpha.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.alpha.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.alpha.readinessProbe.timeoutSeconds }}
