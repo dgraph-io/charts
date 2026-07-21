@@ -16,8 +16,8 @@ spec:
   {{- if .Values.zero.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.zero.service.loadBalancerIP }}
   {{- end }}
-  {{- if .Values.zero.externalTrafficPolicy }}
-  externalTrafficPolicy: {{ .Values.zero.externalTrafficPolicy }}
+  {{- if .Values.zero.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.zero.service.externalTrafficPolicy }}
   {{- end }}
   ports:
     - port: 5080
