@@ -67,10 +67,10 @@ spec:
       labels:
         {{- include "dgraph.labels" (dict "ctx" . "component" .Values.alpha.name "podLabels" .Values.alpha.podLabels) | nindent 8 }}
     spec:
-      {{- if .Values.serviceAccount.create }}
-      serviceAccountName: {{ .Values.serviceAccount.name }}
-      automountServiceAccountToken: {{ .Values.alpha.automountServiceAccountToken }}
+      {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
+      serviceAccountName: {{ include "dgraph.serviceAccountName" . }}
       {{- end }}
+      automountServiceAccountToken: {{ .Values.alpha.automountServiceAccountToken }}
       {{- if .Values.alpha.schedulerName }}
       schedulerName: {{ .Values.alpha.schedulerName }}
       {{- end }}
@@ -210,7 +210,7 @@ spec:
           {{- /* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
           - |
             set -ex
-            dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }} {{ .Values.alpha.extraFlags }}
+            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }} {{ .Values.alpha.extraFlags }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}
@@ -252,10 +252,8 @@ spec:
         readinessProbe: {{- toYaml .Values.alpha.customReadinessProbe | nindent 10 }}
         {{- end }}
         volumeMounts:
-        {{- if .Values.alpha.persistence.enabled }}
         - name: datadir
           mountPath: /dgraph
-        {{- end }}
         {{- if .Values.alpha.configFile }}
         - name: config-volume
           mountPath: /dgraph/config
@@ -282,11 +280,12 @@ spec:
         {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
       volumes:
+      {{- if not .Values.alpha.persistence.enabled }}
+      # When persistence is enabled the volumeClaimTemplates entry below supplies
+      # the "datadir" volume - the StatefulSet controller injects a per-pod PVC
+      # (datadir-<sts>-<ordinal>). Only declare an emptyDir fallback when
+      # persistence is disabled.
       - name: datadir
-      {{- if .Values.alpha.persistence.enabled }}
-        persistentVolumeClaim:
-          claimName: datadir
-      {{- else }}
         emptyDir: {}
       {{- end }}
       {{- if and $backupsEnabled (or $hasS3Keys $hasMinioKeys) }}
