@@ -60,10 +60,10 @@ spec:
       labels:
         {{- include "dgraph.labels" (dict "ctx" . "component" .Values.zero.name "podLabels" .Values.zero.podLabels) | nindent 8 }}
     spec:
-      {{- if .Values.serviceAccount.create }}
-      serviceAccountName: {{ .Values.serviceAccount.name }}
-      automountServiceAccountToken: {{ .Values.zero.automountServiceAccountToken }}
+      {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
+      serviceAccountName: {{ include "dgraph.serviceAccountName" . }}
       {{- end }}
+      automountServiceAccountToken: {{ .Values.zero.automountServiceAccountToken }}
       {{- if .Values.zero.schedulerName }}
       schedulerName: {{ .Values.zero.schedulerName }}
       {{- end }}
