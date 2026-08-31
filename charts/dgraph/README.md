@@ -104,6 +104,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.podLabels`                         | Specify additional labels for template metadata                       | `{}`                                                |
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
 | `zero.schedulerName`                     | Configure an explicit scheduler                                       | `nil`                                               |
+| `zero.priorityClassName`                 | PriorityClass to protect zero pods from preemption                    | `nil`                                               |
 | `zero.monitorLabel`                      | "monitor" label on the zero Service (for Prometheus service discovery) | `zero-dgraph-io`                                    |
 | `zero.rollingUpdatePartition`            | Partition update strategy                                             | `nil`                                               |
 | `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `OrderedReady`                                      |
@@ -150,6 +151,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.monitorLabel`                     | "monitor" label on the alpha Service (for Prometheus service discovery) | `alpha-dgraph-io`                                   |
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
 | `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
+| `alpha.priorityClassName`                | PriorityClass to protect alpha pods from preemption                   | `nil`                                               |
 | `alpha.rollingUpdatePartition`           | Partition update strategy                                             | `nil`                                               |
 | `alpha.podManagementPolicy`              | Pod management policy for alpha nodes                                 | `OrderedReady`                                      |
 | `alpha.replicaCount`                     | Number of alpha nodes                                                 | `3`                                                 |

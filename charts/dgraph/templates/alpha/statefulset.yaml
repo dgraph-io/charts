@@ -81,6 +81,9 @@ spec:
       {{- if .Values.alpha.schedulerName }}
       schedulerName: {{ .Values.alpha.schedulerName }}
       {{- end }}
+      {{- if .Values.alpha.priorityClassName }}
+      priorityClassName: {{ .Values.alpha.priorityClassName }}
+      {{- end }}
       {{- if or (eq .Values.alpha.antiAffinity "hard") (eq .Values.alpha.antiAffinity "soft") .Values.alpha.nodeAffinity }}
       affinity:
       {{- end }}

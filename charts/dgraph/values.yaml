@@ -82,6 +82,13 @@ zero:
   ##
   # schedulerName: stork
 
+  ## Pod priority
+  ## https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
+  ## priorityClassName references an existing PriorityClass to protect pods from
+  ## preemption. Preemption behavior is configured on the PriorityClass itself.
+  ##
+  # priorityClassName: high-priority
+
   ## Partition update strategy
   ## https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#partitions
   ##
@@ -277,6 +284,13 @@ alpha:
   ## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
   ##
   # schedulerName: stork
+
+  ## Pod priority
+  ## https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
+  ## priorityClassName references an existing PriorityClass to protect pods from
+  ## preemption. Preemption behavior is configured on the PriorityClass itself.
+  ##
+  # priorityClassName: high-priority
 
   ## Partition update strategy
   ## https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#partitions

@@ -7,6 +7,7 @@ environments:
   alpha-tls:
   default-json:
   default-yaml:
+  default-priority:
   zero-tls:
 
 releases:

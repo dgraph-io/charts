@@ -1,0 +1,15 @@
+suite: alpha priorityClassName
+templates:
+  - templates/alpha/statefulset.yaml
+tests:
+  - it: omits priorityClassName when unset (chart defaults)
+    asserts:
+      - notExists:
+          path: spec.template.spec.priorityClassName
+  - it: renders priorityClassName when set
+    set:
+      alpha.priorityClassName: high-priority
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: high-priority
