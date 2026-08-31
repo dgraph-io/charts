@@ -254,6 +254,22 @@ zero:
   customLivenessProbe: {}
   customReadinessProbe: {}
 
+  ## Extra containers to run alongside the zero container in each pod.
+  ## Rendered into the StatefulSet pod spec `containers` list after the
+  ## zero container. Values are processed through `tpl`, so Helm template
+  ## expressions inside container specs are resolved at render time.
+  extraContainers: []
+
+  ## Extra pod-level volumes. Available to the zero container via
+  ## extraVolumeMounts below, and to any extraContainers via their own
+  ## volumeMounts.
+  extraVolumes: []
+
+  ## Extra volumeMounts attached to the zero container itself. To attach
+  ## mounts to a sidecar, declare them inside that sidecar's container
+  ## spec under extraContainers.
+  extraVolumeMounts: []
+
 alpha:
   name: alpha
   metrics:
@@ -491,6 +507,23 @@ alpha:
   
   # Enables extra init containers to be added to the alpha statefulset
   extraInitContainers: []
+
+  ## Extra containers to run alongside the alpha container in each pod.
+  ## Rendered into the StatefulSet pod spec `containers` list after the
+  ## alpha container. Values are processed through `tpl`, so Helm template
+  ## expressions inside container specs are resolved at render time (same
+  ## semantics as extraInitContainers above).
+  extraContainers: []
+
+  ## Extra pod-level volumes. Available to the alpha container via
+  ## extraVolumeMounts below, and to any extraContainers via their own
+  ## volumeMounts.
+  extraVolumes: []
+
+  ## Extra volumeMounts attached to the alpha container itself. To attach
+  ## mounts to a sidecar, declare them inside that sidecar's container
+  ## spec under extraContainers.
+  extraVolumeMounts: []
 
   ## You may want to initialize the Alphas with data before starting Alpha containers.
   ## Examples can include:
