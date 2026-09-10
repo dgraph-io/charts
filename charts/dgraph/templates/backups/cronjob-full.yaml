@@ -126,8 +126,25 @@ spec:
           {{- end }}
           {{- if or .Values.alpha.acl.enabled .Values.backups.admin.auth_token }}
           - name: backup-secret-volume
+          {{- if and .Values.alpha.acl.enabled .Values.backups.admin.existingSecret }}
+            projected:
+              sources:
+              - secret:
+                  name: {{ .Values.backups.admin.existingSecret }}
+                  items:
+                  - key: {{ .Values.backups.admin.passwordSecretKey | default "backup_admin_password" }}
+                    path: backup_admin_password
+              {{- if .Values.backups.admin.auth_token }}
+              - secret:
+                  name: {{ template "dgraph.backups.fullname" . }}-secret
+                  items:
+                  - key: backup_auth_token
+                    path: backup_auth_token
+              {{- end }}
+          {{- else }}
             secret:
               secretName: {{ template "dgraph.backups.fullname" . }}-secret
+          {{- end }}
           {{- end }}
           {{- if .Values.backups.nfs.enabled }}
           - name: backups-nfs-volume

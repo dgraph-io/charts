@@ -42,7 +42,7 @@ No manual intervention is required. Also review the [additional breaking changes
 
 **Full backup restartPolicy fix**: The full backup CronJob previously read its `restartPolicy` from `backups.incremental.restartPolicy` instead of `backups.full.restartPolicy`. This has been fixed. If you were working around this bug by setting `backups.incremental.restartPolicy` to control the full backup's restart policy, you will need to move that value to `backups.full.restartPolicy`.
 
-**Backup admin password now required**: When `alpha.acl.enabled` is true and backups are enabled, `backups.admin.password` must be explicitly set. Previously the chart would silently render an empty secret, which would cause backup failures at runtime. The chart now fails at install/upgrade time with a clear error message if the password is missing.
+**Backup admin password now required**: When `alpha.acl.enabled` is true and backups are enabled, `backups.admin.password` must be explicitly set, unless `backups.admin.existingSecret` names a pre-created Secret holding it. Previously the chart would silently render an empty secret, which would cause backup failures at runtime. The chart now fails at install/upgrade time with a clear error message if neither is set.
 
 ### Installing the Chart
 
@@ -248,9 +248,11 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.podAnnotations`                 | Annotations for backup CronJob pods                                   | `{}`                                                |
 | `backups.schedulerName`                  | Configure an explicit scheduler for Backups Kubernetes CronJobs       | `nil`                                               |
 | `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
-| `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `nil`                                               |
+| `backups.admin.password`                 | Login user password for backups (required if ACL enabled, unless `backups.admin.existingSecret` is set) | `nil`                       |
 | `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
+| `backups.admin.existingSecret`           | Name of a pre-created Secret holding the backup admin password, so it never passes through Helm values. Ignored unless `alpha.acl.enabled` is true | `""`                  |
+| `backups.admin.passwordSecretKey`        | Key within `existingSecret` holding the password. Ignored unless `existingSecret` is set; the chart's own backups Secret always uses `backup_admin_password` | `backup_admin_password` |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
 | `backups.image.tag`                      | Container image tag                                                   | `v21.03.0`                                          |
@@ -611,7 +613,7 @@ When ACLs are used, the backup cronjob will log in to the Alpha node using a spe
   * see [Alpha Access Control Lists](#alpha-access-control-lists) above.
 * Backups
   * `backups.admin.user` (default: `groot`) - a user that is a member of `guardians` group will need to be specified.
-  * `backups.admin.password` (required) - the corresponding password for that user will need to be specified.
+  * `backups.admin.password` (required) - the corresponding password for that user will need to be specified, unless `backups.admin.existingSecret` names a pre-created Secret that holds it (see [example_values/backup-admin-existing-secret.yaml](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/backup-admin-existing-secret.yaml)).
 
 ### Using an auth token
 

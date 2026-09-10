@@ -390,8 +390,16 @@ alpha:
   ## ref: https://docs.dgraph.io/installation/configuration/enable-acl
   acl:
     enabled: false
+    ## Filename (and Secret key) of the HMAC secret mounted at /dgraph/acl/<secretFile>.
+    secretFile: hmac_secret_file
+    ## Name of a pre-created Secret holding the HMAC key. When set, the chart does NOT
+    ## render its own ACL Secret from `file` below; the alpha pod mounts this Secret
+    ## instead, so the HMAC never passes through Helm values or release state. The
+    ## Secret must contain the `secretFile` key.
+    existingSecret: ""
     ## The values in `file: {}` will be the filename as key and the file data as the value.
-    ## Make sure that the filename key matches the dgraph configuration of `acl_secret_file`
+    ## Make sure that the filename key matches the dgraph configuration of `acl_secret_file`.
+    ## Ignored when `existingSecret` is set.
     # file:
     #   ## value for 1234567890123456789012345678901
     #   ## Note that Kubernetes secrets must be base64-encoded
@@ -401,8 +409,15 @@ alpha:
   ## ref: https://docs.dgraph.io/installation/configuration/encryption-at-rest
   encryption:
     enabled: false
+    ## Filename (and Secret key) of the encryption key mounted at /dgraph/enc/<keyFile>.
+    keyFile: enc_key_file
+    ## Name of a pre-created Secret holding the encryption key. When set, the chart does
+    ## NOT render its own encryption Secret from `file` below; the alpha pod mounts this
+    ## Secret instead. The Secret must contain the `keyFile` key.
+    existingSecret: ""
     ## The values in `file: {}` will be the filename as key and the file data as the value.
-    ## Make sure that the filename key matches the dgraph configuration of `encryption_key_file`
+    ## Make sure that the filename key matches the dgraph configuration of `encryption_key_file`.
+    ## Ignored when `existingSecret` is set.
     # file:
     #   ## value for 123456789012345
     #   ## Note that Kubernetes secrets must be base64-encoded
@@ -645,6 +660,15 @@ backups:
     ## ref: https://docs.dgraph.io/installation/configuration/enable-acl
     user: groot
     # password: password
+    ## Name of a pre-created Secret holding the backup admin password. When set, the
+    ## chart does NOT mint `backup_admin_password` into its own backups Secret; the
+    ## CronJob mounts this Secret's key instead, so the password never passes through
+    ## Helm values or release state. Ignored unless alpha.acl.enabled is true.
+    existingSecret: ""
+    ## Key within existingSecret that holds the backup admin password. Ignored
+    ## unless existingSecret is set; the chart's own backups Secret always uses the
+    ## key backup_admin_password.
+    passwordSecretKey: backup_admin_password
     ## Mutual TLS client certificate and key can be used to secure transaction that was created with
     ## dgraph cert --client <name-of-client> should be specified here.
     ## ref. https://docs.dgraph.io/admin/security/tls-configuration#tls-options
