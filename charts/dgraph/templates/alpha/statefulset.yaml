@@ -35,6 +35,19 @@
 {{- if and .Values.alpha.encryption.enabled (contains "--encryption" (.Values.alpha.extraFlags | default "")) }}
 {{- fail "alpha.encryption.enabled synthesizes the --encryption superflag, but alpha.extraFlags already contains --encryption. Remove --encryption from alpha.extraFlags (configure alpha.encryption.keyFile / alpha.encryption.existingSecret instead) so the flag is not passed twice." }}
 {{- end }}
+{{- /* The synthesized flag points at /dgraph/<dir>/<file>, and on the chart-owned
+       path the mounted filenames are the keys of the `file` map. A mismatch starts
+       an alpha that exits on a missing key file, so catch it while rendering. */}}
+{{- if and .Values.alpha.acl.enabled (not .Values.alpha.acl.existingSecret) .Values.alpha.acl.file }}
+{{- if not (hasKey .Values.alpha.acl.file (.Values.alpha.acl.secretFile | default "hmac_secret_file")) }}
+{{- fail (printf "alpha.acl.secretFile is %q, but alpha.acl.file has no such key (it has: %s). The chart mounts alpha.acl.file at /dgraph/acl using its own keys as filenames, and --acl points at /dgraph/acl/%s. Set alpha.acl.secretFile to one of those keys, or rename the key in alpha.acl.file." (.Values.alpha.acl.secretFile | default "hmac_secret_file") (join ", " (keys .Values.alpha.acl.file)) (.Values.alpha.acl.secretFile | default "hmac_secret_file")) }}
+{{- end }}
+{{- end }}
+{{- if and .Values.alpha.encryption.enabled (not .Values.alpha.encryption.existingSecret) .Values.alpha.encryption.file }}
+{{- if not (hasKey .Values.alpha.encryption.file (.Values.alpha.encryption.keyFile | default "enc_key_file")) }}
+{{- fail (printf "alpha.encryption.keyFile is %q, but alpha.encryption.file has no such key (it has: %s). The chart mounts alpha.encryption.file at /dgraph/enc using its own keys as filenames, and --encryption points at /dgraph/enc/%s. Set alpha.encryption.keyFile to one of those keys, or rename the key in alpha.encryption.file." (.Values.alpha.encryption.keyFile | default "enc_key_file") (join ", " (keys .Values.alpha.encryption.file)) (.Values.alpha.encryption.keyFile | default "enc_key_file")) }}
+{{- end }}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -219,7 +232,7 @@ spec:
           {{- /* TODO: Remove awk-gsub once dgraph-io/dgraph#6837 is merged and back-ported. */}}
           - |
             set -ex
-            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }} {{ .Values.alpha.extraFlags }}{{- if .Values.alpha.acl.enabled }} --acl "secret-file=/dgraph/acl/{{ .Values.alpha.acl.secretFile }};"{{- end }}{{- if .Values.alpha.encryption.enabled }} --encryption "key-file=/dgraph/enc/{{ .Values.alpha.encryption.keyFile }};"{{- end }}
+            exec dgraph alpha --my=$(hostname -f | awk '{gsub(/\.$/,""); print $0}'):7080 --zero {{ template "multi_zeros" . }} {{ .Values.alpha.extraFlags }}{{- if .Values.alpha.acl.enabled }} --acl "secret-file=/dgraph/acl/{{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }};"{{- end }}{{- if .Values.alpha.encryption.enabled }} --encryption "key-file=/dgraph/enc/{{ .Values.alpha.encryption.keyFile | default "enc_key_file" }};"{{- end }}
         resources:
 {{ toYaml .Values.alpha.resources | indent 10 }}
         {{- if .Values.alpha.startupProbe.enabled }}
