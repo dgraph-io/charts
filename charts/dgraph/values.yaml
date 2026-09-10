@@ -12,6 +12,12 @@
 ## and per-component podLabels will override commonLabels on key conflicts.
 commonLabels: {}
 
+## Optionally specify an array of imagePullSecrets applied to every Pod.
+## Entries may be plain secret-name strings or Kubernetes {name: secret-name}
+## objects. Takes precedence over global.imagePullSecrets and image.pullSecrets.
+## Secrets must be manually created in the namespace.
+imagePullSecrets: []
+
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
@@ -37,6 +43,10 @@ image: &image
 ## Runs automatically on helm upgrade — detects and recreates StatefulSets
 ## with stale selector labels using --cascade=orphan to avoid downtime.
 preUpgradeHook:
+  ## Run the v24-to-v25 StatefulSet selector migration Job on helm upgrade.
+  ## Once every cluster has migrated past the v24-to-v25 selector change this
+  ## can be set to false (it then becomes pure per-upgrade overhead).
+  enabled: true
   image:
     registry: docker.io
     repository: bitnami/kubectl
@@ -126,6 +136,27 @@ zero:
   ## Extra flags for command line flags in command
   extraFlags: ""
 
+  ## Verbosity (glog -v). INFO/WARNING/ERROR are ALWAYS written to stderr; this
+  ## only adds finer V-logs on top. Named level OR a raw -v integer:
+  ##   normal->0 (prod default)   verbose->1   debug->2   trace->3
+  logLevel: normal
+
+  ## Per-module verbosity (glog --vmodule), e.g. "server=3,raft=2". Empty = none.
+  vmodule: ""
+
+  ## Log to the container's stderr (glog --logtostderr). Keep true in Kubernetes
+  ## so logs reach `kubectl logs` / the node collector. Setting false routes logs
+  ## to files under logDir instead — only safe with a writable, mounted logDir.
+  logtostderr: true
+
+  ## Also write logs to files under logDir IN ADDITION to stderr
+  ## (glog --alsologtostderr). Requires a writable logDir.
+  alsologtostderr: false
+
+  ## Directory for glog file output (glog --log_dir); used when logtostderr=false
+  ## or alsologtostderr=true. Must be a writable mount. Empty = glog default.
+  logDir: ""
+
   ## Configuration file for dgraph zero used as an alternative to command-line options
   ## Ref: https://docs.dgraph.io/cli/config
   configFile: {}
@@ -172,6 +203,19 @@ zero:
     enabled: false
     fsGroup: 1001
     runAsUser: 1001
+
+  ## dgraph container Security Context.
+  ## Drops all Linux capabilities and forbids privilege escalation. Every key
+  ## except `enabled` is rendered verbatim into the container securityContext.
+  ## readOnlyRootFilesystem is left false because dgraph writes scratch data
+  ## outside its mounted data dir; flip it on only after verifying on a cluster.
+  containerSecurityContext:
+    enabled: false
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+      - ALL
 
   ## TLS Configuration
   tls:
@@ -314,6 +358,27 @@ alpha:
   ## Extra flags for command line flags in command
   extraFlags: ""
 
+  ## Verbosity (glog -v). INFO/WARNING/ERROR are ALWAYS written to stderr; this
+  ## only adds finer V-logs on top. Named level OR a raw -v integer:
+  ##   normal->0 (prod default)   verbose->1   debug->2   trace->3
+  logLevel: normal
+
+  ## Per-module verbosity (glog --vmodule), e.g. "server=3,raft=2". Empty = none.
+  vmodule: ""
+
+  ## Log to the container's stderr (glog --logtostderr). Keep true in Kubernetes
+  ## so logs reach `kubectl logs` / the node collector. Setting false routes logs
+  ## to files under logDir instead — only safe with a writable, mounted logDir.
+  logtostderr: true
+
+  ## Also write logs to files under logDir IN ADDITION to stderr
+  ## (glog --alsologtostderr). Requires a writable logDir.
+  alsologtostderr: false
+
+  ## Directory for glog file output (glog --log_dir); used when logtostderr=false
+  ## or alsologtostderr=true. Must be a writable mount. Empty = glog default.
+  logDir: ""
+
   ## Configuration file for dgraph alpha used as an alternative to command-line options
   ## Ref: https://docs.dgraph.io/cli/config
   configFile: {}
@@ -376,6 +441,19 @@ alpha:
     enabled: false
     fsGroup: 1001
     runAsUser: 1001
+
+  ## dgraph container Security Context.
+  ## Drops all Linux capabilities and forbids privilege escalation. Every key
+  ## except `enabled` is rendered verbatim into the container securityContext.
+  ## readOnlyRootFilesystem is left false because dgraph writes scratch data
+  ## outside its mounted data dir; flip it on only after verifying on a cluster.
+  containerSecurityContext:
+    enabled: false
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+      - ALL
 
   ## TLS Configuration
   ## Documentation on dgraph alpha TLS options,
@@ -605,6 +683,17 @@ ratel:
     enabled: false
     fsGroup: 1001
     runAsUser: 1001
+
+  ## ratel container Security Context.
+  ## Drops all Linux capabilities and forbids privilege escalation. Every key
+  ## except `enabled` is rendered verbatim into the container securityContext.
+  containerSecurityContext:
+    enabled: false
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+      - ALL
 
   ## Configure resource requests
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/

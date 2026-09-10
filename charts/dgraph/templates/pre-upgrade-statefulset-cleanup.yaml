@@ -3,7 +3,13 @@ Pre-upgrade hook: delete StatefulSets with --cascade=orphan so that Helm can
 recreate them with updated immutable fields (e.g. selector.matchLabels) while
 keeping existing pods running. The pods are adopted by the new StatefulSets
 once the upgrade completes.
+
+Gated by preUpgradeHook.enabled. This only matters for clusters migrating from
+the v24-era selector labels; once a cluster has upgraded past that point the
+hook is pure per-upgrade overhead (a Job plus transient SA/RBAC on every
+helm upgrade) and can be turned off.
 */}}
+{{- if .Values.preUpgradeHook.enabled }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -92,22 +98,36 @@ spec:
 
               # StatefulSets (Alpha and Zero)
               for STS in {{ template "dgraph.alpha.fullname" . }} {{ template "dgraph.zero.fullname" . }}; do
-                SELECTOR=$(kubectl get statefulset "$STS" -n "$NS" --ignore-not-found -o jsonpath='{.spec.selector.matchLabels.chart}')
+                # --ignore-not-found: NotFound exits 0 with empty output (handled
+                # below); any other kubectl error exits non-zero and fails the Job
+                # via sh -e, so RBAC or connection problems stay visible.
+                EXISTS=$(kubectl get statefulset "$STS" -n "$NS" --ignore-not-found -o name)
+                if [ -z "$EXISTS" ]; then
+                  echo "StatefulSet $STS does not exist in namespace $NS, skipping."
+                  continue
+                fi
+                SELECTOR=$(kubectl get statefulset "$STS" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}')
                 if [ -n "$SELECTOR" ]; then
                   echo "StatefulSet $STS has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
                   kubectl delete statefulset "$STS" --cascade=orphan -n "$NS"
                 else
-                  echo "StatefulSet $STS does not have 'chart' selector label (or does not exist), skipping."
+                  echo "StatefulSet $STS does not have 'chart' selector label, skipping."
                 fi
               done
 
               # Deployments (Ratel)
               for DEPLOY in {{ template "dgraph.ratel.fullname" . }}; do
-                SELECTOR=$(kubectl get deployment "$DEPLOY" -n "$NS" --ignore-not-found -o jsonpath='{.spec.selector.matchLabels.chart}')
+                EXISTS=$(kubectl get deployment "$DEPLOY" -n "$NS" --ignore-not-found -o name)
+                if [ -z "$EXISTS" ]; then
+                  echo "Deployment $DEPLOY does not exist in namespace $NS, skipping."
+                  continue
+                fi
+                SELECTOR=$(kubectl get deployment "$DEPLOY" -n "$NS" -o jsonpath='{.spec.selector.matchLabels.chart}')
                 if [ -n "$SELECTOR" ]; then
                   echo "Deployment $DEPLOY has stale 'chart' selector label ($SELECTOR), deleting with --cascade=orphan..."
                   kubectl delete deployment "$DEPLOY" --cascade=orphan -n "$NS"
                 else
-                  echo "Deployment $DEPLOY does not have 'chart' selector label (or does not exist), skipping."
+                  echo "Deployment $DEPLOY does not have 'chart' selector label, skipping."
                 fi
               done
+{{- end }}
