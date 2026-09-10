@@ -17,7 +17,7 @@ metadata:
   labels:
     {{- include "dgraph.labels" (dict "ctx" . "component" .Values.zero.name) | nindent 4 }}
 spec:
-  {{- if .Values.zero.pdb.maxUnavailable }}
+  {{- if not (kindIs "invalid" .Values.zero.pdb.maxUnavailable) }}
   maxUnavailable: {{ .Values.zero.pdb.maxUnavailable }}
   {{- else }}
   minAvailable: {{ .Values.zero.pdb.minAvailable }}
@@ -40,7 +40,7 @@ metadata:
   labels:
     {{- include "dgraph.labels" (dict "ctx" . "component" .Values.alpha.name) | nindent 4 }}
 spec:
-  {{- if .Values.alpha.pdb.maxUnavailable }}
+  {{- if not (kindIs "invalid" .Values.alpha.pdb.maxUnavailable) }}
   maxUnavailable: {{ .Values.alpha.pdb.maxUnavailable }}
   {{- else }}
   minAvailable: {{ .Values.alpha.pdb.minAvailable }}

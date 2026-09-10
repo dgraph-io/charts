@@ -4,9 +4,15 @@ it can't silently break connectivity on clusters whose CNI does not enforce
 NetworkPolicy. When enabled it:
   - always allows intra-cluster dgraph traffic (alpha<->zero, peer gossip) by
     selecting pods that carry this release's own app/release labels;
-  - grants client access to the alpha HTTP (8080) and gRPC (9080) ports only to
-    pods carrying every label in networkPolicy.clientPodLabels;
+  - grants client access to alpha (8080, 9080) and, when ratel is enabled,
+    ratel (8000), to clients matched by clientPodLabels and/or
+    clientNamespaceLabels. Setting both narrows to those pods in those
+    namespaces; a bare podSelector matches only this namespace, so reaching
+    an Ingress controller in another namespace needs clientNamespaceLabels;
   - appends any rules supplied in networkPolicy.extraIngress verbatim.
+Anything not listed above is denied once this policy selects a pod, so review
+the chart's ingress features (alpha.ingress, ratel.ingress, global.ingress)
+against these selectors before enabling.
 Egress is intentionally not restricted (backups reach S3/MinIO/NFS, etc.).
 */ -}}
 {{- if .Values.networkPolicy.enabled }}
@@ -31,17 +37,29 @@ spec:
             matchLabels:
               app: {{ template "dgraph.name" . }}
               release: {{ .Release.Name }}
-    {{- with .Values.networkPolicy.clientPodLabels }}
-    # Clients: pods carrying these labels may reach the alpha client ports.
+    {{- if or .Values.networkPolicy.clientPodLabels .Values.networkPolicy.clientNamespaceLabels }}
+    # Clients: pods and/or namespaces carrying these labels may reach the client ports.
     - from:
-        - podSelector:
+        -
+          {{- with .Values.networkPolicy.clientNamespaceLabels }}
+          namespaceSelector:
             matchLabels:
               {{- toYaml . | nindent 14 }}
+          {{- end }}
+          {{- with .Values.networkPolicy.clientPodLabels }}
+          podSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
       ports:
         - protocol: TCP
           port: 8080
         - protocol: TCP
           port: 9080
+        {{- if .Values.ratel.enabled }}
+        - protocol: TCP
+          port: 8000
+        {{- end }}
     {{- end }}
     {{- with .Values.networkPolicy.extraIngress }}
     {{- toYaml . | nindent 4 }}
