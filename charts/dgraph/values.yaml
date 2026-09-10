@@ -223,6 +223,19 @@ zero:
     ## Files created from './tls' directory set with `dgraph cert` command
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
+    ## Read only when tls.enabled=true; the chart then builds Dgraph's --tls
+    ## superflag from the keys below.
+    ## Enable TLS on the internal gRPC port for inter-node traffic (Dgraph's
+    ## --tls "internal-port=<bool>"). A boolean, not a port number.
+    internalPort: true
+    ## Client cert basename; selects client.<clientName>.crt/.key at /dgraph/tls.
+    ## Empty omits the client cert from --tls.
+    clientName: ""
+    ## Dgraph client-auth-type for the external ports (e.g. REQUIREANDVERIFY).
+    ## Empty omits the field. REQUIREANY/REQUIREANDVERIFY require a clientName and
+    ## are incompatible with the default httpGet probes (use VERIFYIFGIVEN or
+    ## custom exec probes).
+    clientAuthType: ""
 
 
   ## dgraph data Persistent Volume Storage Class
@@ -463,6 +476,19 @@ alpha:
     ## Files created from './tls' directory set with `dgraph cert` command
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
+    ## Read only when tls.enabled=true; the chart then builds Dgraph's --tls
+    ## superflag from the keys below.
+    ## Enable TLS on the internal gRPC port for inter-node traffic (Dgraph's
+    ## --tls "internal-port=<bool>"). A boolean, not a port number.
+    internalPort: true
+    ## Client cert basename; selects client.<clientName>.crt/.key at /dgraph/tls.
+    ## Empty omits the client cert from --tls.
+    clientName: ""
+    ## Dgraph client-auth-type for the external ports (e.g. REQUIREANDVERIFY).
+    ## Empty omits the field. REQUIREANY/REQUIREANDVERIFY require a clientName and
+    ## are incompatible with the default httpGet probes (use VERIFYIFGIVEN or
+    ## custom exec probes).
+    clientAuthType: ""
 
   ## ACL Configuration
   ## ref: https://docs.dgraph.io/installation/configuration/enable-acl
