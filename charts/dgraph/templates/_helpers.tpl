@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "dgraph.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 24 -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 24 | trimSuffix "-" -}}
 {{- end -}}
 {{/*
 Create a default fully qualified app name.
