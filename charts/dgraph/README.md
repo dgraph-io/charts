@@ -40,6 +40,16 @@ No manual intervention is required. Also review the [additional breaking changes
 
 #### Additional v25 breaking changes
 
+**Resource names change if a truncated name ended in a dash**: `dgraph.fullname` truncates to 24 characters and previously kept a trailing dash, producing names like `myrelease--alpha`. The chart now trims it.
+
+This renames every resource in the chart if your release name is 23 characters, or 24 or more with a dash in position 24. Renaming a StatefulSet makes Helm delete and recreate it, and `volumeClaimTemplates` names each PVC after the StatefulSet, so Kubernetes orphans the existing `datadir-*` volumes instead of adopting them and Alpha starts on empty storage. Zero's headless Service is renamed too, so the peer addresses Zero has stored stop resolving.
+
+Check your release name before upgrading. If it matches either pattern, back up your data and rebind the PersistentVolumes to the new PVC names. `dgraph.name` carried the same defect, where it emitted a label value ending in `-` that the API server rejects; that case failed at install rather than corrupting an upgrade.
+
+**Alpha and Zero now run under the configured ServiceAccount**: With `serviceAccount.create: false` and `serviceAccount.name` set, the chart rendered neither `serviceAccountName` nor `automountServiceAccountToken`, so both pods ran under `default` while appearing to honor the setting. They now run under the name you configured.
+
+RBAC is not the risk, because these pods never call the API server. Workload identity is. Under a service mesh the ServiceAccount is the pod's identity, and Istio derives its SPIFFE ID from it, so an `AuthorizationPolicy` or `PeerAuthentication` matching `.../sa/default` stops matching after the upgrade. Update those policies before upgrading. Both Alpha and Zero pods roll on this release.
+
 **Full backup restartPolicy fix**: The full backup CronJob previously read its `restartPolicy` from `backups.incremental.restartPolicy` instead of `backups.full.restartPolicy`. This has been fixed. If you were working around this bug by setting `backups.incremental.restartPolicy` to control the full backup's restart policy, you will need to move that value to `backups.full.restartPolicy`.
 
 **Backup admin password now required**: When `alpha.acl.enabled` is true and backups are enabled, `backups.admin.password` must be explicitly set, unless `backups.admin.existingSecret` names a pre-created Secret holding it. Previously the chart would silently render an empty secret, which would cause backup failures at runtime. The chart now fails at install/upgrade time with a clear error message if neither is set.
