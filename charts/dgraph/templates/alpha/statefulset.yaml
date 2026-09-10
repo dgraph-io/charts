@@ -279,49 +279,9 @@ spec:
           mountPath: {{ .Values.backups.volume.mountPath }}
         {{- end }}
       terminationGracePeriodSeconds: {{ .Values.alpha.terminationGracePeriodSeconds }}
+      {{- with (include "dgraph.alpha.volumes" . | trim) }}
       volumes:
-      {{- if not .Values.alpha.persistence.enabled }}
-      # When persistence is enabled the volumeClaimTemplates entry below supplies
-      # the "datadir" volume - the StatefulSet controller injects a per-pod PVC
-      # (datadir-<sts>-<ordinal>). Only declare an emptyDir fallback when
-      # persistence is disabled.
-      - name: datadir
-        emptyDir: {}
-      {{- end }}
-      {{- if and $backupsEnabled (or $hasS3Keys $hasMinioKeys) }}
-      - name: backup-secret-volume
-        secret:
-          secretName: {{ template "dgraph.backups.fullname" . }}-secret
-      {{- end }}
-      {{- if and $backupsEnabled .Values.backups.nfs.enabled }}
-      - name: backups-nfs-volume
-        persistentVolumeClaim:
-          claimName: {{ template "dgraph.backups.fullname" . }}-claim
-      {{- end }}
-      {{- if and $backupsEnabled .Values.backups.volume.enabled }}
-      - name: backups-vol-volume
-        persistentVolumeClaim:
-          claimName: {{ .Values.backups.volume.claim }}
-      {{- end }}
-      {{- if .Values.alpha.configFile }}
-      - name: config-volume
-        configMap:
-          name: {{ template "dgraph.alpha.fullname" . }}-config
-      {{- end }}
-      {{- if .Values.alpha.tls.enabled }}
-      - name: tls-volume
-        secret:
-          secretName: {{ template "dgraph.alpha.fullname" . }}-tls-secret
-      {{- end }}
-      {{- if .Values.alpha.encryption.enabled }}
-      - name: enc-volume
-        secret:
-          secretName: {{ template "dgraph.alpha.fullname" . }}-encryption-secret
-      {{- end }}
-      {{- if or .Values.alpha.acl.enabled }}
-      - name: acl-volume
-        secret:
-          secretName: {{ template "dgraph.alpha.fullname" . }}-acl-secret
+        {{- . | nindent 6 }}
       {{- end }}
 {{- if .Values.alpha.persistence.enabled }}
   volumeClaimTemplates:

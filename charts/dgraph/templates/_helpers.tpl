@@ -264,3 +264,75 @@ Allow overriding namespace
 {{- define "dgraph.namespace" -}}
 {{- default .Release.Namespace .Values.namespaceOverride -}}
 {{- end -}}
+
+{{/*
+Alpha pod volumes, rendered separately so the caller can omit the `volumes:`
+key entirely when nothing populates it.
+*/}}
+{{- define "dgraph.alpha.volumes" -}}
+{{- $hasS3Keys := include "dgraph.backups.keys.s3.enabled" . -}}
+{{- $hasMinioKeys := include "dgraph.backups.keys.minio.enabled" . -}}
+{{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled -}}
+{{- if not .Values.alpha.persistence.enabled }}
+{{- /* With persistence on, volumeClaimTemplates supplies "datadir" as a per-pod PVC. */}}
+- name: datadir
+  emptyDir: {}
+{{- end }}
+{{- if and $backupsEnabled (or $hasS3Keys $hasMinioKeys) }}
+- name: backup-secret-volume
+  secret:
+    secretName: {{ template "dgraph.backups.fullname" . }}-secret
+{{- end }}
+{{- if and $backupsEnabled .Values.backups.nfs.enabled }}
+- name: backups-nfs-volume
+  persistentVolumeClaim:
+    claimName: {{ template "dgraph.backups.fullname" . }}-claim
+{{- end }}
+{{- if and $backupsEnabled .Values.backups.volume.enabled }}
+- name: backups-vol-volume
+  persistentVolumeClaim:
+    claimName: {{ .Values.backups.volume.claim }}
+{{- end }}
+{{- if .Values.alpha.configFile }}
+- name: config-volume
+  configMap:
+    name: {{ template "dgraph.alpha.fullname" . }}-config
+{{- end }}
+{{- if .Values.alpha.tls.enabled }}
+- name: tls-volume
+  secret:
+    secretName: {{ template "dgraph.alpha.fullname" . }}-tls-secret
+{{- end }}
+{{- if .Values.alpha.encryption.enabled }}
+- name: enc-volume
+  secret:
+    secretName: {{ template "dgraph.alpha.fullname" . }}-encryption-secret
+{{- end }}
+{{- if .Values.alpha.acl.enabled }}
+- name: acl-volume
+  secret:
+    secretName: {{ template "dgraph.alpha.fullname" . }}-acl-secret
+{{- end }}
+{{- end -}}
+
+{{/*
+Zero pod volumes, rendered separately so the caller can omit the `volumes:`
+key entirely when nothing populates it.
+*/}}
+{{- define "dgraph.zero.volumes" -}}
+{{- if not .Values.zero.persistence.enabled }}
+{{- /* With persistence on, volumeClaimTemplates supplies "datadir" as a per-pod PVC. */}}
+- name: datadir
+  emptyDir: {}
+{{- end }}
+{{- if .Values.zero.configFile }}
+- name: config-volume
+  configMap:
+    name: {{ template "dgraph.zero.fullname" . }}-config
+{{- end }}
+{{- if .Values.zero.tls.enabled }}
+- name: tls-volume
+  secret:
+    secretName: {{ template "dgraph.zero.fullname" . }}-tls-secret
+{{- end }}
+{{- end -}}
