@@ -9,51 +9,73 @@ metadata:
 data:
   backup.sh: |
     ######
+    # require_json - validate a curl response before parsing it as JSON
+    #  params:
+    #    1: body        - the response body to validate
+    #    2: curl_status - exit status of the curl that produced the body
+    #    3: url         - request URL, for the error message
+    #  A failed connection through a service mesh (or any network error) returns a
+    #  non-JSON body, e.g. Envoy's "upstream connect error ...", which the field
+    #  extraction below cannot parse. Surface the curl status, the URL, and the raw
+    #  body instead of failing silently with an empty token. Only bodies that fail
+    #  validation are echoed, so a successful login response is never printed.
+    ##########################
+    require_json() {
+      BODY=${1}
+      CURL_STATUS=${2}
+      URL=${3}
+      if [[ "$CURL_STATUS" -ne 0 ]]; then
+        echo "ERROR: curl to ${URL} failed with exit ${CURL_STATUS}: ${BODY}" >&2
+        return 1
+      fi
+      if [[ -z "$BODY" ]]; then
+        echo "ERROR: empty response from ${URL}" >&2
+        return 1
+      fi
+      if ! command -v jq >/dev/null 2>&1; then
+        echo "ERROR: jq not found in the backups image; the backup script needs curl and jq." >&2
+        return 1
+      fi
+      if ! jq -e . >/dev/null 2>&1 <<< "$BODY"; then
+        echo "ERROR: non-JSON response from ${URL}: ${BODY}" >&2
+        return 1
+      fi
+    }
+
+    ######
     # get_token_rest - get accessJWT token with REST command for Dgraph 1.x
     ##########################
     get_token_rest() {
-      JSON="{\"userid\": \"${USER}\", \"password\": \"${PASSWORD}\" }"
+      JSON=$(jq -n --arg userid "$USER" --arg password "$PASSWORD" '{userid: $userid, password: $password}')
+      CURL_STATUS=0
       RESULT=$(
-        /usr/bin/curl --silent \
-          "${HEADERS[@]}" \
-          "${CERTOPTS[@]}" \
-          --request POST \
-          ${ALPHA_HOST}:8080/login \
-          --data "${JSON}"
-      )
-
-      if grep -q errors <<< "$RESULT"; then
-        ERROR=$(grep -oP '(?<=message":")[^"]*' <<< $RESULT)
-        echo "ERROR: $ERROR"
-        return 1
-      fi
-
-      grep -oP '(?<=accessJWT":")[^"]*' <<< "$RESULT"
-
+        /usr/bin/curl --silent "${HEADERS[@]}" "${CERTOPTS[@]}" \
+          --request POST ${ALPHA_HOST}:8080/login --data "${JSON}"
+      ) || CURL_STATUS=$?
+      require_json "$RESULT" "$CURL_STATUS" "${ALPHA_HOST}:8080/login" || return 1
+      ERROR=$(jq -r '.errors[0].message // empty' <<< "$RESULT")
+      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR" >&2; return 1; fi
+      TOKEN=$(jq -r '.data.accessJWT // empty' <<< "$RESULT")
+      [[ -n "$TOKEN" ]] || { echo "ERROR: could not parse accessJWT from /login response" >&2; return 1; }
+      echo "$TOKEN"
     }
 
     ######
     # get_token_graphql - get accessJWT token using GraphQL for Dgraph 20.03.1+
     ##########################
     get_token_graphql() {
-      GQL="{\"query\": \"mutation { login(userId: \\\"${USER}\\\" password: \\\"${PASSWORD}\\\") { response { accessJWT } } }\"}"
+      GQL=$(jq -n --arg userId "$USER" --arg password "$PASSWORD" '{query: "mutation ($userId: String, $password: String) { login(userId: $userId, password: $password) { response { accessJWT } } }", variables: {userId: $userId, password: $password}}')
+      CURL_STATUS=0
       RESULT=$(
-        /usr/bin/curl --silent \
-          "${HEADERS[@]}" \
-          "${CERTOPTS[@]}" \
-          --request POST \
-          ${ALPHA_HOST}:8080/admin \
-          --data "${GQL}"
-      )
-
-      if grep -q errors <<< "$RESULT"; then
-        ERROR=$(grep -oP '(?<=message":")[^"]*' <<< $RESULT)
-        echo "ERROR: $ERROR"
-        return 1
-      fi
-
-      grep -oP '(?<=accessJWT":")[^"]*' <<< "$RESULT"
-
+        /usr/bin/curl --silent "${HEADERS[@]}" "${CERTOPTS[@]}" \
+          --request POST ${ALPHA_HOST}:8080/admin --data "${GQL}"
+      ) || CURL_STATUS=$?
+      require_json "$RESULT" "$CURL_STATUS" "${ALPHA_HOST}:8080/admin" || return 1
+      ERROR=$(jq -r '.errors[0].message // empty' <<< "$RESULT")
+      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR" >&2; return 1; fi
+      TOKEN=$(jq -r '.data.login.response.accessJWT // empty' <<< "$RESULT")
+      [[ -n "$TOKEN" ]] || { echo "ERROR: could not parse accessJWT from /admin login response" >&2; return 1; }
+      echo "$TOKEN"
     }
 
     ######
@@ -74,6 +96,8 @@ data:
       CACERT_PATH=${CACERT_PATH:-""}
       CLIENT_CERT_PATH=${CLIENT_CERT_PATH:-""}
       CLIENT_KEY_PATH=${CLIENT_KEY_PATH:-""}
+      HEADERS=()
+      CERTOPTS=()
 
       ## user/password required for login
       if [[ -z "$USER" || -z "$PASSWORD" ]]; then
@@ -125,6 +149,8 @@ data:
       CACERT_PATH=${CACERT_PATH:-""}
       CLIENT_CERT_PATH=${CLIENT_CERT_PATH:-""}
       CLIENT_KEY_PATH=${CLIENT_KEY_PATH:-""}
+      HEADERS=()
+      CERTOPTS=()
 
       API_TYPE=${API_TYPE:-"graphql"}
 
@@ -168,7 +194,7 @@ data:
         if [[ -d ${BACKUP_DESTINATION%/*} ]]; then
           mkdir -p $BACKUP_DESTINATION
         else
-          echo "Designated Backup Destination '${BACKUP_DESTINATION%/*}' does not exist. Aborting."
+          echo "Designated Backup Destination '${BACKUP_DESTINATION%/*}' does not exist. Aborting." >&2
           return 1
         fi
       fi
@@ -188,24 +214,22 @@ data:
     backup_rest() {
       URL_PATH="admin/backup?force_full=$FORCE_FULL"
 
+      CURL_STATUS=0
       RESULT=$(/usr/bin/curl --silent \
         "${HEADERS[@]}" \
         "${CERTOPTS[@]}" \
         --request POST \
         ${ALPHA_HOST}:8080/$URL_PATH \
-        --data "destination=$BACKUP_DESTINATION"
-      )
+        --data-urlencode "destination=$BACKUP_DESTINATION"
+      ) || CURL_STATUS=$?
+      require_json "$RESULT" "$CURL_STATUS" "${ALPHA_HOST}:8080/${URL_PATH}" || return 1
 
-      if grep -q errors <<< "$RESULT"; then
-        ERROR=$(grep -oP '(?<=message":")[^"]*' <<< $RESULT)
-        MESSAGE="ERROR: $ERROR"
-        if grep -q code <<< "$RESULT"; then
-          CODE=$(grep -oP '(?<=code":")[^"]*' <<< $RESULT)
-          echo "$MESSAGE REASON='$CODE'"
-        fi
+      ERROR=$(jq -r '.errors[0].message // empty' <<< "$RESULT")
+      if [[ -n "$ERROR" ]]; then
+        CODE=$(jq -r '.errors[0].code // empty' <<< "$RESULT")
+        if [[ -n "$CODE" ]]; then echo "ERROR: $ERROR REASON='$CODE'" >&2; else echo "ERROR: $ERROR" >&2; fi
         return 1
       fi
-
       echo $RESULT
 
     }
@@ -214,22 +238,21 @@ data:
     # backup_graphql - trigger backup using GraphQL for Dgraph 20.03.1+
     ##########################
     backup_graphql() {
-      GQL="{\"query\": \"mutation { backup(input: {destination: \\\"${BACKUP_DESTINATION}\\\" forceFull: $FORCE_FULL }) { response { message code } } }\"}"
+      GQL=$(jq -n --arg dest "$BACKUP_DESTINATION" --arg force "$FORCE_FULL" \
+        '{query: "mutation { backup(input: {destination: \($dest|@json) forceFull: \($force) }) { response { message code } } }"}')
 
+      CURL_STATUS=0
       RESULT=$(/usr/bin/curl --silent \
         "${HEADERS[@]}" \
         "${CERTOPTS[@]}" \
         --request POST \
         $ALPHA_HOST:8080/admin \
         --data "$GQL"
-      )
+      ) || CURL_STATUS=$?
+      require_json "$RESULT" "$CURL_STATUS" "${ALPHA_HOST}:8080/admin" || return 1
 
-      if grep -q errors <<< "$RESULT"; then
-        ERROR=$(grep -oP '(?<=message":")[^"]*' <<< $RESULT)
-        echo "ERROR: $ERROR"
-        return 1
-      fi
-
+      ERROR=$(jq -r '.errors[0].message // empty' <<< "$RESULT")
+      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR" >&2; return 1; fi
       echo $RESULT
     }
 {{- end }}

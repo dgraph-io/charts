@@ -170,6 +170,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.service.externalTrafficPolicy`    | route external traffic to node-local or cluster-wide endpoints        | `""`                                                |
 | `alpha.service.loadBalancerSourceRanges` | restrict CIDR IP addresses for a LoadBalancer type                    | `[]`                                                |
 | `alpha.serviceHeadless.labels`           | Alpha headless service labels                                         | `{}`                                                |
+| `alpha.serviceHeadless.publishClientPorts` | Declare alpha client ports 8080/9080 on the headless Service (needed under a strict-mTLS mesh for clients dialing a pod directly; 8080 is declared automatically when backups are enabled) | `false`                    |
 | `alpha.ingress.enabled`                  | Alpha ingress resource enabled                                        | `false`                                             |
 | `alpha.ingress.hostname`                 | Alpha ingress virtual hostname                                        | `nil`                                               |
 | `alpha.ingress.annotations`              | Alpha ingress annotations                                             | `nil`                                               |
@@ -255,7 +256,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
-| `backups.image.tag`                      | Container image tag                                                   | `v21.03.0`                                          |
+| `backups.image.tag`                      | Container image tag                                                   | `v25.3.1`                                           |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
 | `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `nil`                                               |

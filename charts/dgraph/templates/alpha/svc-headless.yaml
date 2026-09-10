@@ -12,6 +12,18 @@ spec:
     - name: grpc-alpha-int
       port: 7080
       targetPort: 7080
+    {{- /* A strict-mTLS sidecar only routes ports the Service declares: the backup
+    CronJobs need 8080 to reach alpha-0, publishClientPorts adds 9080 for gRPC clients. */}}
+    {{- if or .Values.backups.full.enabled .Values.backups.incremental.enabled .Values.alpha.serviceHeadless.publishClientPorts }}
+    - name: http-alpha
+      port: 8080
+      targetPort: 8080
+    {{- end }}
+    {{- if .Values.alpha.serviceHeadless.publishClientPorts }}
+    - name: grpc-alpha
+      port: 9080
+      targetPort: 9080
+    {{- end }}
   selector:
     app: {{ template "dgraph.name" . }}
     component: {{ .Values.alpha.name }}

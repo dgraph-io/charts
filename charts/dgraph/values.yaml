@@ -360,6 +360,13 @@ alpha:
     loadBalancerSourceRanges: []
   serviceHeadless:
     labels: {}
+    ## Declare the alpha client ports (8080 HTTP, 9080 gRPC) on the headless Service.
+    ## Only needed under a strict-mTLS service mesh, where a client sidecar builds an
+    ## mTLS route only for the ports a Service declares, and only for clients that dial
+    ## a specific pod (alpha-0.<headless>) instead of the load-balanced alpha Service.
+    ## 8080 is declared automatically whenever backups are enabled, because the backup
+    ## CronJobs depend on it; this setting additionally declares 9080.
+    publishClientPorts: false
   ## alpha ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
@@ -668,7 +675,7 @@ backups:
     ## specified here so that backups can properly login.
     ## ref. https://docs.dgraph.io/admin/security/admin-endpoint-security#securing-alter-operations
     auth_token: ""
-  ## Backups image - image needs at least curl command
+  ## Backups image - image needs at least the curl and jq commands
   ## default is to reuse dgraph image
   image:
     << : *image
