@@ -44,6 +44,8 @@ No manual intervention is required. Also review the [additional breaking changes
 
 **Backup admin password now required**: When `alpha.acl.enabled` is true and backups are enabled, `backups.admin.password` must be explicitly set, unless `backups.admin.existingSecret` names a pre-created Secret holding it. Previously the chart would silently render an empty secret, which would cause backup failures at runtime. The chart now fails at install/upgrade time with a clear error message if neither is set.
 
+**ACL and encryption flags now auto-activate**: Setting `alpha.acl.enabled: true` (or `alpha.encryption.enabled: true`) now synthesizes the matching `--acl` (or `--encryption`) superflag onto the Alpha command automatically; previously these flags had to be added by hand through `alpha.extraFlags`. If you already pass `--acl` or `--encryption` through `alpha.extraFlags`, remove it — the chart fails rendering rather than pass the flag twice. The chart points the flag at `/dgraph/acl/<alpha.acl.secretFile>` and `/dgraph/enc/<alpha.encryption.keyFile>`, which default to `hmac_secret_file` and `enc_key_file`; override those keys if your Secret stores the file under a different name.
+
 ### Installing the Chart
 
 To install the chart with the release name `my-release`:
@@ -183,9 +185,13 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.securityContext.runAsUser`        | User ID for the Alpha container                                       | `1001`                                              |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
 | `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
-| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled                                      | `false`                                             |
+| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled (auto-adds `--encryption`)           | `false`                                             |
+| `alpha.encryption.keyFile`               | Filename/key of the encryption key within the mounted Secret          | `enc_key_file`                                      |
+| `alpha.encryption.existingSecret`        | Name of a pre-created Secret holding the encryption key (suppresses the chart's own) | `""`                                |
 | `alpha.encryption.file`                  | Alpha Encryption at Rest key file                                     | `nil`                                               |
-| `alpha.acl.enabled`                      | Alpha ACL enabled                                                     | `false`                                             |
+| `alpha.acl.enabled`                      | Alpha ACL enabled (auto-adds `--acl`)                                 | `false`                                             |
+| `alpha.acl.secretFile`                   | Filename/key of the HMAC secret within the mounted Secret             | `hmac_secret_file`                                  |
+| `alpha.acl.existingSecret`               | Name of a pre-created Secret holding the HMAC key (suppresses the chart's own) | `""`                                      |
 | `alpha.acl.file`                         | Alpha ACL secret file                                                 | `nil`                                               |
 | `alpha.persistence.enabled`              | Enable persistence for alpha using PVC                                | `true`                                              |
 | `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
