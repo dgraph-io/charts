@@ -311,8 +311,8 @@ key entirely when nothing populates it.
     secretName: {{ .Values.alpha.encryption.existingSecret | default (printf "%s-encryption-secret" (include "dgraph.alpha.fullname" .)) }}
     {{- if .Values.alpha.encryption.existingSecret }}
     items:
-      - key: {{ .Values.alpha.encryption.keyFile }}
-        path: {{ .Values.alpha.encryption.keyFile }}
+      - key: {{ .Values.alpha.encryption.keyFile | default "enc_key_file" }}
+        path: {{ .Values.alpha.encryption.keyFile | default "enc_key_file" }}
     {{- end }}
 {{- end }}
 {{- if .Values.alpha.acl.enabled }}
@@ -323,8 +323,8 @@ key entirely when nothing populates it.
     secretName: {{ .Values.alpha.acl.existingSecret | default (printf "%s-acl-secret" (include "dgraph.alpha.fullname" .)) }}
     {{- if .Values.alpha.acl.existingSecret }}
     items:
-      - key: {{ .Values.alpha.acl.secretFile }}
-        path: {{ .Values.alpha.acl.secretFile }}
+      - key: {{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }}
+        path: {{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }}
     {{- end }}
 {{- end }}
 {{- end -}}

@@ -665,8 +665,9 @@ backups:
     ## CronJob mounts this Secret's key instead, so the password never passes through
     ## Helm values or release state. Ignored unless alpha.acl.enabled is true.
     existingSecret: ""
-    ## Key within existingSecret (or the chart's own backups Secret) that holds the
-    ## backup admin password.
+    ## Key within existingSecret that holds the backup admin password. Ignored
+    ## unless existingSecret is set; the chart's own backups Secret always uses the
+    ## key backup_admin_password.
     passwordSecretKey: backup_admin_password
     ## Mutual TLS client certificate and key can be used to secure transaction that was created with
     ## dgraph cert --client <name-of-client> should be specified here.

@@ -132,7 +132,7 @@ spec:
               - secret:
                   name: {{ .Values.backups.admin.existingSecret }}
                   items:
-                  - key: {{ .Values.backups.admin.passwordSecretKey }}
+                  - key: {{ .Values.backups.admin.passwordSecretKey | default "backup_admin_password" }}
                     path: backup_admin_password
               {{- if .Values.backups.admin.auth_token }}
               - secret:
