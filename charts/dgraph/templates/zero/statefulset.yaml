@@ -67,10 +67,10 @@ spec:
       labels:
         {{- include "dgraph.labels" (dict "ctx" . "component" .Values.zero.name "podLabels" .Values.zero.podLabels) | nindent 8 }}
     spec:
-      {{- if .Values.serviceAccount.create }}
-      serviceAccountName: {{ .Values.serviceAccount.name }}
-      automountServiceAccountToken: {{ .Values.zero.automountServiceAccountToken }}
+      {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
+      serviceAccountName: {{ include "dgraph.serviceAccountName" . }}
       {{- end }}
+      automountServiceAccountToken: {{ .Values.zero.automountServiceAccountToken }}
       {{- if .Values.zero.schedulerName }}
       schedulerName: {{ .Values.zero.schedulerName }}
       {{- end }}
@@ -197,10 +197,8 @@ spec:
         readinessProbe: {{- toYaml .Values.zero.customReadinessProbe | nindent 10 }}
         {{- end }}
         volumeMounts:
-        {{- if .Values.zero.persistence.enabled }}
         - name: datadir
           mountPath: /dgraph
-        {{- end }}
         {{- if .Values.zero.configFile }}
         - name: config-volume
           mountPath: /dgraph/config
@@ -210,23 +208,9 @@ spec:
           mountPath: /dgraph/tls
         {{- end }}
       terminationGracePeriodSeconds: {{ .Values.zero.terminationGracePeriodSeconds }}
+      {{- with (include "dgraph.zero.volumes" . | trim) }}
       volumes:
-      - name: datadir
-      {{- if .Values.zero.persistence.enabled }}
-        persistentVolumeClaim:
-          claimName: datadir
-      {{- else }}
-        emptyDir: {}
-      {{- end }}
-      {{- if .Values.zero.configFile }}
-      - name: config-volume
-        configMap:
-          name: {{ template "dgraph.zero.fullname" . }}-config
-      {{- end }}
-      {{- if .Values.zero.tls.enabled }}
-      - name: tls-volume
-        secret:
-          secretName: {{ template "dgraph.zero.fullname" . }}-tls-secret
+        {{- . | nindent 6 }}
       {{- end }}
 {{- if .Values.zero.persistence.enabled }}
   volumeClaimTemplates:
