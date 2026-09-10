@@ -32,6 +32,10 @@ data:
         echo "ERROR: empty response from ${URL}" >&2
         return 1
       fi
+      if ! command -v jq >/dev/null 2>&1; then
+        echo "ERROR: jq not found in the backups image; the backup script needs curl and jq." >&2
+        return 1
+      fi
       if ! jq -e . >/dev/null 2>&1 <<< "$BODY"; then
         echo "ERROR: non-JSON response from ${URL}: ${BODY}" >&2
         return 1
@@ -50,7 +54,7 @@ data:
       ) || CURL_STATUS=$?
       require_json "$RESULT" "$CURL_STATUS" "${ALPHA_HOST}:8080/login" || return 1
       ERROR=$(jq -r '.errors[0].message // empty' <<< "$RESULT")
-      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR"; return 1; fi
+      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR" >&2; return 1; fi
       TOKEN=$(jq -r '.data.accessJWT // empty' <<< "$RESULT")
       [[ -n "$TOKEN" ]] || { echo "ERROR: could not parse accessJWT from /login response" >&2; return 1; }
       echo "$TOKEN"
@@ -68,7 +72,7 @@ data:
       ) || CURL_STATUS=$?
       require_json "$RESULT" "$CURL_STATUS" "${ALPHA_HOST}:8080/admin" || return 1
       ERROR=$(jq -r '.errors[0].message // empty' <<< "$RESULT")
-      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR"; return 1; fi
+      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR" >&2; return 1; fi
       TOKEN=$(jq -r '.data.login.response.accessJWT // empty' <<< "$RESULT")
       [[ -n "$TOKEN" ]] || { echo "ERROR: could not parse accessJWT from /admin login response" >&2; return 1; }
       echo "$TOKEN"
@@ -190,7 +194,7 @@ data:
         if [[ -d ${BACKUP_DESTINATION%/*} ]]; then
           mkdir -p $BACKUP_DESTINATION
         else
-          echo "Designated Backup Destination '${BACKUP_DESTINATION%/*}' does not exist. Aborting."
+          echo "Designated Backup Destination '${BACKUP_DESTINATION%/*}' does not exist. Aborting." >&2
           return 1
         fi
       fi
@@ -216,14 +220,14 @@ data:
         "${CERTOPTS[@]}" \
         --request POST \
         ${ALPHA_HOST}:8080/$URL_PATH \
-        --data "destination=$BACKUP_DESTINATION"
+        --data-urlencode "destination=$BACKUP_DESTINATION"
       ) || CURL_STATUS=$?
       require_json "$RESULT" "$CURL_STATUS" "${ALPHA_HOST}:8080/${URL_PATH}" || return 1
 
       ERROR=$(jq -r '.errors[0].message // empty' <<< "$RESULT")
       if [[ -n "$ERROR" ]]; then
         CODE=$(jq -r '.errors[0].code // empty' <<< "$RESULT")
-        if [[ -n "$CODE" ]]; then echo "ERROR: $ERROR REASON='$CODE'"; else echo "ERROR: $ERROR"; fi
+        if [[ -n "$CODE" ]]; then echo "ERROR: $ERROR REASON='$CODE'" >&2; else echo "ERROR: $ERROR" >&2; fi
         return 1
       fi
       echo $RESULT
@@ -234,7 +238,8 @@ data:
     # backup_graphql - trigger backup using GraphQL for Dgraph 20.03.1+
     ##########################
     backup_graphql() {
-      GQL="{\"query\": \"mutation { backup(input: {destination: \\\"${BACKUP_DESTINATION}\\\" forceFull: $FORCE_FULL }) { response { message code } } }\"}"
+      GQL=$(jq -n --arg dest "$BACKUP_DESTINATION" --arg force "$FORCE_FULL" \
+        '{query: "mutation { backup(input: {destination: \($dest|@json) forceFull: \($force) }) { response { message code } } }"}')
 
       CURL_STATUS=0
       RESULT=$(/usr/bin/curl --silent \
@@ -247,7 +252,7 @@ data:
       require_json "$RESULT" "$CURL_STATUS" "${ALPHA_HOST}:8080/admin" || return 1
 
       ERROR=$(jq -r '.errors[0].message // empty' <<< "$RESULT")
-      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR"; return 1; fi
+      if [[ -n "$ERROR" ]]; then echo "ERROR: $ERROR" >&2; return 1; fi
       echo $RESULT
     }
 {{- end }}

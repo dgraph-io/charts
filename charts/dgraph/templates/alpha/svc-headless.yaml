@@ -12,16 +12,14 @@ spec:
     - name: grpc-alpha-int
       port: 7080
       targetPort: 7080
-    ## http-alpha (8080) and grpc-alpha (9080) are exposed here only when backups are
-    ## enabled (backups.full.enabled or backups.incremental.enabled): the backup CronJobs
-    ## are their consumer, addressing a single pinned pod (alpha-0) through this headless
-    ## Service, and under a STRICT mTLS service mesh (e.g. Istio) the client sidecar only
-    ## builds an mTLS route for ports the Service declares. Without 8080 here, the backup
-    ## /admin login falls through to plaintext and Alpha's sidecar resets the connection.
-    {{- if or .Values.backups.full.enabled .Values.backups.incremental.enabled }}
+    {{- /* A strict-mTLS sidecar only routes ports the Service declares: the backup
+    CronJobs need 8080 to reach alpha-0, publishClientPorts adds 9080 for gRPC clients. */}}
+    {{- if or .Values.backups.full.enabled .Values.backups.incremental.enabled .Values.alpha.serviceHeadless.publishClientPorts }}
     - name: http-alpha
       port: 8080
       targetPort: 8080
+    {{- end }}
+    {{- if .Values.alpha.serviceHeadless.publishClientPorts }}
     - name: grpc-alpha
       port: 9080
       targetPort: 9080
