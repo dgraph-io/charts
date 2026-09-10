@@ -754,6 +754,9 @@ serviceMonitor:
 ## alpha/zero instance availability and backup CronJob failures.
 ## Default off — requires the Prometheus Operator CRDs to be installed; a
 ## stock install with this disabled imposes no CRD dependency.
+## The default alerts are built on `up`, which only has series while something
+## is scraping alpha and zero. Enabling this without serviceMonitor.enabled (or
+## an equivalent scrape config of your own) yields alerts that can never fire.
 prometheusRule:
   enabled: false
   labels: {}
@@ -765,7 +768,15 @@ prometheusRule:
 ## enforce NetworkPolicy.
 networkPolicy:
   enabled: false
+  ## Labels identifying client pods allowed to reach the alpha client ports (and
+  ## ratel, when enabled). A podSelector alone matches only pods in this release's
+  ## own namespace.
   clientPodLabels: {}
+  ## Labels identifying namespaces whose pods are allowed to reach those ports. An
+  ## Ingress controller living in its own namespace (e.g. ingress-nginx) can only be
+  ## authorized this way. Set alongside clientPodLabels to narrow to those pods in
+  ## those namespaces; set alone to admit every pod in those namespaces.
+  clientNamespaceLabels: {}
   extraIngress: []
 
 global:

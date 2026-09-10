@@ -9,6 +9,11 @@ The selector requires the `monitor` label, which only the ClusterIP Services
 carry (set from alpha.monitorLabel / zero.monitorLabel). The headless Services
 share the same app/release labels but do not carry `monitor`, so they are
 never selected.
+
+Note that alpha and zero pods also carry prometheus.io/scrape annotations. A
+Prometheus doing annotation-based discovery as well as running the operator
+will scrape every target twice under different `job` labels, which double
+counts in any aggregation. Drop one of the two discovery paths.
 */ -}}
 {{- if .Values.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
