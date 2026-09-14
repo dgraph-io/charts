@@ -60,6 +60,12 @@ RBAC is not the risk, because these pods never call the API server. Workload ide
 
 **Health probes use HTTPS when TLS is enabled**: With `alpha.tls.enabled: true` (or `zero.tls.enabled: true`), the built-in httpGet startup, liveness, and readiness probes switch to `scheme: HTTPS`. A cert-requiring `clientAuthType` (`REQUIREANY` or `REQUIREANDVERIFY`) makes every client present a certificate, which the kubelet's probes cannot; the chart fails rendering in that case. Set `clientAuthType: VERIFYIFGIVEN`, or supply exec probes through `customStartupProbe`/`customLivenessProbe`/`customReadinessProbe`. A cert-requiring `clientAuthType` also requires `clientName` so in-cluster callers (inter-node TLS) can present a client cert.
 
+#### v25.3.x to v25.4.x
+
+**Zero's admin HTTP endpoints now authenticate**: Dgraph v25.4.0 gave Zero a `--security` superflag (`token=...;whitelist=...`) matching Alpha's, and authorizes the admin endpoints on its HTTP port (6080) against it. `/removeNode` and `/moveTablet` are always guarded: with no token or whitelist configured, only loopback callers are admitted. `/state` and `/assign` keep their previous open behavior until a token or whitelist is configured, and are enforced from then on.
+
+The chart's Zero startup, liveness, and readiness probes call `/state`, so a stock install is unaffected. If you pass `--security` to Zero through `zero.extraFlags` or `zero.configFile`, the kubelet's probe requests must pass the whitelist too: include the node or pod CIDRs the probes originate from, or supply exec probes through `zero.customStartupProbe`, `zero.customLivenessProbe`, and `zero.customReadinessProbe`. Anything that drove `/removeNode` or `/moveTablet` remotely, such as a maintenance Job or an operator's workstation, now needs a token or a whitelist entry.
+
 ### Installing the Chart
 
 To install the chart with the release name `my-release`:
@@ -101,7 +107,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `imagePullSecrets`                       | Array of imagePullSecrets applied to every Pod (plain strings or `{name: ...}` objects); takes precedence over `global.imagePullSecrets` and `image.pullSecrets` | `[]` |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v25.3.8`                                           |
+| `image.tag`                              | Container image tag                                                   | `v25.4.1`                                           |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `namespaceOverride`                      | Deployment namespace override if specified.                           | `nil`                                               |
