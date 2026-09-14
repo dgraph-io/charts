@@ -756,7 +756,8 @@ serviceMonitor:
 ## stock install with this disabled imposes no CRD dependency.
 ## The default alerts are built on `up`, which only has series while something
 ## is scraping alpha and zero. Enabling this without serviceMonitor.enabled (or
-## an equivalent scrape config of your own) yields alerts that can never fire.
+## an equivalent scrape config of your own) means the instance and quorum alerts
+## can never fire, while the targets-missing alerts fire after 15 minutes.
 prometheusRule:
   enabled: false
   labels: {}

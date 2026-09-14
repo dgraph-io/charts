@@ -3,7 +3,8 @@ Prometheus Operator PrometheusRule. Default off. The default alerts below are
 deliberately conservative and built only on metrics that are stable regardless
 of this chart's internal metric names:
   - `up`, emitted by Prometheus for every scrape target (works with the
-    ServiceMonitor above), keyed to the exact alpha/zero Service names; and
+    ServiceMonitor above), keyed to the exact alpha/zero Service names in this
+    release's namespace, so same-named releases elsewhere never mix in; and
   - `kube_job_status_failed` from kube-state-metrics, for backup CronJob failures.
 The `up` alerts only have series while serviceMonitor.enabled is also true; the
 Targets-missing alerts below cover the case where those series stop existing,
@@ -14,6 +15,9 @@ prometheusRule.extraRules once you have validated the names against a live
 target. Set prometheusRule.defaultRules=false to ship only your extraRules.
 */ -}}
 {{- if .Values.prometheusRule.enabled }}
+{{- if not (or .Values.prometheusRule.defaultRules .Values.prometheusRule.extraRules) }}
+{{- fail "prometheusRule.enabled is true but prometheusRule.defaultRules is false and prometheusRule.extraRules is empty, so the PrometheusRule would carry no rules. Enable defaultRules, add extraRules, or disable prometheusRule." }}
+{{- end }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -30,7 +34,7 @@ spec:
       rules:
         {{- if .Values.prometheusRule.defaultRules }}
         - alert: DgraphAlphaInstanceDown
-          expr: up{service="{{ template "dgraph.alpha.fullname" . }}"} == 0
+          expr: up{namespace="{{ include "dgraph.namespace" . }}",service="{{ template "dgraph.alpha.fullname" . }}"} == 0
           for: 5m
           labels:
             severity: warning
@@ -38,7 +42,7 @@ spec:
             summary: "Dgraph alpha instance {{`{{ $labels.instance }}`}} is down"
             description: "An alpha pod has been unreachable to Prometheus for 5m. A replicated group tolerates one; DgraphAlphaGroupQuorumAtRisk escalates if a second follows."
         - alert: DgraphAlphaGroupQuorumAtRisk
-          expr: count(up{service="{{ template "dgraph.alpha.fullname" . }}"} == 0) >= 2
+          expr: count(up{namespace="{{ include "dgraph.namespace" . }}",service="{{ template "dgraph.alpha.fullname" . }}"} == 0) >= 2
           for: 5m
           labels:
             severity: critical
@@ -46,7 +50,7 @@ spec:
             summary: "Two or more Dgraph alpha instances are down"
             description: "With a 3-node group, losing two alphas drops the group below quorum."
         - alert: DgraphAlphaTargetsMissing
-          expr: absent(up{service="{{ template "dgraph.alpha.fullname" . }}"})
+          expr: absent(up{namespace="{{ include "dgraph.namespace" . }}",service="{{ template "dgraph.alpha.fullname" . }}"})
           for: 15m
           labels:
             severity: warning
@@ -54,7 +58,7 @@ spec:
             summary: "Prometheus has no Dgraph alpha targets"
             description: "The alpha series have stopped existing rather than going to zero, so the instance-down alerts cannot fire. Check that the ServiceMonitor and the alpha Service are still present."
         - alert: DgraphZeroInstanceDown
-          expr: up{service="{{ template "dgraph.zero.fullname" . }}"} == 0
+          expr: up{namespace="{{ include "dgraph.namespace" . }}",service="{{ template "dgraph.zero.fullname" . }}"} == 0
           for: 5m
           labels:
             severity: warning
@@ -62,7 +66,7 @@ spec:
             summary: "Dgraph zero instance {{`{{ $labels.instance }}`}} is down"
             description: "A zero pod has been unreachable to Prometheus for 5m. A replicated group tolerates one; DgraphZeroGroupQuorumAtRisk escalates if a second follows."
         - alert: DgraphZeroGroupQuorumAtRisk
-          expr: count(up{service="{{ template "dgraph.zero.fullname" . }}"} == 0) >= 2
+          expr: count(up{namespace="{{ include "dgraph.namespace" . }}",service="{{ template "dgraph.zero.fullname" . }}"} == 0) >= 2
           for: 5m
           labels:
             severity: critical
@@ -70,7 +74,7 @@ spec:
             summary: "Two or more Dgraph zero instances are down"
             description: "Zero is the cluster's Raft coordinator; losing quorum stalls the cluster."
         - alert: DgraphZeroTargetsMissing
-          expr: absent(up{service="{{ template "dgraph.zero.fullname" . }}"})
+          expr: absent(up{namespace="{{ include "dgraph.namespace" . }}",service="{{ template "dgraph.zero.fullname" . }}"})
           for: 15m
           labels:
             severity: warning

@@ -297,7 +297,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `global.ingress_grpc.ingressClassName`   | global ingress-grpc ingress class to select ingress controller        | `nil`                                               |
 | `serviceMonitor.enabled`                 | Create a Prometheus Operator ServiceMonitor for alpha and zero        | `false`                                             |
 | `serviceMonitor.namespace`               | Namespace to create the ServiceMonitor in (defaults to the release namespace) | `nil`                                               |
-| `serviceMonitor.labels`                  | Extra labels on the ServiceMonitor, to match your Prometheus ruleSelector | `{}`                                                |
+| `serviceMonitor.labels`                  | Extra labels on the ServiceMonitor, to match your Prometheus serviceMonitorSelector | `{}`                                                |
 | `serviceMonitor.interval`                | Scrape interval                                                       | `30s`                                               |
 | `serviceMonitor.scrapeTimeout`           | Scrape timeout                                                        | `10s`                                               |
 | `serviceMonitor.path`                    | HTTP path exposing Prometheus metrics                                 | `/debug/prometheus_metrics`                         |
