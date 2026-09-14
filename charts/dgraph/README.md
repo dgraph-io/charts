@@ -105,6 +105,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
 | `zero.schedulerName`                     | Configure an explicit scheduler                                       | `nil`                                               |
 | `zero.monitorLabel`                      | "monitor" label on the zero Service (for Prometheus service discovery) | `zero-dgraph-io`                                    |
+| `zero.pdb.enabled`                       | Create a PodDisruptionBudget for zero                                 | `false`                                             |
+| `zero.pdb.minAvailable`                  | Minimum zero pods that must stay available (ignored when maxUnavailable is set) | `2`                                                 |
+| `zero.pdb.maxUnavailable`                | Maximum zero pods that may be evicted at once; 0 blocks all voluntary eviction | `nil`                                               |
 | `zero.rollingUpdatePartition`            | Partition update strategy                                             | `nil`                                               |
 | `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `OrderedReady`                                      |
 | `zero.replicaCount`                      | Number of zero nodes                                                  | `3`                                                 |
@@ -148,6 +151,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
 | `alpha.podLabels`                        | Specify additional labels for template metadata                       | `{}`                                                |
 | `alpha.monitorLabel`                     | "monitor" label on the alpha Service (for Prometheus service discovery) | `alpha-dgraph-io`                                   |
+| `alpha.pdb.enabled`                      | Create a PodDisruptionBudget for alpha                                | `false`                                             |
+| `alpha.pdb.minAvailable`                 | Minimum alpha pods that must stay available (ignored when maxUnavailable is set) | `2`                                                 |
+| `alpha.pdb.maxUnavailable`               | Maximum alpha pods that may be evicted at once; 0 blocks all voluntary eviction | `nil`                                               |
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
 | `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `alpha.rollingUpdatePartition`           | Partition update strategy                                             | `nil`                                               |
@@ -291,6 +297,22 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `global.ingress_grpc.tls`                | global ingress-grpc tls settings                                      | `{}`                                                |
 | `global.ingress_grpc.alpha_grpc_hostname`| global ingress-grpc virtual host name for Alpha GRPC service          | `nil`                                               |
 | `global.ingress_grpc.ingressClassName`   | global ingress-grpc ingress class to select ingress controller        | `nil`                                               |
+| `serviceMonitor.enabled`                 | Create a Prometheus Operator ServiceMonitor for alpha and zero        | `false`                                             |
+| `serviceMonitor.namespace`               | Namespace to create the ServiceMonitor in (defaults to the release namespace) | `nil`                                               |
+| `serviceMonitor.labels`                  | Extra labels on the ServiceMonitor, to match your Prometheus serviceMonitorSelector | `{}`                                                |
+| `serviceMonitor.interval`                | Scrape interval                                                       | `30s`                                               |
+| `serviceMonitor.scrapeTimeout`           | Scrape timeout                                                        | `10s`                                               |
+| `serviceMonitor.path`                    | HTTP path exposing Prometheus metrics                                 | `/debug/prometheus_metrics`                         |
+| `prometheusRule.enabled`                 | Create a Prometheus Operator PrometheusRule                           | `false`                                             |
+| `prometheusRule.labels`                  | Extra labels on the PrometheusRule, to match your Prometheus ruleSelector | `{}`                                                |
+| `prometheusRule.defaultRules`            | Ship the built-in alerts (needs serviceMonitor.enabled, or the `up` series will not exist) | `true`                                              |
+| `prometheusRule.extraRules`              | Additional alerting rules appended verbatim                           | `[]`                                                |
+| `networkPolicy.enabled`                  | Create a NetworkPolicy restricting ingress to the dgraph pods         | `false`                                             |
+| `networkPolicy.clientPodLabels`          | Labels of client pods permitted to reach the client ports (this namespace only) | `{}`                                                |
+| `networkPolicy.clientNamespaceLabels`    | Labels of namespaces whose pods may reach the client ports (required for an Ingress controller in another namespace) | `{}`                                                |
+| `networkPolicy.scraperPodLabels`         | Labels of metrics-scraping pods permitted to reach alpha 8080 and zero 6080 (this namespace only) | `{}`                                                |
+| `networkPolicy.scraperNamespaceLabels`   | Labels of namespaces whose pods may reach alpha 8080 and zero 6080 (a Prometheus in another namespace needs this) | `{}`                                                |
+| `networkPolicy.extraIngress`             | Additional ingress rules appended verbatim                            | `[]`                                                |
 
 ## Ingress resource
 

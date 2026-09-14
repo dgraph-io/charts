@@ -1,0 +1,92 @@
+{{- /*
+Optional NetworkPolicy restricting ingress to the dgraph pods. Default off so
+it can't silently break connectivity on clusters whose CNI does not enforce
+NetworkPolicy. When enabled it:
+  - always allows intra-cluster dgraph traffic (alpha<->zero, peer gossip) by
+    selecting pods that carry this release's own app/release labels;
+  - grants client access to alpha (8080, 9080) and, when ratel is enabled,
+    ratel (8000), to clients matched by clientPodLabels and/or
+    clientNamespaceLabels. Setting both narrows to those pods in those
+    namespaces; a bare podSelector matches only this namespace, so reaching
+    an Ingress controller in another namespace needs clientNamespaceLabels;
+  - grants metrics access to alpha (8080) and zero (6080) to scrapers matched
+    by scraperPodLabels and/or scraperNamespaceLabels, with the same
+    narrowing. Zero's 6080 is not a client port, so a Prometheus admitted only
+    through the client selectors cannot scrape zero; set these whenever
+    serviceMonitor is enabled alongside this policy;
+  - appends any rules supplied in networkPolicy.extraIngress verbatim.
+Anything not listed above is denied once this policy selects a pod, so review
+the chart's ingress features (alpha.ingress, ratel.ingress, global.ingress)
+against these selectors before enabling.
+Egress is intentionally not restricted (backups reach S3/MinIO/NFS, etc.).
+*/ -}}
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ template "dgraph.fullname" . }}
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" .) | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "dgraph.name" . }}
+      release: {{ .Release.Name }}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Intra-cluster: any dgraph pod from this release may reach any other.
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ template "dgraph.name" . }}
+              release: {{ .Release.Name }}
+    {{- if or .Values.networkPolicy.clientPodLabels .Values.networkPolicy.clientNamespaceLabels }}
+    # Clients: pods and/or namespaces carrying these labels may reach the client ports.
+    - from:
+        -
+          {{- with .Values.networkPolicy.clientNamespaceLabels }}
+          namespaceSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
+          {{- with .Values.networkPolicy.clientPodLabels }}
+          podSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 9080
+        {{- if .Values.ratel.enabled }}
+        - protocol: TCP
+          port: 8000
+        {{- end }}
+    {{- end }}
+    {{- if or .Values.networkPolicy.scraperPodLabels .Values.networkPolicy.scraperNamespaceLabels }}
+    # Scrapers: pods and/or namespaces carrying these labels may reach the metrics ports.
+    - from:
+        -
+          {{- with .Values.networkPolicy.scraperNamespaceLabels }}
+          namespaceSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
+          {{- with .Values.networkPolicy.scraperPodLabels }}
+          podSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 6080
+    {{- end }}
+    {{- with .Values.networkPolicy.extraIngress }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

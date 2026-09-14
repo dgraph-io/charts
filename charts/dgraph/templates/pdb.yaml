@@ -1,0 +1,53 @@
+{{- /*
+PodDisruptionBudgets for the alpha and zero Raft groups. Default off: setting
+minAvailable (or maxUnavailable) too tight relative to replicaCount can block
+voluntary evictions entirely. In particular, minAvailable >= replicaCount on a
+single-replica group makes `kubectl drain` (and cluster-autoscaler scale-down)
+hang forever, since Kubernetes will never evict a Pod that would violate the
+budget. Review minAvailable/maxUnavailable against each group's replicaCount
+before enabling.
+Set maxUnavailable instead of minAvailable to express the budget the other way.
+*/ -}}
+{{- if .Values.zero.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "dgraph.zero.fullname" . }}
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.zero.name) | nindent 4 }}
+spec:
+  {{- if not (kindIs "invalid" .Values.zero.pdb.maxUnavailable) }}
+  maxUnavailable: {{ .Values.zero.pdb.maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ .Values.zero.pdb.minAvailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "dgraph.name" . }}
+      release: {{ .Release.Name }}
+      component: {{ .Values.zero.name }}
+{{- end }}
+{{- if .Values.alpha.pdb.enabled }}
+{{- if .Values.zero.pdb.enabled }}
+---
+{{- end }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "dgraph.alpha.fullname" . }}
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" .Values.alpha.name) | nindent 4 }}
+spec:
+  {{- if not (kindIs "invalid" .Values.alpha.pdb.maxUnavailable) }}
+  maxUnavailable: {{ .Values.alpha.pdb.maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ .Values.alpha.pdb.minAvailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "dgraph.name" . }}
+      release: {{ .Release.Name }}
+      component: {{ .Values.alpha.name }}
+{{- end }}
