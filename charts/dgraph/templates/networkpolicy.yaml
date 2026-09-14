@@ -9,6 +9,11 @@ NetworkPolicy. When enabled it:
     clientNamespaceLabels. Setting both narrows to those pods in those
     namespaces; a bare podSelector matches only this namespace, so reaching
     an Ingress controller in another namespace needs clientNamespaceLabels;
+  - grants metrics access to alpha (8080) and zero (6080) to scrapers matched
+    by scraperPodLabels and/or scraperNamespaceLabels, with the same
+    narrowing. Zero's 6080 is not a client port, so a Prometheus admitted only
+    through the client selectors cannot scrape zero; set these whenever
+    serviceMonitor is enabled alongside this policy;
   - appends any rules supplied in networkPolicy.extraIngress verbatim.
 Anything not listed above is denied once this policy selects a pod, so review
 the chart's ingress features (alpha.ingress, ratel.ingress, global.ingress)
@@ -60,6 +65,26 @@ spec:
         - protocol: TCP
           port: 8000
         {{- end }}
+    {{- end }}
+    {{- if or .Values.networkPolicy.scraperPodLabels .Values.networkPolicy.scraperNamespaceLabels }}
+    # Scrapers: pods and/or namespaces carrying these labels may reach the metrics ports.
+    - from:
+        -
+          {{- with .Values.networkPolicy.scraperNamespaceLabels }}
+          namespaceSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
+          {{- with .Values.networkPolicy.scraperPodLabels }}
+          podSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 6080
     {{- end }}
     {{- with .Values.networkPolicy.extraIngress }}
     {{- toYaml . | nindent 4 }}

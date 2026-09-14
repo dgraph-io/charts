@@ -308,6 +308,8 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `networkPolicy.enabled`                  | Create a NetworkPolicy restricting ingress to the dgraph pods         | `false`                                             |
 | `networkPolicy.clientPodLabels`          | Labels of client pods permitted to reach the client ports (this namespace only) | `{}`                                                |
 | `networkPolicy.clientNamespaceLabels`    | Labels of namespaces whose pods may reach the client ports (required for an Ingress controller in another namespace) | `{}`                                                |
+| `networkPolicy.scraperPodLabels`         | Labels of metrics-scraping pods permitted to reach alpha 8080 and zero 6080 (this namespace only) | `{}`                                                |
+| `networkPolicy.scraperNamespaceLabels`   | Labels of namespaces whose pods may reach alpha 8080 and zero 6080 (a Prometheus in another namespace needs this) | `{}`                                                |
 | `networkPolicy.extraIngress`             | Additional ingress rules appended verbatim                            | `[]`                                                |
 
 ## Ingress resource

@@ -777,6 +777,11 @@ networkPolicy:
   ## authorized this way. Set alongside clientPodLabels to narrow to those pods in
   ## those namespaces; set alone to admit every pod in those namespaces.
   clientNamespaceLabels: {}
+  ## Labels of the pods and/or namespaces that scrape metrics; they may reach alpha
+  ## 8080 and zero 6080. Zero's 6080 is not a client port, so a Prometheus admitted
+  ## only through the client selectors above cannot scrape zero.
+  scraperPodLabels: {}
+  scraperNamespaceLabels: {}
   extraIngress: []
 
 global:
