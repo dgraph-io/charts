@@ -43,6 +43,16 @@ jobs:
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
+        with:
+          mark_as_latest: false
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
+      - name: Keep the Latest badge on the dgraph chart
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          version=$(sed -n 's/^version: *//p' charts/dgraph/Chart.yaml)
+          if gh release view "dgraph-$version" >/dev/null 2>&1; then
+            gh release edit "dgraph-$version" --latest
+          fi
