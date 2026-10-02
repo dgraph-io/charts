@@ -5,6 +5,7 @@ ingress:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
   hosts:
-    - paths:
-        - path: /*
-          pathType: ImplementationSpecific
+    - host: ratel.example.com
+      paths:
+        - path: /
+          pathType: Prefix
