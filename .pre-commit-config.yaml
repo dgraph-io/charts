@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: ct-lint
         name: ct lint (changed charts)
-        # Requires ct, helm, yamllint, and yamale on PATH (brew install chart-testing helm).
+        # `make setup` installs ct, helm, yamllint, and yamale.
         entry: ct lint --config ct.yaml
         language: system
         files: ^(charts/|ct\.yaml$)
