@@ -1,8 +1,8 @@
 apiVersion: v2
 name: dgraph
 type: application
-version: 25.3.8
-appVersion: v25.3.8
+version: 25.4.1
+appVersion: v25.4.1
 description: Dgraph is a horizontally scalable and distributed graph database, providing ACID transactions, consistent replication and linearizable reads.
 keywords:
 - dgraph
