@@ -6,6 +6,7 @@ set -euo pipefail
 tool="${1:?usage: scripts/deps.sh <tool>}"
 auto_install="${AUTO_INSTALL:-false}"
 ct_version="${CT_VERSION:-3.14.0}"
+helm_script_ref="${HELM_SCRIPT_REF:-v3.22.0}"
 
 case "$(uname -s)" in
   Darwin)
@@ -94,12 +95,14 @@ ct_arch() {
 install_cmd() {
   case "$tool:$pm" in
     helm:brew | helm:pacman) pkg_cmd helm ;;
-    helm:*) echo "$(with_cmds curl tar openssl)curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash" ;;
+    helm:*) echo "$(with_cmds curl tar openssl)tmp=\$(mktemp) && curl -fsSLo \"\$tmp\" https://raw.githubusercontent.com/helm/helm/${helm_script_ref}/scripts/get-helm-3 && bash \"\$tmp\"" ;;
     ct:brew) pkg_cmd chart-testing ;;
     ct:*)
-      local url
-      url="https://github.com/helm/chart-testing/releases/download/v${ct_version}/chart-testing_${ct_version}_linux_$(ct_arch).tar.gz"
-      echo "$(with_cmds curl tar)mkdir -p \"\$HOME/.local/bin\" \"\$HOME/.ct\" && curl -fsSL $url | tar -xz -C \"\$HOME/.ct\" && mv \"\$HOME/.ct/ct\" \"\$HOME/.local/bin/ct\" && mv \"\$HOME/.ct/etc/\"* \"\$HOME/.ct/\""
+      local base file
+      base="https://github.com/helm/chart-testing/releases/download/v${ct_version}"
+      file="chart-testing_${ct_version}_linux_$(ct_arch).tar.gz"
+      # Verify the tarball against the release's published SHA-256 checksums before unpacking.
+      echo "$(with_cmds curl tar)tmp=\$(mktemp -d) && curl -fsSLo \"\$tmp/$file\" $base/$file && curl -fsSLo \"\$tmp/checksums.txt\" $base/checksums.txt && (cd \"\$tmp\" && grep ' $file\$' checksums.txt | sha256sum -c -) && mkdir -p \"\$HOME/.local/bin\" \"\$HOME/.ct\" && tar -xzf \"\$tmp/$file\" -C \"\$HOME/.ct\" && mv \"\$HOME/.ct/ct\" \"\$HOME/.local/bin/ct\" && mv \"\$HOME/.ct/etc/\"* \"\$HOME/.ct/\""
       ;;
     yamllint:*) pkg_cmd yamllint ;;
     yamale:brew) pkg_cmd yamale ;;
@@ -118,7 +121,7 @@ install_cmd() {
       local noninteractive=""
       [ -t 0 ] || noninteractive="NONINTERACTIVE=1 "
       # shellcheck disable=SC2016 # expanded when the command runs
-      echo "${noninteractive}"'/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+      echo 'tmp=$(mktemp) && curl -fsSLo "$tmp" https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh && '"${noninteractive}"'/bin/bash "$tmp"'
       ;;
   esac
 }
@@ -181,9 +184,13 @@ if [ "$tool" = brew ]; then
 fi
 
 if ! present; then
-  echo "Error: $tool installed but is not on PATH."
-  echo ""
-  echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
+  if [ -x "$HOME/.local/bin/$tool" ]; then
+    echo "Error: $tool installed to ~/.local/bin, which is not on PATH."
+    echo ""
+    echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
+  else
+    echo "Error: installing $tool did not put it on PATH. See the installer output above."
+  fi
   exit 1
 fi
 

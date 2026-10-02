@@ -12,6 +12,8 @@ export AUTO_INSTALL
 DEPS := scripts/deps.sh
 
 .DEFAULT_GOAL := help
+# Package managers hold locks, so installs must not run in parallel.
+.NOTPARALLEL:
 .PHONY: help deps setup lint lint-all \
 	deps-pm deps-pm-darwin deps-pm-linux \
 	deps-helm deps-ct deps-yamllint deps-yamale deps-pre-commit deps-hook
