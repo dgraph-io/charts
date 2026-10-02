@@ -133,7 +133,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.pdb.minAvailable`                  | Minimum zero pods that must stay available (ignored when maxUnavailable is set) | `2`                                                 |
 | `zero.pdb.maxUnavailable`                | Maximum zero pods that may be evicted at once; 0 blocks all voluntary eviction | `nil`                                               |
 | `zero.rollingUpdatePartition`            | Partition update strategy                                             | `nil`                                               |
-| `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `OrderedReady`                                      |
+| `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `Parallel`                                          |
 | `zero.replicaCount`                      | Number of zero nodes                                                  | `3`                                                 |
 | `zero.shardReplicaCount`                 | Max number of replicas per data shard                                 | `5`                                                 |
 | `zero.terminationGracePeriodSeconds`     | Zero server pod termination grace period                              | `60`                                                |
@@ -193,7 +193,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
 | `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `alpha.rollingUpdatePartition`           | Partition update strategy                                             | `nil`                                               |
-| `alpha.podManagementPolicy`              | Pod management policy for alpha nodes                                 | `OrderedReady`                                      |
+| `alpha.podManagementPolicy`              | Pod management policy for alpha nodes                                 | `Parallel`                                          |
 | `alpha.replicaCount`                     | Number of alpha nodes                                                 | `3`                                                 |
 | `alpha.terminationGracePeriodSeconds`    | Alpha server pod termination grace period                             | `600`                                               |
 | `alpha.antiAffinity`                     | Alpha anti-affinity policy                                            | `soft`                                              |
@@ -269,10 +269,10 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.customLivenessProbe`              | Alpha custom liveness probes (if `alpha.livenessProbe` not enabled)   | `{}`                                                |
 | `alpha.customReadinessProbe`             | Alpha custom readiness probes (if `alpha.readinessProbe` not enabled) | `{}`                                                |
 | `alpha.extraInitContainers`             | Enables extra init containers to be added to the alpha statefulset | `[]`                                                |
-| `alpha.initContainers.init.enabled`      | Alpha initContainer enabled                                           | `true`                                              |
+| `alpha.initContainers.init.enabled`      | Alpha initContainer enabled                                           | `false`                                              |
 | `alpha.initContainers.init.image.registry`   | Alpha initContainer registry name                                 | `docker.io`                                         |
 | `alpha.initContainers.init.image.repository` | Alpha initContainer image name                                    | `dgraph/dgraph`                                     |
-| `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | `v21.03.0`                                          |
+| `alpha.initContainers.init.image.tag`        | Alpha initContainer image tag                                     | Same as `image.tag`                                          |
 | `alpha.initContainers.init.image.pullPolicy` | Alpha initContainer pull policy                                   | `IfNotPresent`                                      |
 | `alpha.initContainers.init.env` | Adds environment variables for the alpha init container                                  | `[]`                                      |
 | `alpha.initContainers.init.envFrom`      | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
@@ -284,7 +284,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.podLabels`                        | Specify additional labels for template metadata                       | `{}`                                                |
 | `ratel.image.registry`                   | Container registry name                                               | `docker.io`                                         |
 | `ratel.image.repository`                 | Container image name                                                  | `dgraph/ratel`                                      |
-| `ratel.image.tag`                        | Container image tag                                                   | `v21.03.1`                                          |
+| `ratel.image.tag`                        | Container image tag                                                   | `v21.12.0`                                          |
 | `ratel.image.pullPolicy`                 | Container pull policy                                                 | `IfNotPresent`                                      |
 | `ratel.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `ratel.replicaCount`                     | Number of ratel nodes                                                 | `1`                                                 |
@@ -321,25 +321,25 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.schedulerName`                  | Configure an explicit scheduler for Backups Kubernetes CronJobs       | `nil`                                               |
 | `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
 | `backups.admin.password`                 | Login user password for backups (required if ACL enabled, unless `backups.admin.existingSecret` is set) | `nil`                       |
-| `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
-| `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
+| `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `""`                                                |
+| `backups.admin.auth_token`               | Auth Token                                                            | `""`                                                |
 | `backups.admin.existingSecret`           | Name of a pre-created Secret holding the backup admin password, so it never passes through Helm values. Ignored unless `alpha.acl.enabled` is true | `""`                  |
 | `backups.admin.passwordSecretKey`        | Key within `existingSecret` holding the password. Ignored unless `existingSecret` is set; the chart's own backups Secret always uses `backup_admin_password` | `backup_admin_password` |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
-| `backups.image.tag`                      | Container image tag                                                   | `v25.3.1`                                           |
+| `backups.image.tag`                      | Container image tag                                                   | Same as `image.tag`                                           |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
-| `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `nil`                                               |
-| `backups.nfs.path`                       | NFS Server file share path name                                       | `nil`                                               |
+| `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `""`                                                |
+| `backups.nfs.path`                       | NFS Server file share path name                                       | `""`                                                |
 | `backups.nfs.storage`                    | Storage allocated from NFS volume and claim                           | `512Gi`                                             |
 | `backups.nfs.mountPath`                  | Path to mount volume in Alpha (should match `backup.destination`)     | `/dgraph/backups`                                   |
 | `backups.volume.enabled`                 | Enable mounted volume from a PVC for backups                          | `false`                                             |
 | `backups.volume.claim`                   | Name of PVC previously deployed                                       | `""`                                                |
-| `backups.volume.mountPath`               | Path to mount volume in Alpha (should match `backup.destination`)     | `/dgraph/backups`                                   |
+| `backups.volume.mountPath`               | Path to mount volume in Alpha (should match `backup.destination`)     | `/dgraph/backups/`                                   |
 | `backups.full.enabled`                   | Enable full backups cronjob                                           | `false`                                             |
 | `backups.full.debug`                     | Enable `set -x` for cron shell script                                 | `false`                                             |
-| `backups.full.schedule`                  | Cronjob schedule                                                      | `"0 * * * *"`                                       |
+| `backups.full.schedule`                  | Cronjob schedule                                                      | `0 0 * * *`                                         |
 | `backups.full.restartPolicy`             | Restart policy                                                        | `Never`                                             |
 | `backups.incremental.enabled`            | Enable incremental backups cronjob                                    | `false`                                             |
 | `backups.incremental.debug`              | Enable `set -x` for cron shell script                                 | `false`                                             |

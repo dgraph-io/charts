@@ -2,15 +2,17 @@ name: Release Charts
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: github.ref == 'refs/heads/main'
+    # One release at a time, so two runs cannot both pass the version check.
+    concurrency:
+      group: release-charts
+      cancel-in-progress: false
     # depending on default permission settings for your org (contents being read-only or read-write for workloads), you will have to add permissions
     # see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
     runs-on: ubuntu-latest
@@ -25,7 +27,52 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Stop if a changed chart's version is already released
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          # Same change detection as chart-releaser: charts changed since the latest tag.
+          git fetch --tags --quiet
+          latest_tag=$(git describe --tags --abbrev=0 HEAD~ 2>/dev/null || git rev-list --max-parents=0 --first-parent HEAD)
+          # Read once: a pipe into grep -q can fail under pipefail and misreport "not indexed".
+          index=$(git show origin/gh-pages:index.yaml)
+          status=0
+          for chart in $(git diff --find-renames --name-only "$latest_tag" -- charts | cut -d/ -f1-2 | sort -u); do
+            [ -f "$chart/Chart.yaml" ] || continue
+            name=$(sed -n 's/^name: *//p' "$chart/Chart.yaml")
+            version=$(sed -n 's/^version: *//p' "$chart/Chart.yaml")
+            # A release tagged at this commit means a re-run after a partial failure.
+            if [ "$(git rev-list -n1 "$name-$version" 2>/dev/null)" = "$(git rev-parse HEAD)" ]; then
+              if grep -qF "/releases/download/$name-$version/" <<<"$index"; then
+                echo "$name-$version was already released and indexed from this commit; skipping."
+              else
+                # Not indexed, so the earlier attempt failed partway; let chart-releaser recreate it.
+                echo "$name-$version was released from this commit but not indexed; deleting it to recreate."
+                gh release delete "$name-$version" --cleanup-tag --yes
+              fi
+              continue
+            fi
+            if gh release view "$name-$version" >/dev/null 2>&1; then
+              echo "::error file=$chart/Chart.yaml::$chart changed since $latest_tag, but $name-$version is already released. Bump its version."
+              status=1
+            fi
+          done
+          exit "$status"
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
+        with:
+          mark_as_latest: false
+          # Only a re-run reaches an existing release; the check above stops anything else.
+          skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Keep the Latest badge on the dgraph chart
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          version=$(sed -n 's/^version: *//p' charts/dgraph/Chart.yaml)
+          if gh release view "dgraph-$version" >/dev/null 2>&1; then
+            gh release edit "dgraph-$version" --latest
+          fi

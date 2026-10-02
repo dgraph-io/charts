@@ -11,7 +11,7 @@ keywords:
 - lambda
 - JavaScript
 type: application
-version: 0.0.2
+version: 0.0.3
 appVersion: v1.2.4
 sources:
   - https://github.com/dgraph-io/dgraph-lambda
