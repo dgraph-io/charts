@@ -668,7 +668,7 @@ alpha:
   customStartupProbe: {}
   customLivenessProbe: {}
   customReadinessProbe: {}
-  
+
   # Enables extra init containers to be added to the alpha statefulset
   extraInitContainers: []
 
@@ -684,14 +684,14 @@ alpha:
       env: []
       envFrom: []
       image:
-        << : *image
+        <<: *image
       command:
         - bash
         - "-c"
         - |
           trap "exit" SIGINT SIGTERM
           echo "Write to /dgraph/doneinit when ready."
-          until [ -f /dgraph/doneinit ]; do sleep 2; done          
+          until [ -f /dgraph/doneinit ]; do sleep 2; done
       ## Configure resource requests
       ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
       ##
@@ -871,7 +871,7 @@ backups:
   ## Backups image - image needs at least the curl and jq commands
   ## default is to reuse dgraph image
   image:
-    << : *image
+    <<: *image
   ## NFS Configuration for mounting a filepath in Alpha pods
   ## Prerequisites: NFS Server required, e.g. Google Cloud FileStore, EFS, etc.
   ## ref. https://kubernetes.io/docs/concepts/storage/volumes/#nfs
