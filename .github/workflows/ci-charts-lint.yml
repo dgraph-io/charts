@@ -31,4 +31,6 @@ jobs:
         uses: helm/chart-testing-action@v2.8.0
 
       - name: Lint changed charts
-        run: ct lint --config ct.yaml --target-branch "${{ github.event.pull_request.base.ref }}"
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: ct lint --config ct.yaml --target-branch "$BASE_REF"
