@@ -12,10 +12,16 @@
 ## and per-component podLabels will override commonLabels on key conflicts.
 commonLabels: {}
 
+## Optionally specify an array of imagePullSecrets applied to every Pod.
+## Entries may be plain secret-name strings or Kubernetes {name: secret-name}
+## objects. Takes precedence over global.imagePullSecrets and image.pullSecrets.
+## Secrets must be manually created in the namespace.
+imagePullSecrets: []
+
 image: &image
   registry: docker.io
   repository: dgraph/dgraph
-  tag: v25.3.1
+  tag: v25.4.1
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -37,6 +43,10 @@ image: &image
 ## Runs automatically on helm upgrade — detects and recreates StatefulSets
 ## with stale selector labels using --cascade=orphan to avoid downtime.
 preUpgradeHook:
+  ## Run the v24-to-v25 StatefulSet selector migration Job on helm upgrade.
+  ## Once every cluster has migrated past the v24-to-v25 selector change this
+  ## can be set to false (it then becomes pure per-upgrade overhead).
+  enabled: true
   image:
     registry: docker.io
     repository: bitnami/kubectl
@@ -72,6 +82,15 @@ zero:
   ## Value for the "monitor" label on the zero Service (not on pods or other resources).
   ## Used by Prometheus for service discovery.
   monitorLabel: zero-dgraph-io
+
+  ## PodDisruptionBudget for the zero StatefulSet. Default off — see templates/pdb.yaml
+  ## for why minAvailable >= replicaCount can deadlock `kubectl drain` on a
+  ## single-replica group. Review against replicaCount before enabling.
+  pdb:
+    enabled: false
+    minAvailable: 2
+    # maxUnavailable:
+
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
   ##
@@ -126,6 +145,27 @@ zero:
   ## Extra flags for command line flags in command
   extraFlags: ""
 
+  ## Verbosity (glog -v). INFO/WARNING/ERROR are ALWAYS written to stderr; this
+  ## only adds finer V-logs on top. Named level OR a raw -v integer:
+  ##   normal->0 (prod default)   verbose->1   debug->2   trace->3
+  logLevel: normal
+
+  ## Per-module verbosity (glog --vmodule), e.g. "server=3,raft=2". Empty = none.
+  vmodule: ""
+
+  ## Log to the container's stderr (glog --logtostderr). Keep true in Kubernetes
+  ## so logs reach `kubectl logs` / the node collector. Setting false routes logs
+  ## to files under logDir instead — only safe with a writable, mounted logDir.
+  logtostderr: true
+
+  ## Also write logs to files under logDir IN ADDITION to stderr
+  ## (glog --alsologtostderr). Requires a writable logDir.
+  alsologtostderr: false
+
+  ## Directory for glog file output (glog --log_dir); used when logtostderr=false
+  ## or alsologtostderr=true. Must be a writable mount. Empty = glog default.
+  logDir: ""
+
   ## Configuration file for dgraph zero used as an alternative to command-line options
   ## Ref: https://docs.dgraph.io/cli/config
   configFile: {}
@@ -173,12 +213,38 @@ zero:
     fsGroup: 1001
     runAsUser: 1001
 
+  ## dgraph container Security Context.
+  ## Drops all Linux capabilities and forbids privilege escalation. Every key
+  ## except `enabled` is rendered verbatim into the container securityContext.
+  ## readOnlyRootFilesystem is left false because dgraph writes scratch data
+  ## outside its mounted data dir; flip it on only after verifying on a cluster.
+  containerSecurityContext:
+    enabled: false
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+      - ALL
+
   ## TLS Configuration
   tls:
     enabled: false
     ## Files created from './tls' directory set with `dgraph cert` command
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
+    ## Read only when tls.enabled=true; the chart then builds Dgraph's --tls
+    ## superflag from the keys below.
+    ## Enable TLS on the internal gRPC port for inter-node traffic (Dgraph's
+    ## --tls "internal-port=<bool>"). A boolean, not a port number.
+    internalPort: true
+    ## Client cert basename; selects client.<clientName>.crt/.key at /dgraph/tls.
+    ## Empty omits the client cert from --tls.
+    clientName: ""
+    ## Dgraph client-auth-type for the external ports (e.g. REQUIREANDVERIFY).
+    ## Empty omits the field. REQUIREANY/REQUIREANDVERIFY require a clientName and
+    ## are incompatible with the default httpGet probes (use VERIFYIFGIVEN or
+    ## custom exec probes).
+    clientAuthType: ""
 
 
   ## dgraph data Persistent Volume Storage Class
@@ -268,6 +334,15 @@ alpha:
   ## Value for the "monitor" label on the alpha Service (not on pods or other resources).
   ## Used by Prometheus for service discovery.
   monitorLabel: alpha-dgraph-io
+
+  ## PodDisruptionBudget for the alpha StatefulSet. Default off — see templates/pdb.yaml
+  ## for why minAvailable >= replicaCount can deadlock `kubectl drain` on a
+  ## single-replica group. Review against replicaCount before enabling.
+  pdb:
+    enabled: false
+    minAvailable: 2
+    # maxUnavailable:
+
   ## StatefulSet controller supports automated updates. There are two valid update strategies: RollingUpdate and OnDelete
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
   ##
@@ -321,6 +396,27 @@ alpha:
   ## Extra flags for command line flags in command
   extraFlags: ""
 
+  ## Verbosity (glog -v). INFO/WARNING/ERROR are ALWAYS written to stderr; this
+  ## only adds finer V-logs on top. Named level OR a raw -v integer:
+  ##   normal->0 (prod default)   verbose->1   debug->2   trace->3
+  logLevel: normal
+
+  ## Per-module verbosity (glog --vmodule), e.g. "server=3,raft=2". Empty = none.
+  vmodule: ""
+
+  ## Log to the container's stderr (glog --logtostderr). Keep true in Kubernetes
+  ## so logs reach `kubectl logs` / the node collector. Setting false routes logs
+  ## to files under logDir instead — only safe with a writable, mounted logDir.
+  logtostderr: true
+
+  ## Also write logs to files under logDir IN ADDITION to stderr
+  ## (glog --alsologtostderr). Requires a writable logDir.
+  alsologtostderr: false
+
+  ## Directory for glog file output (glog --log_dir); used when logtostderr=false
+  ## or alsologtostderr=true. Must be a writable mount. Empty = glog default.
+  logDir: ""
+
   ## Configuration file for dgraph alpha used as an alternative to command-line options
   ## Ref: https://docs.dgraph.io/cli/config
   configFile: {}
@@ -360,6 +456,13 @@ alpha:
     loadBalancerSourceRanges: []
   serviceHeadless:
     labels: {}
+    ## Declare the alpha client ports (8080 HTTP, 9080 gRPC) on the headless Service.
+    ## Only needed under a strict-mTLS service mesh, where a client sidecar builds an
+    ## mTLS route only for the ports a Service declares, and only for clients that dial
+    ## a specific pod (alpha-0.<headless>) instead of the load-balanced alpha Service.
+    ## 8080 is declared automatically whenever backups are enabled, because the backup
+    ## CronJobs depend on it; this setting additionally declares 9080.
+    publishClientPorts: false
   ## alpha ingress resource configuration
   ## This requires an ingress controller to be installed into your k8s cluster
   ingress:
@@ -384,6 +487,19 @@ alpha:
     fsGroup: 1001
     runAsUser: 1001
 
+  ## dgraph container Security Context.
+  ## Drops all Linux capabilities and forbids privilege escalation. Every key
+  ## except `enabled` is rendered verbatim into the container securityContext.
+  ## readOnlyRootFilesystem is left false because dgraph writes scratch data
+  ## outside its mounted data dir; flip it on only after verifying on a cluster.
+  containerSecurityContext:
+    enabled: false
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+      - ALL
+
   ## TLS Configuration
   ## Documentation on dgraph alpha TLS options,
   ##  see https://docs.dgraph.io/admin/security/tls-configuration#tls-options
@@ -392,24 +508,88 @@ alpha:
     ## Files created from './tls' directory set with `dgraph cert` command
     ## Can use make_tls_secrets.sh to generate secrets.yaml
     files: {}
+    ## Read only when tls.enabled=true; the chart then builds Dgraph's --tls
+    ## superflag from the keys below.
+    ## Enable TLS on the internal gRPC port for inter-node traffic (Dgraph's
+    ## --tls "internal-port=<bool>"). A boolean, not a port number.
+    internalPort: true
+    ## Client cert basename; selects client.<clientName>.crt/.key at /dgraph/tls.
+    ## Empty omits the client cert from --tls.
+    clientName: ""
+    ## Dgraph client-auth-type for the external ports (e.g. REQUIREANDVERIFY).
+    ## Empty omits the field. REQUIREANY/REQUIREANDVERIFY require a clientName and
+    ## are incompatible with the default httpGet probes (use VERIFYIFGIVEN or
+    ## custom exec probes).
+    clientAuthType: ""
 
   ## ACL Configuration
   ## ref: https://docs.dgraph.io/installation/configuration/enable-acl
   acl:
     enabled: false
+    ## Filename (and Secret key) of the HMAC secret mounted at /dgraph/acl/<secretFile>.
+    secretFile: hmac_secret_file
+    ## Name of a pre-created Secret holding the HMAC key. When set, the chart does NOT
+    ## render its own ACL Secret from `file` below; the alpha pod mounts this Secret
+    ## instead, so the HMAC never passes through Helm values or release state. The
+    ## Secret must contain the `secretFile` key.
+    existingSecret: ""
     ## The values in `file: {}` will be the filename as key and the file data as the value.
-    ## Make sure that the filename key matches the dgraph configuration of `acl_secret_file`
+    ## Make sure that the filename key matches the dgraph configuration of `acl_secret_file`.
+    ## Ignored when `existingSecret` is set.
     # file:
     #   ## value for 1234567890123456789012345678901
     #   ## Note that Kubernetes secrets must be base64-encoded
     #   hmac_secret_file: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMQo=
 
+    ## Bootstrap: a run-once-per-deploy Job (post-install/post-upgrade hook) that
+    ## rotates `groot` off its default password and converges the declared users and
+    ## groups. Idempotent, so it is safe on every helm upgrade. Requires acl.enabled
+    ## and a credentials Secret (acl.existingSecret or the chart-created ACL Secret,
+    ## holding groot and per-user passwords). Default off.
+    ##
+    ## Add an engineer: append a `users` entry with `groups: [guardians]` and add
+    ##   their password under a new key in the credentials Secret (`passwordSecretKey`).
+    ## Add a service: add a `groups` entry with predicate `rules`, then a `users`
+    ##   entry placed in that group.
+    bootstrap:
+      enabled: false
+      ## Secret holding the credentials the Job reads; defaults to acl.existingSecret
+      ## (else the chart-created ACL Secret).
+      existingSecret: ""
+      ## Key in the credentials Secret holding groot's target (rotated) password.
+      grootPasswordSecretKey: groot_password
+      ## Opaque rotation token rendered as a Job pod annotation. Change it (e.g. from
+      ## a Terraform counter) to force a helm upgrade that re-runs the reconciler,
+      ## without touching Alpha. Empty = no annotation.
+      rotation: ""
+      ## Image for the bootstrap Job. Empty (the default) reuses the deployed dgraph
+      ## image, which provides bash, curl, and jq. Set registry/repository/tag to pin
+      ## an explicit override:
+      # image:
+      #   registry: docker.io
+      #   repository: dgraph/dgraph
+      #   tag: v25.4.1
+      image: {}
+      ## Each group: { name, rules: [{ predicate, permission }] }.
+      ## permission is OR-summed: 1=read, 2=write, 4=modify.
+      groups: []
+      ## Each user: { name, passwordSecretKey, groups: [ ... ] }.
+      ## `guardians` is the built-in superadmin group.
+      users: []
+
   ## Encryption at Rest Configuration
   ## ref: https://docs.dgraph.io/installation/configuration/encryption-at-rest
   encryption:
     enabled: false
+    ## Filename (and Secret key) of the encryption key mounted at /dgraph/enc/<keyFile>.
+    keyFile: enc_key_file
+    ## Name of a pre-created Secret holding the encryption key. When set, the chart does
+    ## NOT render its own encryption Secret from `file` below; the alpha pod mounts this
+    ## Secret instead. The Secret must contain the `keyFile` key.
+    existingSecret: ""
     ## The values in `file: {}` will be the filename as key and the file data as the value.
-    ## Make sure that the filename key matches the dgraph configuration of `encryption_key_file`
+    ## Make sure that the filename key matches the dgraph configuration of `encryption_key_file`.
+    ## Ignored when `existingSecret` is set.
     # file:
     #   ## value for 123456789012345
     #   ## Note that Kubernetes secrets must be base64-encoded
@@ -605,6 +785,17 @@ ratel:
     fsGroup: 1001
     runAsUser: 1001
 
+  ## ratel container Security Context.
+  ## Drops all Linux capabilities and forbids privilege escalation. Every key
+  ## except `enabled` is rendered verbatim into the container securityContext.
+  containerSecurityContext:
+    enabled: false
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+      - ALL
+
   ## Configure resource requests
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
@@ -659,6 +850,15 @@ backups:
     ## ref: https://docs.dgraph.io/installation/configuration/enable-acl
     user: groot
     # password: password
+    ## Name of a pre-created Secret holding the backup admin password. When set, the
+    ## chart does NOT mint `backup_admin_password` into its own backups Secret; the
+    ## CronJob mounts this Secret's key instead, so the password never passes through
+    ## Helm values or release state. Ignored unless alpha.acl.enabled is true.
+    existingSecret: ""
+    ## Key within existingSecret that holds the backup admin password. Ignored
+    ## unless existingSecret is set; the chart's own backups Secret always uses the
+    ## key backup_admin_password.
+    passwordSecretKey: backup_admin_password
     ## Mutual TLS client certificate and key can be used to secure transaction that was created with
     ## dgraph cert --client <name-of-client> should be specified here.
     ## ref. https://docs.dgraph.io/admin/security/tls-configuration#tls-options
@@ -668,7 +868,7 @@ backups:
     ## specified here so that backups can properly login.
     ## ref. https://docs.dgraph.io/admin/security/admin-endpoint-security#securing-alter-operations
     auth_token: ""
-  ## Backups image - image needs at least curl command
+  ## Backups image - image needs at least the curl and jq commands
   ## default is to reuse dgraph image
   image:
     << : *image
@@ -734,6 +934,107 @@ backups:
       access: ""
       ## AWS_SECRET_ACCESS_KEY env var
       secret: ""
+
+## Prometheus Operator ServiceMonitor for the alpha and zero metrics endpoints.
+## Default off — requires the Prometheus Operator CRDs to be installed; a
+## stock install with this disabled imposes no CRD dependency.
+serviceMonitor:
+  enabled: false
+  # namespace: monitoring
+  labels: {}
+  interval: 30s
+  scrapeTimeout: 10s
+  path: /debug/prometheus_metrics
+
+## Prometheus Operator PrometheusRule with conservative default alerts for
+## alpha/zero instance availability and backup CronJob failures.
+## Default off — requires the Prometheus Operator CRDs to be installed; a
+## stock install with this disabled imposes no CRD dependency.
+## The default alerts are built on `up`, which only has series while something
+## is scraping alpha and zero. Enabling this without serviceMonitor.enabled (or
+## an equivalent scrape config of your own) means the instance and quorum alerts
+## can never fire, while the targets-missing alerts fire after 15 minutes.
+prometheusRule:
+  enabled: false
+  labels: {}
+  defaultRules: true
+  extraRules: []
+
+## Optional NetworkPolicy restricting ingress to the dgraph pods. Default off
+## so it can't silently break connectivity on clusters whose CNI does not
+## enforce NetworkPolicy.
+networkPolicy:
+  enabled: false
+  ## Labels identifying client pods allowed to reach the alpha client ports (and
+  ## ratel, when enabled). A podSelector alone matches only pods in this release's
+  ## own namespace.
+  clientPodLabels: {}
+  ## Labels identifying namespaces whose pods are allowed to reach those ports. An
+  ## Ingress controller living in its own namespace (e.g. ingress-nginx) can only be
+  ## authorized this way. Set alongside clientPodLabels to narrow to those pods in
+  ## those namespaces; set alone to admit every pod in those namespaces.
+  clientNamespaceLabels: {}
+  ## Labels of the pods and/or namespaces that scrape metrics; they may reach alpha
+  ## 8080 and zero 6080. Zero's 6080 is not a client port, so a Prometheus admitted
+  ## only through the client selectors above cannot scrape zero.
+  scraperPodLabels: {}
+  scraperNamespaceLabels: {}
+  extraIngress: []
+
+## Post-install validation subsystem. A validator asserts the running cluster
+## matches what the chart rendered (health, membership, ACL enforcement, admin
+## and per-user logins, group rules, and optionally backup CronJob schedules).
+## Default off and inert on a stock install: nothing renders unless enabled.
+validation:
+  ## Master switch for all validator resources (ConfigMap, test Pod, Job, CronJob, RBAC).
+  enabled: false
+  ## Validator image. Empty (the default) reuses the deployed dgraph image (which
+  ## bundles bash, curl, jq) so the validator always matches the running version.
+  ## Set all three fields below only to pin an explicit override:
+  # image:
+  #   registry: docker.io
+  #   repository: dgraph/dgraph
+  #   tag: v25.4.1
+  image: {}
+  ## Account the validator logs in as for auth-dependent checks. Defaults to the
+  ## groot superadmin.
+  adminUser: groot
+  ## Secret key holding adminUser's password. Empty derives it (groot's key, else
+  ## <adminUser>_password).
+  adminPasswordSecretKey: ""
+  ## The validator reads passwords from the ACL creds Secret (alpha.acl.bootstrap.existingSecret /
+  ## alpha.acl.existingSecret, else the chart-managed <fullname>-acl-secret). An external creds Secret
+  ## must carry the password keys the validator reads — adminPasswordSecretKey (or groot's key) and each
+  ## bootstrap user's passwordSecretKey — otherwise the admin/user-login checks FAIL the gating hook.
+  ## Post-install/upgrade hook Job that gates the release on a passing validation.
+  ## Default off: a failed check would fail `helm install/upgrade`.
+  job:
+    enabled: false
+    ## Job backoffLimit (also used by the manual CronJob's jobTemplate).
+    backoffLimit: 1
+  ## Suspended manual-trigger CronJob (kubectl create job --from=cronjob/...).
+  ## Default off.
+  cronjob:
+    enabled: false
+  ## RBAC for the backup-CronJob check (the validator reads CronJobs via the
+  ## Kubernetes API). Create the validator ServiceAccount/Role/RoleBinding.
+  ## Required by checkBackups.
+  rbac:
+    enabled: false
+  ## Also assert the backup CronJobs exist with their expected schedules (requires rbac.enabled).
+  checkBackups: false
+  ## Trigger a live backup round-trip to S3 (side-effecting, slow; reserved for future use). Default off.
+  backupRoundtrip: false
+  ## Per-check retry attempts before failing.
+  retries: 10
+  ## Seconds between retries.
+  retrySleep: 12
+  ## Extra annotations for validator pods.
+  podAnnotations: {}
+  ## nodeSelector for validator pods. Empty falls back to alpha.nodeSelector.
+  nodeSelector: {}
+  ## tolerations for validator pods. Empty falls back to alpha.tolerations.
+  tolerations: []
 
 global:
   domain: cluster.local

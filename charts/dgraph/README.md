@@ -40,9 +40,31 @@ No manual intervention is required. Also review the [additional breaking changes
 
 #### Additional v25 breaking changes
 
+**Resource names change if a truncated name ended in a dash**: `dgraph.fullname` truncates to 24 characters and previously kept a trailing dash, producing names like `myrelease--alpha`. The chart now trims it.
+
+This renames every resource in the chart if your release name is 23 characters, or 24 or more with a dash in position 24. Renaming a StatefulSet makes Helm delete and recreate it, and `volumeClaimTemplates` names each PVC after the StatefulSet, so Kubernetes orphans the existing `datadir-*` volumes instead of adopting them and Alpha starts on empty storage. Zero's headless Service is renamed too, so the peer addresses Zero has stored stop resolving.
+
+Check your release name before upgrading. If it matches either pattern, back up your data and rebind the PersistentVolumes to the new PVC names. `dgraph.name` carried the same defect, where it emitted a label value ending in `-` that the API server rejects; that case failed at install rather than corrupting an upgrade.
+
+**Alpha and Zero now run under the configured ServiceAccount**: With `serviceAccount.create: false` and `serviceAccount.name` set, the chart rendered neither `serviceAccountName` nor `automountServiceAccountToken`, so both pods ran under `default` while appearing to honor the setting. They now run under the name you configured.
+
+RBAC is not the risk, because these pods never call the API server. Workload identity is. Under a service mesh the ServiceAccount is the pod's identity, and Istio derives its SPIFFE ID from it, so an `AuthorizationPolicy` or `PeerAuthentication` matching `.../sa/default` stops matching after the upgrade. Update those policies before upgrading. Both Alpha and Zero pods roll on this release.
+
 **Full backup restartPolicy fix**: The full backup CronJob previously read its `restartPolicy` from `backups.incremental.restartPolicy` instead of `backups.full.restartPolicy`. This has been fixed. If you were working around this bug by setting `backups.incremental.restartPolicy` to control the full backup's restart policy, you will need to move that value to `backups.full.restartPolicy`.
 
-**Backup admin password now required**: When `alpha.acl.enabled` is true and backups are enabled, `backups.admin.password` must be explicitly set. Previously the chart would silently render an empty secret, which would cause backup failures at runtime. The chart now fails at install/upgrade time with a clear error message if the password is missing.
+**Backup admin password now required**: When `alpha.acl.enabled` is true and backups are enabled, `backups.admin.password` must be explicitly set, unless `backups.admin.existingSecret` names a pre-created Secret holding it. Previously the chart would silently render an empty secret, which would cause backup failures at runtime. The chart now fails at install/upgrade time with a clear error message if neither is set.
+
+**ACL and encryption flags now auto-activate**: Setting `alpha.acl.enabled: true` (or `alpha.encryption.enabled: true`) now synthesizes the matching `--acl` (or `--encryption`) superflag onto the Alpha command automatically; previously these flags had to be added by hand through `alpha.extraFlags`. If you already pass `--acl` or `--encryption` through `alpha.extraFlags`, remove it — the chart fails rendering rather than pass the flag twice. The chart points the flag at `/dgraph/acl/<alpha.acl.secretFile>` and `/dgraph/enc/<alpha.encryption.keyFile>`, which default to `hmac_secret_file` and `enc_key_file`; override those keys if your Secret stores the file under a different name.
+
+**TLS now activates from the tls block**: Setting `alpha.tls.enabled: true` (or `zero.tls.enabled: true`) now synthesizes the `--tls` superflag onto the Alpha (or Zero) command; previously the flag had to be added by hand through `extraFlags`. If you already pass `--tls` through `alpha.extraFlags` or `zero.extraFlags`, remove it — the chart fails rendering rather than pass the flag twice. Configure TLS through the new `tls.internalPort`, `tls.clientName`, and `tls.clientAuthType` keys; the chart reads the cert files from `/dgraph/tls` (`ca.crt`, `node.crt`, `node.key`, and `client.<clientName>.crt`/`.key`).
+
+**Health probes use HTTPS when TLS is enabled**: With `alpha.tls.enabled: true` (or `zero.tls.enabled: true`), the built-in httpGet startup, liveness, and readiness probes switch to `scheme: HTTPS`. A cert-requiring `clientAuthType` (`REQUIREANY` or `REQUIREANDVERIFY`) makes every client present a certificate, which the kubelet's probes cannot; the chart fails rendering in that case. Set `clientAuthType: VERIFYIFGIVEN`, or supply exec probes through `customStartupProbe`/`customLivenessProbe`/`customReadinessProbe`. A cert-requiring `clientAuthType` also requires `clientName` so in-cluster callers (inter-node TLS) can present a client cert.
+
+#### v25.3.x to v25.4.x
+
+**Zero's admin HTTP endpoints now authenticate**: Dgraph v25.4.0 gave Zero a `--security` superflag (`token=...;whitelist=...`) matching Alpha's, and authorizes the admin endpoints on its HTTP port (6080) against it. `/removeNode` and `/moveTablet` are always guarded: with no token or whitelist configured, only loopback callers are admitted. `/state` and `/assign` keep their previous open behavior until a token or whitelist is configured, and are enforced from then on.
+
+The chart's Zero startup, liveness, and readiness probes call `/state`, so a stock install is unaffected. If you pass `--security` to Zero through `zero.extraFlags` or `zero.configFile`, the kubelet's probe requests must pass the whitelist too: include the node or pod CIDRs the probes originate from, or supply exec probes through `zero.customStartupProbe`, `zero.customLivenessProbe`, and `zero.customReadinessProbe`. Anything that drove `/removeNode` or `/moveTablet` remotely, such as a maintenance Job or an operator's workstation, now needs a token or a whitelist entry.
 
 ### Installing the Chart
 
@@ -82,13 +104,15 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 |              Parameter                   |                             Description                               |                       Default                       |
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `commonLabels`                           | Labels to add to all resources and pod templates                      | `{}`                                                |
+| `imagePullSecrets`                       | Array of imagePullSecrets applied to every Pod (plain strings or `{name: ...}` objects); takes precedence over `global.imagePullSecrets` and `image.pullSecrets` | `[]` |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v25.3.1`                                           |
+| `image.tag`                              | Container image tag                                                   | `v25.4.1`                                           |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `namespaceOverride`                      | Deployment namespace override if specified.                           | `nil`                                               |
 | `fullnameOverride`                       | Deployment full name override (the release name is ignored)           | `nil`                                               |
+| `preUpgradeHook.enabled`                 | Run the v24-to-v25 StatefulSet selector migration Job on `helm upgrade` | `true`                                              |
 | `preUpgradeHook.image.registry`          | Pre-upgrade hook image registry                                       | `docker.io`                                         |
 | `preUpgradeHook.image.repository`        | Pre-upgrade hook image repository                                     | `bitnami/kubectl`                                   |
 | `preUpgradeHook.image.tag`               | Pre-upgrade hook image tag                                            | `1.31`                                              |
@@ -105,6 +129,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.updateStrategy`                    | Strategy for upgrading zero nodes                                     | `RollingUpdate`                                     |
 | `zero.schedulerName`                     | Configure an explicit scheduler                                       | `nil`                                               |
 | `zero.monitorLabel`                      | "monitor" label on the zero Service (for Prometheus service discovery) | `zero-dgraph-io`                                    |
+| `zero.pdb.enabled`                       | Create a PodDisruptionBudget for zero                                 | `false`                                             |
+| `zero.pdb.minAvailable`                  | Minimum zero pods that must stay available (ignored when maxUnavailable is set) | `2`                                                 |
+| `zero.pdb.maxUnavailable`                | Maximum zero pods that may be evicted at once; 0 blocks all voluntary eviction | `nil`                                               |
 | `zero.rollingUpdatePartition`            | Partition update strategy                                             | `nil`                                               |
 | `zero.podManagementPolicy`               | Pod management policy for zero nodes                                  | `OrderedReady`                                      |
 | `zero.replicaCount`                      | Number of zero nodes                                                  | `3`                                                 |
@@ -116,6 +143,11 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.envFrom`                           | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
 | `zero.extraEnvs`                         | extra env vars                                                        | `[]`                                                |
 | `zero.extraFlags`                        | Zero extra flags for command line                                     | `""`                                                |
+| `zero.logLevel`                          | Verbosity (glog `-v`): `normal`/`verbose`/`debug`/`trace`, or a raw integer | `normal`                                        |
+| `zero.vmodule`                           | Per-module glog verbosity (`--vmodule`), e.g. `server=3,raft=2`        | `""`                                                |
+| `zero.logtostderr`                       | Log to the container's stderr (glog `--logtostderr`)                  | `true`                                              |
+| `zero.alsologtostderr`                   | Also write logs under `logDir` in addition to stderr                  | `false`                                             |
+| `zero.logDir`                            | Directory for glog file output (`--log_dir`); used when `logtostderr=false` or `alsologtostderr=true` | `""`                        |
 | `zero.configFile`                        | Zero config file                                                      | `{}`                                                |
 | `zero.automountServiceAccountToken`      | automatically mount a ServiceAccount API credentials                   | `true`                                              |
 | `zero.service.type`                      | Zero service type                                                     | `ClusterIP`                                         |
@@ -129,6 +161,10 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.securityContext.enabled`           | Security context for zero nodes enabled                               | `false`                                             |
 | `zero.securityContext.fsGroup`           | Group id of the zero container                                        | `1001`                                              |
 | `zero.securityContext.runAsUser`         | User ID for the zero container                                        | `1001`                                              |
+| `zero.containerSecurityContext.enabled`  | Enable the zero container securityContext (drop ALL capabilities, forbid privilege escalation) | `false`                    |
+| `zero.containerSecurityContext.allowPrivilegeEscalation` | Allow privilege escalation for the zero container     | `false`                                             |
+| `zero.containerSecurityContext.readOnlyRootFilesystem` | Mount the zero container's root filesystem read-only   | `false`                                             |
+| `zero.containerSecurityContext.capabilities.drop` | Linux capabilities dropped from the zero container           | `['ALL']`                                           |
 | `zero.persistence.enabled`               | Enable persistence for zero using PVC                                 | `true`                                              |
 | `zero.persistence.storageClass`          | PVC Storage Class for zero volume                                     | `nil`                                               |
 | `zero.persistence.accessModes`           | PVC Access Mode for zero volume                                       | `['ReadWriteOnce']`                                 |
@@ -143,11 +179,17 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.customStartupProbe`                | Zero custom startup probes (if `zero.startupProbe` not enabled)       | `{}`                                                |
 | `zero.customLivenessProbe`               | Zero custom liveness probes (if `zero.livenessProbe` not enabled)     | `{}`                                                |
 | `zero.customReadinessProbe`              | Zero custom readiness probes  (if `zero.readinessProbe` not enabled)  | `{}`                                                |
+| `zero.tls.internalPort`                  | Enable TLS on Zero's internal gRPC port (synthesized into `--tls`)    | `true`                                              |
+| `zero.tls.clientName`                    | Client cert basename for Zero `--tls` (empty omits the client cert)   | `""`                                                |
+| `zero.tls.clientAuthType`                | Zero `--tls` client-auth-type, e.g. `REQUIREANDVERIFY` (empty omits)  | `""`                                                |
 | `alpha.name`                             | Alpha component name                                                  | `alpha`                                             |
 | `alpha.metrics.enabled`                  | Add annotations for Prometheus metric scraping                        | `true`                                              |
 | `alpha.extraAnnotations`                 | Specify annotations for template metadata                             | `{}`                                                |
 | `alpha.podLabels`                        | Specify additional labels for template metadata                       | `{}`                                                |
 | `alpha.monitorLabel`                     | "monitor" label on the alpha Service (for Prometheus service discovery) | `alpha-dgraph-io`                                   |
+| `alpha.pdb.enabled`                      | Create a PodDisruptionBudget for alpha                                | `false`                                             |
+| `alpha.pdb.minAvailable`                 | Minimum alpha pods that must stay available (ignored when maxUnavailable is set) | `2`                                                 |
+| `alpha.pdb.maxUnavailable`               | Maximum alpha pods that may be evicted at once; 0 blocks all voluntary eviction | `nil`                                               |
 | `alpha.updateStrategy`                   | Strategy for upgrading alpha nodes                                    | `RollingUpdate`                                     |
 | `alpha.schedulerName`                    | Configure an explicit scheduler                                       | `nil`                                               |
 | `alpha.rollingUpdatePartition`           | Partition update strategy                                             | `nil`                                               |
@@ -160,6 +202,11 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.envFrom`                          | Extra environment variables loaded from configmap(s) and/or secret(s) | `[]`                                                |
 | `alpha.extraEnvs`                        | extra env vars                                                        | `[]`                                                |
 | `alpha.extraFlags`                       | Alpha extra flags for command                                         | `""`                                                |
+| `alpha.logLevel`                         | Verbosity (glog `-v`): `normal`/`verbose`/`debug`/`trace`, or a raw integer | `normal`                                       |
+| `alpha.vmodule`                          | Per-module glog verbosity (`--vmodule`), e.g. `server=3,raft=2`       | `""`                                                |
+| `alpha.logtostderr`                      | Log to the container's stderr (glog `--logtostderr`)                 | `true`                                              |
+| `alpha.alsologtostderr`                  | Also write logs under `logDir` in addition to stderr                 | `false`                                             |
+| `alpha.logDir`                           | Directory for glog file output (`--log_dir`); used when `logtostderr=false` or `alsologtostderr=true` | `""`                       |
 | `alpha.configFile`                       | Alpha config file                                                     | `{}`                                                |
 | `alpha.automountServiceAccountToken`     | automatically mount a ServiceAccount API credentials                   | `true`                                              |
 | `alpha.service.type`                     | Alpha node service type                                               | `ClusterIP`                                         |
@@ -170,6 +217,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.service.externalTrafficPolicy`    | route external traffic to node-local or cluster-wide endpoints        | `""`                                                |
 | `alpha.service.loadBalancerSourceRanges` | restrict CIDR IP addresses for a LoadBalancer type                    | `[]`                                                |
 | `alpha.serviceHeadless.labels`           | Alpha headless service labels                                         | `{}`                                                |
+| `alpha.serviceHeadless.publishClientPorts` | Declare alpha client ports 8080/9080 on the headless Service (needed under a strict-mTLS mesh for clients dialing a pod directly; 8080 is declared automatically when backups are enabled) | `false`                    |
 | `alpha.ingress.enabled`                  | Alpha ingress resource enabled                                        | `false`                                             |
 | `alpha.ingress.hostname`                 | Alpha ingress virtual hostname                                        | `nil`                                               |
 | `alpha.ingress.annotations`              | Alpha ingress annotations                                             | `nil`                                               |
@@ -182,12 +230,30 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.securityContext.enabled`          | Security context for Alpha nodes enabled                              | `false`                                             |
 | `alpha.securityContext.fsGroup`          | Group id of the Alpha container                                       | `1001`                                              |
 | `alpha.securityContext.runAsUser`        | User ID for the Alpha container                                       | `1001`                                              |
+| `alpha.containerSecurityContext.enabled` | Enable the alpha container securityContext (drop ALL capabilities, forbid privilege escalation) | `false`                   |
+| `alpha.containerSecurityContext.allowPrivilegeEscalation` | Allow privilege escalation for the alpha container   | `false`                                             |
+| `alpha.containerSecurityContext.readOnlyRootFilesystem` | Mount the alpha container's root filesystem read-only | `false`                                             |
+| `alpha.containerSecurityContext.capabilities.drop` | Linux capabilities dropped from the alpha container         | `['ALL']`                                           |
 | `alpha.tls.enabled`                      | Alpha service TLS enabled                                             | `false`                                             |
 | `alpha.tls.files`                        | Alpha service TLS key and certificate files stored as secrets         | `false`                                             |
-| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled                                      | `false`                                             |
+| `alpha.tls.internalPort`                 | Enable TLS on Alpha's internal gRPC port (synthesized into `--tls`)   | `true`                                              |
+| `alpha.tls.clientName`                   | Client cert basename for Alpha `--tls` (empty omits the client cert)  | `""`                                                |
+| `alpha.tls.clientAuthType`               | Alpha `--tls` client-auth-type, e.g. `REQUIREANDVERIFY` (empty omits) | `""`                                                |
+| `alpha.encryption.enabled`               | Alpha Encryption at Rest enabled (auto-adds `--encryption`)           | `false`                                             |
+| `alpha.encryption.keyFile`               | Filename/key of the encryption key within the mounted Secret          | `enc_key_file`                                      |
+| `alpha.encryption.existingSecret`        | Name of a pre-created Secret holding the encryption key (suppresses the chart's own) | `""`                                |
 | `alpha.encryption.file`                  | Alpha Encryption at Rest key file                                     | `nil`                                               |
-| `alpha.acl.enabled`                      | Alpha ACL enabled                                                     | `false`                                             |
+| `alpha.acl.enabled`                      | Alpha ACL enabled (auto-adds `--acl`)                                 | `false`                                             |
+| `alpha.acl.secretFile`                   | Filename/key of the HMAC secret within the mounted Secret             | `hmac_secret_file`                                  |
+| `alpha.acl.existingSecret`               | Name of a pre-created Secret holding the HMAC key (suppresses the chart's own) | `""`                                      |
 | `alpha.acl.file`                         | Alpha ACL secret file                                                 | `nil`                                               |
+| `alpha.acl.bootstrap.enabled`            | Enable the post-install/post-upgrade ACL bootstrap reconciler Job     | `false`                                             |
+| `alpha.acl.bootstrap.existingSecret`     | Secret holding the credentials the bootstrap Job reads (defaults to `acl.existingSecret`, else the chart-managed ACL Secret) | `""`                |
+| `alpha.acl.bootstrap.grootPasswordSecretKey` | Key in the credentials Secret holding groot's rotated password   | `groot_password`                                    |
+| `alpha.acl.bootstrap.rotation`           | Opaque token rendered as a Job pod annotation; change it to force a re-run without touching Alpha | `""`                        |
+| `alpha.acl.bootstrap.image`              | Image override for the bootstrap Job (empty reuses the deployed dgraph image) | `{}`                                         |
+| `alpha.acl.bootstrap.groups`             | Declarative ACL groups (`name`, `rules: [{predicate, permission}]`) the reconciler converges | `[]`                                 |
+| `alpha.acl.bootstrap.users`              | Declarative ACL users (`name`, `passwordSecretKey`, `groups`) the reconciler converges | `[]`                                        |
 | `alpha.persistence.enabled`              | Enable persistence for alpha using PVC                                | `true`                                              |
 | `alpha.persistence.storageClass`         | PVC Storage Class for alpha volume                                    | `nil`                                               |
 | `alpha.persistence.accessModes`          | PVC Access Mode for alpha volume                                      | `['ReadWriteOnce']`                                 |
@@ -240,6 +306,10 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `ratel.securityContext.enabled`          | Security context for ratel nodes enabled                              | `false`                                             |
 | `ratel.securityContext.fsGroup`          | Group id of the ratel container                                       | `1001`                                              |
 | `ratel.securityContext.runAsUser`        | User ID for the ratel container                                       | `1001`                                              |
+| `ratel.containerSecurityContext.enabled` | Enable the ratel container securityContext (drop ALL capabilities, forbid privilege escalation) | `false`                   |
+| `ratel.containerSecurityContext.allowPrivilegeEscalation` | Allow privilege escalation for the ratel container   | `false`                                             |
+| `ratel.containerSecurityContext.readOnlyRootFilesystem` | Mount the ratel container's root filesystem read-only | `false`                                             |
+| `ratel.containerSecurityContext.capabilities.drop` | Linux capabilities dropped from the ratel container         | `['ALL']`                                           |
 | `ratel.resources.requests`               | Ratel pod resources requests                                          | `nil`                                               |
 | `ratel.livenessProbe`                    | Ratel liveness probes                                                 | See `values.yaml` for defaults                      |
 | `ratel.readinessProbe`                   | Ratel readiness probes                                                | See `values.yaml` for defaults                      |
@@ -250,12 +320,14 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.podAnnotations`                 | Annotations for backup CronJob pods                                   | `{}`                                                |
 | `backups.schedulerName`                  | Configure an explicit scheduler for Backups Kubernetes CronJobs       | `nil`                                               |
 | `backups.admin.user`                     | Login user for backups (required if ACL enabled)                      | `groot`                                             |
-| `backups.admin.password`                 | Login user password for backups (required if ACL enabled)             | `nil`                                               |
+| `backups.admin.password`                 | Login user password for backups (required if ACL enabled, unless `backups.admin.existingSecret` is set) | `nil`                       |
 | `backups.admin.tls_client`               | TLS Client Name (requried if `REQUIREANY` or `REQUIREANDVERIFY` set)  | `nil`                                               |
 | `backups.admin.auth_token`               | Auth Token                                                            | `nil`                                               |
+| `backups.admin.existingSecret`           | Name of a pre-created Secret holding the backup admin password, so it never passes through Helm values. Ignored unless `alpha.acl.enabled` is true | `""`                  |
+| `backups.admin.passwordSecretKey`        | Key within `existingSecret` holding the password. Ignored unless `existingSecret` is set; the chart's own backups Secret always uses `backup_admin_password` | `backup_admin_password` |
 | `backups.image.registry`                 | Container registry name                                               | `docker.io`                                         |
 | `backups.image.repository`               | Container image name                                                  | `dgraph/dgraph`                                     |
-| `backups.image.tag`                      | Container image tag                                                   | `v21.03.0`                                          |
+| `backups.image.tag`                      | Container image tag                                                   | `v25.3.1`                                           |
 | `backups.image.pullPolicy`               | Container pull policy                                                 | `IfNotPresent`                                      |
 | `backups.nfs.enabled`                    | Enable mounted NFS volume for backups                                 | `false`                                             |
 | `backups.nfs.server`                     | NFS Server DNS or IP address                                          | `nil`                                               |
@@ -280,6 +352,21 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `backups.keys.minio.secret`              | Alpha env variable `MINIO_SECRET_KEY` fetched from secrets            | ""                                                  |
 | `backups.keys.s3.access`                 | Alpha env variable `AWS_ACCESS_KEY_ID` fetched from secrets           | ""                                                  |
 | `backups.keys.s3.secret`                 | Alpha env variable `AWS_SECRET_ACCESS_KEY` fetched from secrets       | ""                                                  |
+| `validation.enabled`                      | Master switch for the post-install validation subsystem (ConfigMap, test Pod, Job, CronJob, RBAC) | `false`                        |
+| `validation.image`                        | Validator image override (empty reuses the deployed dgraph image)    | `{}`                                                |
+| `validation.adminUser`                    | Account the validator logs in as for auth-dependent checks            | `groot`                                             |
+| `validation.adminPasswordSecretKey`       | Secret key holding `adminUser`'s password (empty derives it)         | `""`                                                |
+| `validation.job.enabled`                  | Run validation as a post-install/upgrade hook Job that gates the release | `false`                                          |
+| `validation.job.backoffLimit`             | Job `backoffLimit` (also used by the manual CronJob's jobTemplate)   | `1`                                                 |
+| `validation.cronjob.enabled`              | Create a suspended, manually-triggered CronJob for on-demand validation | `false`                                           |
+| `validation.rbac.enabled`                 | Create the validator ServiceAccount/Role/RoleBinding (required by `checkBackups`) | `false`                                 |
+| `validation.checkBackups`                 | Also assert the backup CronJobs exist with their expected schedules (requires `rbac.enabled`) | `false`                     |
+| `validation.backupRoundtrip`              | Trigger a live backup round-trip to S3 (side-effecting, slow; reserved for future use) | `false`                                 |
+| `validation.retries`                      | Per-check retry attempts before failing                               | `10`                                                |
+| `validation.retrySleep`                   | Seconds between retries                                                | `12`                                                |
+| `validation.podAnnotations`               | Extra annotations for validator pods                                  | `{}`                                                |
+| `validation.nodeSelector`                 | nodeSelector for validator pods (empty falls back to `alpha.nodeSelector`) | `{}`                                           |
+| `validation.tolerations`                  | tolerations for validator pods (empty falls back to `alpha.tolerations`) | `[]`                                             |
 | `global.ingress.enabled`                 | Enable global ingress resource (overrides Alpha/Ratel ingress)        | `false`                                             |
 | `global.ingress.annotations`             | global ingress annotations                                            | `{}`                                                |
 | `global.ingress.tls`                     | global ingress tls settings                                           | `{}`                                                |
@@ -291,6 +378,22 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `global.ingress_grpc.tls`                | global ingress-grpc tls settings                                      | `{}`                                                |
 | `global.ingress_grpc.alpha_grpc_hostname`| global ingress-grpc virtual host name for Alpha GRPC service          | `nil`                                               |
 | `global.ingress_grpc.ingressClassName`   | global ingress-grpc ingress class to select ingress controller        | `nil`                                               |
+| `serviceMonitor.enabled`                 | Create a Prometheus Operator ServiceMonitor for alpha and zero        | `false`                                             |
+| `serviceMonitor.namespace`               | Namespace to create the ServiceMonitor in (defaults to the release namespace) | `nil`                                               |
+| `serviceMonitor.labels`                  | Extra labels on the ServiceMonitor, to match your Prometheus serviceMonitorSelector | `{}`                                                |
+| `serviceMonitor.interval`                | Scrape interval                                                       | `30s`                                               |
+| `serviceMonitor.scrapeTimeout`           | Scrape timeout                                                        | `10s`                                               |
+| `serviceMonitor.path`                    | HTTP path exposing Prometheus metrics                                 | `/debug/prometheus_metrics`                         |
+| `prometheusRule.enabled`                 | Create a Prometheus Operator PrometheusRule                           | `false`                                             |
+| `prometheusRule.labels`                  | Extra labels on the PrometheusRule, to match your Prometheus ruleSelector | `{}`                                                |
+| `prometheusRule.defaultRules`            | Ship the built-in alerts (needs serviceMonitor.enabled, or the `up` series will not exist) | `true`                                              |
+| `prometheusRule.extraRules`              | Additional alerting rules appended verbatim                           | `[]`                                                |
+| `networkPolicy.enabled`                  | Create a NetworkPolicy restricting ingress to the dgraph pods         | `false`                                             |
+| `networkPolicy.clientPodLabels`          | Labels of client pods permitted to reach the client ports (this namespace only) | `{}`                                                |
+| `networkPolicy.clientNamespaceLabels`    | Labels of namespaces whose pods may reach the client ports (required for an Ingress controller in another namespace) | `{}`                                                |
+| `networkPolicy.scraperPodLabels`         | Labels of metrics-scraping pods permitted to reach alpha 8080 and zero 6080 (this namespace only) | `{}`                                                |
+| `networkPolicy.scraperNamespaceLabels`   | Labels of namespaces whose pods may reach alpha 8080 and zero 6080 (a Prometheus in another namespace needs this) | `{}`                                                |
+| `networkPolicy.extraIngress`             | Additional ingress rules appended verbatim                            | `[]`                                                |
 
 ## Ingress resource
 
@@ -613,7 +716,7 @@ When ACLs are used, the backup cronjob will log in to the Alpha node using a spe
   * see [Alpha Access Control Lists](#alpha-access-control-lists) above.
 * Backups
   * `backups.admin.user` (default: `groot`) - a user that is a member of `guardians` group will need to be specified.
-  * `backups.admin.password` (required) - the corresponding password for that user will need to be specified.
+  * `backups.admin.password` (required) - the corresponding password for that user will need to be specified, unless `backups.admin.existingSecret` names a pre-created Secret that holds it (see [example_values/backup-admin-existing-secret.yaml](https://github.com/dgraph-io/charts/tree/master/charts/dgraph/example_values/backup-admin-existing-secret.yaml)).
 
 ### Using an auth token
 

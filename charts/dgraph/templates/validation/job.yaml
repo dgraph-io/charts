@@ -1,0 +1,32 @@
+{{- if and .Values.validation.enabled .Values.validation.job.enabled }}
+{{- /*
+  Post-install/upgrade hook Job that gates the release: a failed validation fails
+  the hook, which fails `helm install/upgrade` (and, under Terraform, the
+  helm_release with wait). Weight 10 runs it after the ACL bootstrap (weight 5)
+  so accounts exist first. A failed Job is kept (only hook-succeeded deletes) for
+  inspection; before-hook-creation clears the prior one on the next run.
+*/}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-validate
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: {{ .Values.validation.job.backoffLimit }}
+  template:
+    metadata:
+      labels:
+        {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 8 }}
+      {{- with .Values.validation.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- include "dgraph.validation.podSpec" . | nindent 6 }}
+{{- end }}

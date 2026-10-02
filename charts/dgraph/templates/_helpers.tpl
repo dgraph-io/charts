@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "dgraph.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 24 -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 24 | trimAll "-" -}}
 {{- end -}}
 {{/*
 Create a default fully qualified app name.
@@ -11,10 +11,10 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "dgraph.fullname" -}}
 {{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 24 | trimSuffix "-" -}}
+{{- .Values.fullnameOverride | trunc 24 | trimAll "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 24 | trimAll "-" -}}
 {{- end -}}
 {{- end -}}
 {{/*
@@ -147,25 +147,23 @@ Also, we can't use a single if because lazy evaluation is not an option
 
 {{/*
 Return the proper Docker Image Registry Secret Names
+Priority: imagePullSecrets (Kubernetes object list) > global.imagePullSecrets (string list) > image.pullSecrets (string list)
 */}}
 {{- define "dgraph.imagePullSecrets" -}}
-{{/*
-Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
-but Helm 2.9 and 2.10 doesn't support it, so we need to implement this if-else logic.
-Also, we can't use a single if because lazy evaluation is not an option
-*/}}
-{{- if .Values.global }}
-{{- if .Values.global.imagePullSecrets }}
+{{- if .Values.imagePullSecrets }}
+imagePullSecrets:
+{{- range .Values.imagePullSecrets }}
+{{- if kindIs "map" . }}
+  - name: {{ .name }}
+{{- else }}
+  - name: {{ . }}
+{{- end }}
+{{- end }}
+{{- else if and .Values.global .Values.global.imagePullSecrets }}
 imagePullSecrets:
 {{- range .Values.global.imagePullSecrets }}
   - name: {{ . }}
 {{- end }}
-{{- else if .Values.image.pullSecrets }}
-imagePullSecrets:
-{{- range .Values.image.pullSecrets }}
-  - name: {{ . }}
-{{- end }}
-{{- end -}}
 {{- else if .Values.image.pullSecrets }}
 imagePullSecrets:
 {{- range .Values.image.pullSecrets }}
@@ -263,4 +261,201 @@ Allow overriding namespace
 */}}
 {{- define "dgraph.namespace" -}}
 {{- default .Release.Namespace .Values.namespaceOverride -}}
+{{- end -}}
+
+{{/*
+Alpha pod volumes, rendered separately so the caller can omit the `volumes:`
+key entirely when nothing populates it.
+*/}}
+{{- define "dgraph.alpha.volumes" -}}
+{{- $hasS3Keys := include "dgraph.backups.keys.s3.enabled" . -}}
+{{- $hasMinioKeys := include "dgraph.backups.keys.minio.enabled" . -}}
+{{- $backupsEnabled := or .Values.backups.full.enabled .Values.backups.incremental.enabled -}}
+{{- if not .Values.alpha.persistence.enabled }}
+{{- /* With persistence on, volumeClaimTemplates supplies "datadir" as a per-pod PVC. */}}
+- name: datadir
+  emptyDir: {}
+{{- end }}
+{{- if and $backupsEnabled (or $hasS3Keys $hasMinioKeys) }}
+- name: backup-secret-volume
+  secret:
+    secretName: {{ template "dgraph.backups.fullname" . }}-secret
+{{- end }}
+{{- if and $backupsEnabled .Values.backups.nfs.enabled }}
+- name: backups-nfs-volume
+  persistentVolumeClaim:
+    claimName: {{ template "dgraph.backups.fullname" . }}-claim
+{{- end }}
+{{- if and $backupsEnabled .Values.backups.volume.enabled }}
+- name: backups-vol-volume
+  persistentVolumeClaim:
+    claimName: {{ .Values.backups.volume.claim }}
+{{- end }}
+{{- if .Values.alpha.configFile }}
+- name: config-volume
+  configMap:
+    name: {{ template "dgraph.alpha.fullname" . }}-config
+{{- end }}
+{{- if .Values.alpha.tls.enabled }}
+- name: tls-volume
+  secret:
+    secretName: {{ template "dgraph.alpha.fullname" . }}-tls-secret
+{{- end }}
+{{- if .Values.alpha.encryption.enabled }}
+- name: enc-volume
+  secret:
+    {{- /* existingSecret supplies the key without it passing through Helm values.
+    items pins the on-disk filename, so a Secret missing that key fails at mount. */}}
+    secretName: {{ .Values.alpha.encryption.existingSecret | default (printf "%s-encryption-secret" (include "dgraph.alpha.fullname" .)) }}
+    {{- if .Values.alpha.encryption.existingSecret }}
+    items:
+      - key: {{ .Values.alpha.encryption.keyFile | default "enc_key_file" }}
+        path: {{ .Values.alpha.encryption.keyFile | default "enc_key_file" }}
+    {{- end }}
+{{- end }}
+{{- if .Values.alpha.acl.enabled }}
+- name: acl-volume
+  secret:
+    {{- /* existingSecret supplies the HMAC key without it passing through Helm values.
+    items pins the on-disk filename, so a Secret missing that key fails at mount. */}}
+    secretName: {{ .Values.alpha.acl.existingSecret | default (printf "%s-acl-secret" (include "dgraph.alpha.fullname" .)) }}
+    {{- if .Values.alpha.acl.existingSecret }}
+    items:
+      - key: {{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }}
+        path: {{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }}
+    {{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Zero pod volumes, rendered separately so the caller can omit the `volumes:`
+key entirely when nothing populates it.
+*/}}
+{{- define "dgraph.zero.volumes" -}}
+{{- if not .Values.zero.persistence.enabled }}
+{{- /* With persistence on, volumeClaimTemplates supplies "datadir" as a per-pod PVC. */}}
+- name: datadir
+  emptyDir: {}
+{{- end }}
+{{- if .Values.zero.configFile }}
+- name: config-volume
+  configMap:
+    name: {{ template "dgraph.zero.fullname" . }}-config
+{{- end }}
+{{- if .Values.zero.tls.enabled }}
+- name: tls-volume
+  secret:
+    secretName: {{ template "dgraph.zero.fullname" . }}-tls-secret
+{{- end }}
+{{- end -}}
+
+{{/*
+Generate the ingress path. Emits "/*" for ingress classes that need a wildcard
+prefix (gce, alb, nsx) and "/" otherwise, checking global.ingress.ingressClassName
+first and falling back to the kubernetes.io/ingress.class annotation.
+*/}}
+{{- define "dgraph.ingressPath" -}}
+  {{- $path := "/" -}}
+  {{- if .Values.global.ingress.ingressClassName -}}
+    {{- if eq .Values.global.ingress.ingressClassName "gce" "alb" "nsx" }}
+      {{- $path = "/*" -}}
+    {{- else }}
+      {{- $path = "/" -}}
+    {{- end }}
+  {{- else if index $.Values.global.ingress "annotations" -}}
+    {{- if eq (index $.Values.global.ingress.annotations "kubernetes.io/ingress.class" | default "") "gce" "alb" "nsx" }}
+      {{- $path = "/*" -}}
+    {{- else }}
+      {{- $path = "/" -}}
+    {{- end }}
+  {{- end -}}
+  {{- printf "%s" $path -}}
+{{- end -}}
+
+{{/*
+Cluster-domain suffix for in-cluster FQDNs: ".<global.domain>" with the leading
+dot, or empty when global.domain is unset. Trims stray leading/trailing dots so
+a host never renders "...svc." or "...svc..cluster.local".
+Use as: ...svc{{ include "dgraph.domainSuffix" . }}
+*/}}
+{{- define "dgraph.domainSuffix" -}}
+{{- with (.Values.global.domain | default "" | trimAll ".") }}.{{ . }}{{ end -}}
+{{- end -}}
+
+{{/*
+Map a named log level to its glog -v integer; pass any other value (e.g. a raw
+integer) through unchanged. Names are lowercase.
+*/}}
+{{- define "dgraph.verbosity" -}}
+  {{- $m := dict "normal" "0" "verbose" "1" "debug" "2" "trace" "3" -}}
+  {{- $k := toString . -}}
+  {{- index $m $k | default $k -}}
+{{- end -}}
+
+{{/*
+Render the glog flag fragment for a role. "." is a role value map (.Values.alpha
+or .Values.zero). Emits nothing when every value is a glog default (logLevel
+normal/0, empty vmodule, alsologtostderr false, empty logDir, logtostderr true),
+so the default command line is unchanged. When any value differs it emits, with a
+leading space, "-v=<n> --logtostderr=<bool>" plus --vmodule / --alsologtostderr /
+--log_dir when those are set.
+*/}}
+{{- define "dgraph.logFlags" -}}
+{{- $v := include "dgraph.verbosity" .logLevel -}}
+{{- /* logtostderr defaults to true (values.yaml), but Helm's `default` treats a
+       boolean false as empty, so an explicit `false` would be flipped back to the
+       default. Use a nil check so nil -> true while honoring an explicit false. */}}
+{{- $logtostderr := .logtostderr -}}
+{{- if kindIs "invalid" $logtostderr -}}{{- $logtostderr = true -}}{{- end -}}
+{{- if or (ne $v "0") .vmodule .alsologtostderr .logDir (not $logtostderr) -}}
+{{- printf " -v=%s --logtostderr=%v" $v $logtostderr -}}
+{{- if .vmodule }}{{ printf " --vmodule=%s" .vmodule }}{{ end -}}
+{{- if .alsologtostderr }} --alsologtostderr{{ end -}}
+{{- if .logDir }}{{ printf " --log_dir=%s" .logDir }}{{ end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Does this tls block force every client to present a certificate?
+
+client-auth-type mirrors Go's crypto/tls.ClientAuthType, which separates
+"require" from "verify". REQUIREANY and REQUIREANDVERIFY are the only values
+that force a cert (REQUIREANY never verifies it, REQUIREANDVERIFY does).
+VERIFYIFGIVEN leaves the cert optional but verifies one that is presented;
+REQUEST asks for a cert and neither requires nor verifies it; "" and OFF
+disable client auth outright.
+
+Returns the STRING "true" or "" (empty) -- NOT a boolean. Compare it as a
+string: eq (include "dgraph.tls.certRequired" (dict "tls" .Values.alpha.tls)) "true".
+
+Single source of truth for the alpha/zero probe guards. Keep them reading from
+here: an inline re-derivation drifts.
+*/}}
+{{- define "dgraph.tls.certRequired" -}}
+{{- $t := .tls.clientAuthType | default "" -}}
+{{- if or (eq $t "REQUIREANDVERIFY") (eq $t "REQUIREANY") -}}true{{- end -}}
+{{- end -}}
+
+{{/*
+Compose Dgraph's --tls superflag from a tier's tls map. Pass a dict
+{"tls": .Values.alpha.tls, "path": "/dgraph/tls"}. Filenames follow the output
+of scripts/make_tls_secrets.sh (ca.crt, node.crt, node.key,
+client.<name>.crt/.key). client-cert/key and client-auth-type are emitted only
+when the corresponding values are set.
+*/}}
+{{- define "dgraph.tlsFlag" -}}
+{{- /* internalPort defaults to true (values.yaml), but Helm's `default` treats a
+       boolean false as empty, so an explicit `false` would be flipped back to the
+       default. Use a nil check so nil -> true while honoring an explicit false. */}}
+{{- $ip := .tls.internalPort -}}
+{{- if kindIs "invalid" $ip -}}{{- $ip = true -}}{{- end -}}
+{{- $opts := list (printf "ca-cert=%s/ca.crt" .path) (printf "server-cert=%s/node.crt" .path) (printf "server-key=%s/node.key" .path) (printf "internal-port=%v" $ip) -}}
+{{- if .tls.clientName -}}
+{{- $opts = append $opts (printf "client-cert=%s/client.%s.crt" .path .tls.clientName) -}}
+{{- $opts = append $opts (printf "client-key=%s/client.%s.key" .path .tls.clientName) -}}
+{{- end -}}
+{{- if .tls.clientAuthType -}}
+{{- $opts = append $opts (printf "client-auth-type=%s" .tls.clientAuthType) -}}
+{{- end -}}
+{{- printf "--tls \"%s;\"" (join "; " $opts) -}}
 {{- end -}}
