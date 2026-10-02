@@ -1,0 +1,26 @@
+{{- if .Values.validation.enabled }}
+{{- /*
+  checkBackups reads the backup CronJobs via the Kubernetes API, which needs the
+  validator ServiceAccount/Role. Fail at render time rather than deploy a
+  validator that cannot satisfy the check it was asked to run.
+*/}}
+{{- if and .Values.validation.checkBackups (not .Values.validation.rbac.enabled) }}
+{{- fail "validation.checkBackups requires validation.rbac.enabled: the backup-CronJob check reads the Kubernetes API with the validator ServiceAccount." }}
+{{- end }}
+{{- /*
+  The validator script only. The expected-state document it reads lives in a
+  Secret (templates/validation/secret.yaml), not here, because it names the
+  Secret keys that hold the admin/user passwords and so is kept out of a
+  world-readable ConfigMap.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dgraph.alpha.fullname" . }}-validate
+  namespace: {{ include "dgraph.namespace" . }}
+  labels:
+    {{- include "dgraph.labels" (dict "ctx" . "component" "validate") | nindent 4 }}
+data:
+  validate.sh: |
+{{ .Files.Get "files/validation/validate.sh" | indent 4 }}
+{{- end }}
