@@ -35,9 +35,9 @@ The following table lists the configurable parameters of the ratel chart and the
 |              Parameter                   |                             Description                               |                       Default                       |
 | ---------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `replicaCount`                           | number of Kubernetes replicas                                         | `1`                                                 |
-| `image.repository`                       | Container repository name                                             | `dgraph/dgraph-lambda`                              |
+| `image.repository`                       | Container repository name                                             | `dgraph/ratel`                                      |
 | `image.pullPolicy`                       | Container image pull policy                                           | `IfNotPresent`                                      |
-| `image.tag`                              | Container image tag                                                   | `v21.12.0`                                          |
+| `image.tag`                              | Container image tag                                                   | `v25.2.0`                                           |
 | `imagePullSecrets`                       | Image pull secrets auth tokens used to access a private registry      | `[]`                                                |
 | `nameOverride`                           | Name override of the default chart name                               | `""`                                                |
 | `namespaceOverride`                      | Namespace override                                                    | `nil`                                               |
