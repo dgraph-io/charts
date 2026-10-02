@@ -6,14 +6,13 @@ on:
 permissions:
   contents: write
 
-# One release at a time, so two runs cannot both pass the version check.
-concurrency:
-  group: release-charts
-  cancel-in-progress: false
-
 jobs:
   release:
     if: github.ref == 'refs/heads/main'
+    # One release at a time, so two runs cannot both pass the version check.
+    concurrency:
+      group: release-charts
+      cancel-in-progress: false
     # depending on default permission settings for your org (contents being read-only or read-write for workloads), you will have to add permissions
     # see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
     runs-on: ubuntu-latest
@@ -35,6 +34,8 @@ jobs:
           # Same change detection as chart-releaser: charts changed since the latest tag.
           git fetch --tags --quiet
           latest_tag=$(git describe --tags --abbrev=0 HEAD~ 2>/dev/null || git rev-list --max-parents=0 --first-parent HEAD)
+          # Read once: a pipe into grep -q can fail under pipefail and misreport "not indexed".
+          index=$(git show origin/gh-pages:index.yaml)
           status=0
           for chart in $(git diff --find-renames --name-only "$latest_tag" -- charts | cut -d/ -f1-2 | sort -u); do
             [ -f "$chart/Chart.yaml" ] || continue
@@ -42,7 +43,13 @@ jobs:
             version=$(sed -n 's/^version: *//p' "$chart/Chart.yaml")
             # A release tagged at this commit means a re-run after a partial failure.
             if [ "$(git rev-list -n1 "$name-$version" 2>/dev/null)" = "$(git rev-parse HEAD)" ]; then
-              echo "$name-$version was already released from this commit; skipping."
+              if grep -qF "/releases/download/$name-$version/" <<<"$index"; then
+                echo "$name-$version was already released and indexed from this commit; skipping."
+              else
+                # Not indexed, so the earlier attempt failed partway; let chart-releaser recreate it.
+                echo "$name-$version was released from this commit but not indexed; deleting it to recreate."
+                gh release delete "$name-$version" --cleanup-tag --yes
+              fi
               continue
             fi
             if gh release view "$name-$version" >/dev/null 2>&1; then
