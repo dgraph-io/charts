@@ -22,7 +22,27 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Stop if a changed chart's version is already released
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          # Same change detection as chart-releaser: charts changed since the latest tag.
+          git fetch --tags --quiet
+          latest_tag=$(git describe --tags --abbrev=0 HEAD~ 2>/dev/null || git rev-list --max-parents=0 --first-parent HEAD)
+          status=0
+          for chart in $(git diff --find-renames --name-only "$latest_tag" -- charts | cut -d/ -f1-2 | sort -u); do
+            [ -f "$chart/Chart.yaml" ] || continue
+            name=$(sed -n 's/^name: *//p' "$chart/Chart.yaml")
+            version=$(sed -n 's/^version: *//p' "$chart/Chart.yaml")
+            if gh release view "$name-$version" >/dev/null 2>&1; then
+              echo "::error file=$chart/Chart.yaml::$chart changed since $latest_tag, but $name-$version is already released. Bump its version."
+              status=1
+            fi
+          done
+          exit "$status"
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
