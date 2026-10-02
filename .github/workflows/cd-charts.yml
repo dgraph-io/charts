@@ -6,8 +6,14 @@ on:
 permissions:
   contents: write
 
+# One release at a time, so two runs cannot both pass the version check.
+concurrency:
+  group: release-charts
+  cancel-in-progress: false
+
 jobs:
   release:
+    if: github.ref == 'refs/heads/main'
     # depending on default permission settings for your org (contents being read-only or read-write for workloads), you will have to add permissions
     # see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
     runs-on: ubuntu-latest
@@ -34,6 +40,11 @@ jobs:
             [ -f "$chart/Chart.yaml" ] || continue
             name=$(sed -n 's/^name: *//p' "$chart/Chart.yaml")
             version=$(sed -n 's/^version: *//p' "$chart/Chart.yaml")
+            # A release tagged at this commit means a re-run after a partial failure.
+            if [ "$(git rev-list -n1 "$name-$version" 2>/dev/null)" = "$(git rev-parse HEAD)" ]; then
+              echo "$name-$version was already released from this commit; skipping."
+              continue
+            fi
             if gh release view "$name-$version" >/dev/null 2>&1; then
               echo "::error file=$chart/Chart.yaml::$chart changed since $latest_tag, but $name-$version is already released. Bump its version."
               status=1
@@ -45,6 +56,8 @@ jobs:
         uses: helm/chart-releaser-action@v1.7.0
         with:
           mark_as_latest: false
+          # Only a re-run reaches an existing release; the check above stops anything else.
+          skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
