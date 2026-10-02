@@ -351,9 +351,6 @@ spec:
       volumes:
         {{- . | nindent 6 }}
       {{- end }}
-      {{- with .Values.alpha.extraVolumes }}
-        {{- tpl (toYaml .) $ | nindent 6 }}
-      {{- end }}
 {{- if .Values.alpha.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:
