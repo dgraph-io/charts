@@ -325,6 +325,9 @@ key entirely when nothing populates it.
         path: {{ .Values.alpha.acl.secretFile | default "hmac_secret_file" }}
     {{- end }}
 {{- end }}
+{{- with .Values.alpha.extraVolumes }}
+{{ tpl (toYaml .) $ }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -346,6 +349,9 @@ key entirely when nothing populates it.
 - name: tls-volume
   secret:
     secretName: {{ template "dgraph.zero.fullname" . }}-tls-secret
+{{- end }}
+{{- with .Values.zero.extraVolumes }}
+{{ tpl (toYaml .) $ }}
 {{- end }}
 {{- end -}}
 

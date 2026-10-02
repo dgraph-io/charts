@@ -179,6 +179,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `zero.customStartupProbe`                | Zero custom startup probes (if `zero.startupProbe` not enabled)       | `{}`                                                |
 | `zero.customLivenessProbe`               | Zero custom liveness probes (if `zero.livenessProbe` not enabled)     | `{}`                                                |
 | `zero.customReadinessProbe`              | Zero custom readiness probes  (if `zero.readinessProbe` not enabled)  | `{}`                                                |
+| `zero.extraContainers`                   | Extra containers run alongside zero in each pod (rendered through `tpl`)| `[]`                                              |
+| `zero.extraVolumes`                      | Extra pod volumes, usable by zero via `extraVolumeMounts` and by sidecars| `[]`                                              |
+| `zero.extraVolumeMounts`                 | Extra volume mounts on the zero container itself                      | `[]`                                              |
 | `zero.tls.internalPort`                  | Enable TLS on Zero's internal gRPC port (synthesized into `--tls`)    | `true`                                              |
 | `zero.tls.clientName`                    | Client cert basename for Zero `--tls` (empty omits the client cert)   | `""`                                                |
 | `zero.tls.clientAuthType`                | Zero `--tls` client-auth-type, e.g. `REQUIREANDVERIFY` (empty omits)  | `""`                                                |
@@ -269,6 +272,9 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `alpha.customLivenessProbe`              | Alpha custom liveness probes (if `alpha.livenessProbe` not enabled)   | `{}`                                                |
 | `alpha.customReadinessProbe`             | Alpha custom readiness probes (if `alpha.readinessProbe` not enabled) | `{}`                                                |
 | `alpha.extraInitContainers`             | Enables extra init containers to be added to the alpha statefulset | `[]`                                                |
+| `alpha.extraContainers`                  | Extra containers run alongside alpha in each pod (rendered through `tpl`)| `[]`                                              |
+| `alpha.extraVolumes`                     | Extra pod volumes, usable by alpha via `extraVolumeMounts` and by sidecars| `[]`                                              |
+| `alpha.extraVolumeMounts`                | Extra volume mounts on the alpha container itself                     | `[]`                                              |
 | `alpha.initContainers.init.enabled`      | Alpha initContainer enabled                                           | `true`                                              |
 | `alpha.initContainers.init.image.registry`   | Alpha initContainer registry name                                 | `docker.io`                                         |
 | `alpha.initContainers.init.image.repository` | Alpha initContainer image name                                    | `dgraph/dgraph`                                     |
