@@ -1,6 +1,36 @@
-Helm charts should auto-build and publish using the GitHub Actions workflow defined in `.github/workflows/cd-charts.yml`.
+# Publishing the charts
 
-## Manually Publish Helm Charts
+Charts are published by manually running the Release Charts workflow (`.github/workflows/cd-charts.yml`). Merging to `main` publishes nothing.
+
+## Before you release
+
+Bump `version` in the `Chart.yaml` of every chart that changed since the latest tag. The workflow releases those charts, and stops before publishing anything if any of them already has a GitHub release named `<chart>-<version>`.
+
+## Release
+
+Run Release Charts on `main` from the repository's Actions tab, or:
+
+```bash
+gh workflow run cd-charts.yml --repo dgraph-io/charts --ref main
+```
+
+The workflow:
+
+1. stops, naming each chart, if any changed chart's version already has a release;
+2. packages each changed chart, creates a GitHub release for it, and adds it to the Helm index at <https://charts.dgraph.io>, served from the `gh-pages` branch;
+3. marks the release matching the version in `charts/dgraph/Chart.yaml` as GitHub's Latest release, so a dgraph-lambda or ratel release never takes that label.
+
+To confirm a new version is listed, check each released chart. The index can take a few minutes to update after the run.
+
+```bash
+helm repo add dgraph https://charts.dgraph.io   # once
+helm repo update
+helm search repo dgraph/dgraph --versions | head -3
+```
+
+## Publishing without the workflow
+
+Use these steps only when the workflow cannot run. Bump versions first, as above, and afterwards mark the dgraph chart's release as Latest with `gh release edit dgraph-<version> --latest --repo dgraph-io/charts`.
 
 ### Before we begin
 
@@ -17,6 +47,7 @@ to verify that the chart is well-formed:
 ```bash
 helm lint charts/dgraph
 helm lint charts/dgraph-lambda
+helm lint charts/ratel
 ```
 
 ### Create the Helm chart package
@@ -30,6 +61,8 @@ rm -rf .cr-release-packages/*
 helm package charts/dgraph --destination .cr-release-packages/
 ## for publishing dgraph-lambda chart
 helm package charts/dgraph-lambda --destination .cr-release-packages/
+## for publishing ratel chart
+helm package charts/ratel --destination .cr-release-packages/
 ```
 
 ### Upload the package to GitHub
@@ -115,7 +148,7 @@ git commit -m "chart-version index.yaml update"
 git push origin gh-pages
 ```
 
-## Cleanup
+### Cleanup
 
 In the end, be sure to delete the `.cr-release-packages` folder.
 
