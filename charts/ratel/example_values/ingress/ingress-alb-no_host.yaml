@@ -1,8 +1,9 @@
 # aws-load-balancer-controller
 # * https://github.com/kubernetes-sigs/aws-load-balancer-controller
-# NOTE: 
-#  * shared ALB with group name of 'dgraph' will be used.  
+# NOTE:
+#  * shared ALB with group name of 'dgraph' will be used.
 #    This avoids provisioning multiple ALBs
+ingress:
   enabled: true
   className: alb
   annotations:
@@ -13,4 +14,3 @@
     - paths:
         - path: /*
           pathType: ImplementationSpecific
-      host: ratel.example.com

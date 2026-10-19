@@ -45,9 +45,13 @@ $ helm repo add dgraph https://charts.dgraph.io
 
 See the [README of Dgraph helm chart](./charts/dgraph/README.md).
 
-### Publishing the Chart
+## Contributing
 
-See the [instructions here to publish the chart](./PUBLISH.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) to set up a development environment and run the checks CI runs.
+
+## Publishing the charts
+
+See [PUBLISH.md](./PUBLISH.md) to release the charts.
 
 # License
 

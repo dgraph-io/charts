@@ -1,0 +1,7 @@
+# chart-testing settings, shared by the pre-commit hook and the PR lint workflow.
+chart-dirs:
+  - charts
+target-branch: main
+# Charts are versioned per release, not per PR.
+check-version-increment: false
+validate-maintainers: false
