@@ -107,7 +107,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `imagePullSecrets`                       | Array of imagePullSecrets applied to every Pod (plain strings or `{name: ...}` objects); takes precedence over `global.imagePullSecrets` and `image.pullSecrets` | `[]` |
 | `image.registry`                         | Container registry name                                               | `docker.io`                                         |
 | `image.repository`                       | Container image name                                                  | `dgraph/dgraph`                                     |
-| `image.tag`                              | Container image tag                                                   | `v25.4.1`                                           |
+| `image.tag`                              | Container image tag                                                   | `v25.5.1`                                           |
 | `image.pullPolicy`                       | Container pull policy                                                 | `IfNotPresent`                                      |
 | `nameOverride`                           | Deployment name override (will append the release name)               | `nil`                                               |
 | `namespaceOverride`                      | Deployment namespace override if specified.                           | `nil`                                               |
