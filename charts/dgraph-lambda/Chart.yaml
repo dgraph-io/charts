@@ -12,7 +12,7 @@ keywords:
 - JavaScript
 type: application
 version: 0.0.3
-appVersion: v1.2.4
+appVersion: v1.4.1
 sources:
   - https://github.com/dgraph-io/dgraph-lambda
 maintainers:

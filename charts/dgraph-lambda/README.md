@@ -149,7 +149,7 @@ The following table lists the configurable parameters of the `dgraph` chart and 
 | `replicaCount`                           | number of Kubernetes replicas                                         | `1`                                                 |
 | `image.repository`                       | Container repository name                                             | `dgraph/dgraph-lambda`                              |
 | `image.pullPolicy`                       | Container image pull policy                                           | `IfNotPresent`                                      |
-| `image.tag`                              | Container image tag                                                   | `v1.2.4`                                          |
+| `image.tag`                              | Container image tag                                                   | `v1.4.1`                                          |
 | `imagePullSecrets`                       | Image pull secrets auth tokens used to access a private registry      | `[]`                                                |
 | `nameOverride`                           | Name override of the default chart name                               | `""`                                                |
 | `fullnameOverride`                       | Full Name override of the release name + chart name                   | `""`                                                |
